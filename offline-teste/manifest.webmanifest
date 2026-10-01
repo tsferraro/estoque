@@ -1,0 +1,12 @@
+{
+  "name": "Gestão de Estoque · offline (teste)",
+  "short_name": "Estoque off",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F7F8FA",
+  "theme_color": "#FF6E00",
+  "icons": [
+    { "src": "../icones/u-mandu-180.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

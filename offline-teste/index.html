@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Estoque · offline (teste)</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="../icones/u-mandu-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="../icones/u-mandu-180.png">
+<meta name="theme-color" content="#FF6E00">
+<style>
+  :root{--orange:#FF6E00;--orange-dark:#B24D00;--orange-bg:#FFF5EE;--navy:#0E2A47;--bg:#F7F8FA;--text:#1A1A1A;--text2:#5A6472;--line:#E3E6EB;--ok:#1E7A46;--ok-bg:#EAF6EF;--erro:#B3261E;--erro-bg:#FCEDEC}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--text);font-family:Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:16px 16px 40px;font-size:16px}
+  .cartao{max-width:460px;margin:0 auto;background:#fff;border-radius:18px;padding:22px 18px;box-shadow:0 2px 24px rgba(14,42,71,.10)}
+  header{display:flex;align-items:center;gap:12px;margin:0 0 16px}
+  header .u{width:40px;height:40px;border-radius:10px;background:var(--orange);color:#fff;font-weight:700;font-size:24px;display:flex;align-items:center;justify-content:center}
+  h1{margin:0;font-size:19px;line-height:1.2} header small{display:block;color:var(--text2);font-size:13px}
+  h2{margin:0 0 12px;font-size:18px}
+  .lbl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin:18px 0 8px}
+  label.chave{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--line);border-radius:12px;padding:14px;cursor:pointer}
+  label.chave input{width:22px;height:22px;margin:1px 0 0;accent-color:var(--orange);flex:none}
+  label.chave b{display:block} label.chave span{font-size:13px;color:var(--text2)}
+  .orgs{display:flex;flex-direction:column;gap:10px}
+  a.org{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text);border:1.5px solid var(--line);border-radius:12px;padding:14px}
+  a.org .n{font-weight:700;display:block} a.org .d{font-size:13px;color:var(--text2);display:block}
+  a.org .seta{margin-left:auto;color:var(--orange);font-weight:700;font-size:20px}
+  .faixa{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
+  .pill{font-size:12px;font-weight:700;border-radius:999px;padding:5px 10px;background:var(--bg);color:var(--text2)}
+  .pill.on{background:var(--ok-bg);color:var(--ok)} .pill.off{background:var(--erro-bg);color:var(--erro)} .pill.laranja{background:var(--orange-bg);color:var(--orange-dark)}
+  button{font:inherit;cursor:pointer}
+  .grande{display:block;width:100%;border:0;border-radius:12px;padding:16px;font-weight:700;font-size:17px;background:var(--orange);color:#fff}
+  .grande:disabled{background:#C9CED6}
+  .grande.sec{background:#fff;color:var(--navy);border:1.5px solid var(--line)}
+  .acoes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .acao{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:16px 6px;font-weight:700;color:var(--navy)}
+  .acao.prim{border-color:var(--orange);background:var(--orange-bg);color:var(--orange-dark)}
+  .acao:disabled{color:#A7AEB8;background:var(--bg)} .acao small{display:block;font-weight:400;font-size:11px;margin-top:2px}
+  ul.fila{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-direction:column;gap:8px}
+  ul.fila li{border:1.5px solid var(--line);border-radius:12px;padding:12px;font-size:14px;line-height:1.4}
+  ul.fila li b{display:block;font-size:15px}
+  ul.fila li.guardado{border-color:var(--orange)} ul.fila li.enviado{border-color:var(--ok)} ul.fila li.recusado{border-color:var(--erro)}
+  .st{font-size:13px;font-weight:700;margin-top:4px}
+  li.guardado .st{color:var(--orange-dark)} li.enviado .st{color:var(--ok)} li.recusado .st{color:var(--erro)}
+  .link{background:none;border:0;color:var(--navy);text-decoration:underline;padding:4px 0;font-size:13px}
+  .grade{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .opc{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:14px 10px;font-weight:700;text-align:left}
+  .opc.on{border-color:var(--orange);background:var(--orange-bg)}
+  .txt{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:10px;padding:12px;color:var(--text)}
+  .txt:focus{outline:none;border-color:var(--orange)}
+  .sug{display:flex;flex-direction:column;gap:6px;margin:8px 0 0}
+  .sug button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:11px 12px;text-align:left}
+  .sug button.nova{border-style:dashed;color:var(--orange-dark)}
+  .linha{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-left:4px solid var(--orange);border-radius:10px;padding:8px 10px;margin:8px 0 0}
+  .linha .nome{flex:1;font-weight:700;font-size:15px} .linha .nome small{display:block;font-weight:400;color:var(--text2);font-size:12px}
+  .linha input{width:96px;font:inherit;font-weight:700;text-align:right;border:1.5px solid var(--line);border-radius:8px;padding:10px 8px}
+  .linha .x{border:0;background:none;color:var(--text2);font-size:20px;padding:4px 6px}
+  .total{margin:12px 0;font-size:15px} .total b{font-size:18px}
+  .topo{display:flex;align-items:center;gap:8px;margin:0 0 12px} .topo .link{font-size:15px}
+  .aviso{font-size:13px;color:var(--text2);line-height:1.5;margin:10px 0 0}
+  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);max-width:calc(100% - 32px);background:var(--navy);color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;box-shadow:0 4px 18px rgba(0,0,0,.2);display:none;z-index:9}
+  select.txt{background:#fff}
+</style>
+</head>
+<body>
+<main class="cartao" id="app"></main>
+<div class="toast" id="toast" role="status"></div>
+<script>
+/* ── PROTÓTIPO · lançadora com versão offline (30/09/2026) ─────────────────
+ * Handoff `camtaua/working/HANDOFF-2026-09-30_offline-e-lancadora.md` · H10-59.
+ * Fonte: camtaua/copias/lancadora/offline-teste/ no repositório sistema.
+ *
+ * A invariante do padrão da casa (webapp-mandu, referência 08 «fila
+ * offline-first»): NADA TOCA A REDE ANTES DE ESTAR GUARDADO NO APARELHO, e a
+ * tela confirma a GRAVAÇÃO, nunca o envio. «Guardado no aparelho» ≠ «na
+ * planilha» — só o retorno do servidor muda para «na planilha · REC-…».
+ *
+ * O ENVIO É UMA NAVEGAÇÃO, NÃO UM fetch. O app roda como quem acessa
+ * (USER_ACCESSING): só uma navegação de topo leva o login Google. A fila vai
+ * no fragmento (#f=…) para `/exec?modo=sincronizar`; a página de lá grava pelo
+ * google.script.run e devolve os resultados no fragmento desta (#r=…).
+ * Reenviar é seguro: o servidor deduplica pelo token do gesto (R-411). */
+
+var ORGS = [
+  { id:'camtaua', nome:'Camtauá', desc:'Santo Antônio do Tauá, PA',
+    url:'https://script.google.com/a/macros/mandusocial.org/s/AKfycbyw9syhEIyuaMaYT-ej95koauzv4hXlLJEyAXY6OMwL4Ba6socaChpIapRx9ekWcVve/exec',
+    offline:'' },   // produção: offline ainda não liberado
+  { id:'demo', nome:'Camtauá · Demonstração', desc:'Base limpa para teste e apresentação',
+    url:'https://script.google.com/a/macros/mandusocial.org/s/AKfycbyVou5SnmL8RYNWqWWDIb0sY-WsiTW7zvCTnCd9mDnXg7vNj_onBWOKphDJlGR0TC2J/exec',
+    offline:'https://script.google.com/a/macros/mandusocial.org/s/AKfycbwzgQpOQ4W_KHeUwUyzPamxQ-Tl7Ey7rDUgL83FY3lOfJPNXMfrltdoO1cHsrMt5JQ6/exec' }
+];
+
+/* ── armazenamento: uma chave versionada, lida e gravada inteira (sem await
+   no meio, então não há retrato velho para gravar por cima — referência 08 §6.2) */
+var CHAVE = 'estoque_offline_v1';
+function ler(){ try { return JSON.parse(localStorage.getItem(CHAVE)) || {}; } catch(e){ return {}; } }
+function gravar(db){
+  try { localStorage.setItem(CHAVE, JSON.stringify(db)); return localStorage.getItem(CHAVE) === JSON.stringify(db); }
+  catch(e){ return false; }          // cota estourada ou modo privado: a tela PRECISA dizer
+}
+function mudar(fn){ var db = ler(); db.fila = db.fila || []; db.cadastros = db.cadastros || {}; db.operador = db.operador || {}; fn(db); return gravar(db); }
+function novoToken(){ return (crypto.randomUUID && crypto.randomUUID()) || (Date.now() + '-' + Math.random().toString(36).slice(2)); }
+
+function b64url(t){ return btoa(unescape(encodeURIComponent(t))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+function deB64url(s){ s = String(s).replace(/-/g,'+').replace(/_/g,'/'); while (s.length % 4) s += '='; return decodeURIComponent(escape(atob(s))); }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function kgTxt(n){ return Number(n||0).toLocaleString('pt-BR',{maximumFractionDigits:2}); }
+/* ADR-031: separador seguido de EXATAMENTE 3 dígitos é milhar; outra contagem é decimal. */
+function numDe(v){
+  var s = String(v == null ? '' : v).trim().replace(/\s/g,''); if (!s) return 0;
+  var sep = s.match(/[.,]/g) || [];
+  if (sep.length > 1) { var ult = Math.max(s.lastIndexOf(','), s.lastIndexOf('.')); s = s.slice(0,ult).replace(/[.,]/g,'') + '.' + s.slice(ult+1); }
+  else if (sep.length === 1) { var p = s.split(/[.,]/); s = p[1].length === 3 ? p[0] + p[1] : p[0] + '.' + p[1]; }
+  var n = Number(s); return isFinite(n) ? n : 0;
+}
+function quandoTxt(iso){ return new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+function toast(msg){ var t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(toast._t); toast._t = setTimeout(function(){ t.style.display = 'none'; }, 4200); }
+
+var TELA = { nome:'inicio', form:null };
+var ultima = null; try { ultima = localStorage.getItem('estoque_org'); } catch(e){}
+
+function orgsOffline(){ return ORGS.filter(function(o){ return o.offline; }); }
+function orgAtual(){
+  var db = ler(), lista = orgsOffline();
+  return lista.find(function(o){ return o.id === db.orgOffline; }) || lista.find(function(o){ return o.id === ultima; }) || lista[0];
+}
+
+/* ── RETORNO do /exec?modo=sincronizar (#r=…) ─────────────────────────────── */
+function lerRetorno(){
+  var h = location.hash; if (h.indexOf('#r=') !== 0) return;
+  history.replaceState(null, '', location.pathname + location.search);
+  var r; try { r = JSON.parse(deB64url(h.slice(3))); } catch(e){ toast('O retorno do envio veio ilegível — nada foi marcado; envie de novo.'); return; }
+  var ok = 0, rec = 0;
+  var gravou = mudar(function(db){
+    (r.resultados || []).forEach(function(res){
+      var it = db.fila.find(function(i){ return i.token === res.token; }); if (!it) return;
+      if (res.ok) { it.estado = 'enviado'; it.codigos = res.codigos || []; it.repetido = !!res.repetido; it.enviadoEm = r.quando; it.erro = ''; ok++; }
+      else { it.estado = 'recusado'; it.erro = res.erro || 'recusado'; rec++; }
+    });
+    if (r.cadastros) db.cadastros[r.org] = r.cadastros;
+    db.orgOffline = r.org;
+    /* poda: só o JÁ ENVIADO sai, e só depois de 30 dias. Pendente nunca sai sozinho. */
+    db.fila = db.fila.filter(function(i){ return i.estado !== 'enviado' || Date.now() - Date.parse(i.enviadoEm || i.quando) < 30 * 864e5; });
+  });
+  toast(!gravou ? 'O aparelho recusou guardar o retorno — confira o espaço livre.' :
+        (r.resultados||[]).length ? (ok + ' na planilha' + (rec ? ' · ' + rec + ' recusado(s)' : '') + ' · cadastros atualizados') :
+        'Modo offline preparado · cadastros guardados no aparelho');
+}
+
+/* ── ENVIO: navegação para o /exec da organização ─────────────────────────── */
+function enviar(soCadastros){
+  var org = orgAtual(), db = ler();
+  var pend = soCadastros ? [] : (db.fila || []).filter(function(i){ return i.org === org.id && i.estado === 'guardado'; });
+  if (!navigator.onLine) { toast('Sem rede agora. Está tudo guardado no aparelho — envie quando o sinal voltar.'); return; }
+  var pacote = { volta: location.origin + location.pathname, org: org.id,
+                 fila: pend.map(function(i){ return { token:i.token, tipo:i.tipo, quando:i.quando, payload:i.payload }; }) };
+  location.href = org.offline + '?modo=sincronizar#f=' + b64url(JSON.stringify(pacote));
+}
+
+/* ── TELAS ────────────────────────────────────────────────────────────────── */
+function render(){
+  var db = ler(), app = document.getElementById('app');
+  if (TELA.nome === 'receber') { app.innerHTML = telaReceber(db); ligarReceber(); return; }
+  var h = '<header><div class="u">Ū</div><div><h1>Gestão de Estoque</h1><small>Mandū Inovação Social</small></div></header>';
+  h += '<label class="chave"><input type="checkbox" id="chk-off"' + (db.modoOffline ? ' checked' : '') + '>' +
+       '<div><b>Versão offline</b><span>Só os formulários. O que você lança fica guardado neste aparelho e vai para a planilha quando houver rede.</span></div></label>';
+  if (!db.modoOffline) {
+    h += '<p class="lbl">Escolha a organização</p><nav class="orgs">' + ORGS.map(function(o){
+      return '<a class="org" href="' + esc(o.url) + '" data-org="' + esc(o.id) + '"><span><span class="n">' + esc(o.nome) + '</span><span class="d">' + esc(o.desc) + '</span></span><span class="seta">›</span></a>';
+    }).join('') + '</nav>';
+    app.innerHTML = h; ligarInicio(); return;
+  }
+  var org = orgAtual(), cad = db.cadastros && db.cadastros[org.id];
+  var fila = (db.fila || []).filter(function(i){ return i.org === org.id; });
+  var pend = fila.filter(function(i){ return i.estado === 'guardado'; });
+  var lista = orgsOffline();
+  h += '<p class="lbl">Organização</p>' + (lista.length > 1 ?
+       '<select class="txt" id="sel-org">' + lista.map(function(o){ return '<option value="' + esc(o.id) + '"' + (o.id === org.id ? ' selected' : '') + '>' + esc(o.nome) + '</option>'; }).join('') + '</select>' :
+       '<div><b>' + esc(org.nome) + '</b></div>');
+  h += '<div class="faixa" style="margin-top:12px">' +
+       '<span class="pill ' + (navigator.onLine ? 'on' : 'off') + '" id="pill-rede">' + (navigator.onLine ? 'com rede' : 'sem rede') + '</span>' +
+       '<span class="pill">' + (cad ? 'cadastros de ' + quandoTxt(cad.geradoEm) : 'cadastros: ainda não') + '</span>' +
+       (pend.length ? '<span class="pill laranja">' + pend.length + ' guardado(s) no aparelho</span>' : '') + '</div>';
+  if (!cad) {
+    h += '<p class="aviso" style="margin:0 0 12px">Para lançar sem rede, o aparelho precisa guardar uma vez as comunidades, famílias e produtos desta organização. Faça isso agora, com sinal.</p>' +
+         '<button class="grande" id="btn-preparar">Preparar o modo offline</button>';
+    app.innerHTML = h; ligarInicio(); return;
+  }
+  h += '<div class="acoes"><button class="acao prim" id="btn-receber">Receber</button>' +
+       '<button class="acao" disabled>Abrir<small>próxima etapa</small></button>' +
+       '<button class="acao" disabled>Fechar<small>próxima etapa</small></button></div>';
+  h += '<p class="lbl">Lançamentos deste aparelho</p>';
+  h += fila.length ? '<ul class="fila">' + fila.slice().reverse().map(function(i){
+      var p = i.payload, tot = p.itens.reduce(function(a,x){ return a + x.kg; }, 0);
+      var st = i.estado === 'enviado' ? ((i.repetido ? 'já estava na planilha · ' : 'na planilha · ') + i.codigos.join(', ')) :
+               i.estado === 'recusado' ? 'recusado pela planilha: ' + i.erro : 'guardado no aparelho · ainda não está na planilha';
+      return '<li class="' + i.estado + '"><b>Receber · ' + esc(p.produto) + ' · ' + kgTxt(tot) + ' kg</b>' +
+             esc(p.itens.length + ' família(s) · ' + (p.comunidadeNome || '') + ' · ' + quandoTxt(i.quando)) +
+             '<div class="st">' + esc(st) + '</div>' +
+             (i.estado === 'recusado' ? '<button class="link" data-descartar="' + esc(i.token) + '">descartar este lançamento</button>' : '') + '</li>';
+    }).join('') + '</ul>' : '<p class="aviso" style="margin:0 0 12px">Nada lançado neste aparelho ainda.</p>';
+  h += '<button class="grande' + (pend.length ? '' : ' sec') + '" id="btn-enviar">' +
+       (pend.length ? 'Enviar ' + pend.length + ' para a planilha' : 'Atualizar cadastros') + '</button>';
+  h += '<p class="aviso">Quem assina o envio é a conta Google aberta no celular na hora de enviar. Enviar de novo é seguro: o que já entrou não entra duas vezes.</p>';
+  app.innerHTML = h; ligarInicio();
+}
+
+function ligarInicio(){
+  var chk = document.getElementById('chk-off');
+  chk.onchange = function(){
+    mudar(function(db){ db.modoOffline = chk.checked; });
+    if (chk.checked && navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function(){});
+    render();
+  };
+  document.querySelectorAll('a.org').forEach(function(a){ a.onclick = function(){ try { localStorage.setItem('estoque_org', a.dataset.org); } catch(e){} }; });
+  var sel = document.getElementById('sel-org'); if (sel) sel.onchange = function(){ mudar(function(db){ db.orgOffline = sel.value; }); render(); };
+  var bp = document.getElementById('btn-preparar'); if (bp) bp.onclick = function(){ enviar(true); };
+  var br = document.getElementById('btn-receber'); if (br) br.onclick = function(){ TELA = { nome:'receber', form:{ itens:[], busca:'' } }; render(); };
+  var be = document.getElementById('btn-enviar'); if (be) be.onclick = function(){ enviar(false); };
+  document.querySelectorAll('[data-descartar]').forEach(function(b){ b.onclick = function(){
+    if (!confirm('Descartar este lançamento recusado? Ele sai do aparelho e não vai para a planilha.')) return;
+    mudar(function(db){ db.fila = db.fila.filter(function(i){ return i.token !== b.dataset.descartar; }); }); render(); }; });
+}
+
+/* ── RECEBER simplificado: comunidade → produto → famílias e peso ─────────── */
+function telaReceber(db){
+  var org = orgAtual(), cad = db.cadastros[org.id], f = TELA.form;
+  var h = '<div class="topo"><button class="link" id="btn-voltar">‹ voltar</button></div><h2>Receber</h2>';
+  var com = cad.comunidades.find(function(c){ return c[0] === f.comunidade; });
+  if (!f.comunidade) {
+    return h + '<p class="lbl">De qual comunidade?</p><div class="grade">' + cad.comunidades.map(function(c){
+      return '<button class="opc" data-com="' + esc(c[0]) + '">' + esc(c[1]) + '</button>'; }).join('') + '</div>';
+  }
+  h += '<div class="faixa"><button class="pill laranja" id="troca-com">' + esc(com ? com[1] : f.comunidade) + ' ✕</button>' +
+       (f.produto ? '<button class="pill laranja" id="troca-prod">' + esc(f.produto) + ' ✕</button>' : '') + '</div>';
+  if (!f.produto) {
+    return h + '<p class="lbl">Qual produto está entrando?</p><div class="grade">' + cad.materias.map(function(m){
+      return '<button class="opc" data-prod="' + esc(m[0]) + '">' + esc(m[0]) + '</button>'; }).join('') + '</div>';
+  }
+  var daCom = cad.familias.filter(function(fa){ return fa[2] === f.comunidade || (com && fa[2] === com[1]); });
+  var ja = f.itens.map(function(i){ return i.familia; });
+  var q = (f.busca || '').trim().toLowerCase();
+  var sug = q ? daCom.filter(function(fa){ return ja.indexOf(fa[0]) < 0 && fa[1].toLowerCase().indexOf(q) >= 0; }).slice(0, 6) : [];
+  h += '<p class="lbl">Famílias e peso</p>' +
+       '<input class="txt" id="busca" placeholder="buscar família de ' + esc(com ? com[1] : '') + '" value="' + esc(f.busca || '') + '" autocomplete="off">' +
+       '<div class="sug">' + sug.map(function(fa){ return '<button data-fam="' + esc(fa[0]) + '">' + esc(fa[1]) + '</button>'; }).join('') +
+       (q && !daCom.some(function(fa){ return fa[1].toLowerCase() === q; }) ? '<button class="nova" id="fam-nova">+ família nova: «' + esc(f.busca.trim()) + '»</button>' : '') + '</div>';
+  h += f.itens.map(function(it, k){
+    return '<div class="linha"><div class="nome">' + esc(it.nome) + (it.nova ? '<small>família nova · o gestor completa o cadastro</small>' : '') + '</div>' +
+           '<input inputmode="decimal" data-kg="' + k + '" value="' + esc(it.kg) + '" placeholder="kg"><button class="x" data-tira="' + k + '" aria-label="tirar">×</button></div>';
+  }).join('');
+  var total = f.itens.reduce(function(a,i){ return a + numDe(i.kg); }, 0);
+  var pronto = f.itens.length > 0 && f.itens.every(function(i){ return numDe(i.kg) > 0; });
+  h += '<div class="total">Total que entra: <b id="total">' + kgTxt(total) + ' kg</b></div>';
+  h += '<p class="lbl">Observação (opcional)</p><input class="txt" id="obs" value="' + esc(f.obs || '') + '" placeholder="algo fora do normal nesta entrega">';
+  var ops = cad.operadores || [], eu = cad.eu && cad.eu.operador;
+  var op = db.operador[org.id] || eu || '';
+  h += '<p class="lbl">Quem está lançando</p><select class="txt" id="sel-op"><option value="">— escolha —</option>' + ops.map(function(o){
+    return '<option value="' + esc(o[0]) + '"' + (o[0] === op ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('') + '</select>';
+  h += '<div style="margin-top:16px"><button class="grande" id="btn-guardar"' + (pronto && op ? '' : ' disabled') + '>Guardar no aparelho</button></div>' +
+       '<p class="aviso">Fica guardado neste celular, mesmo sem rede e mesmo se fechar a página. Vai para a planilha quando você tocar em «Enviar».</p>';
+  return h;
+}
+
+function ligarReceber(){
+  var f = TELA.form, org = orgAtual();
+  document.getElementById('btn-voltar').onclick = function(){ TELA = { nome:'inicio' }; render(); };
+  document.querySelectorAll('[data-com]').forEach(function(b){ b.onclick = function(){ f.comunidade = b.dataset.com; f.itens = []; render(); }; });
+  document.querySelectorAll('[data-prod]').forEach(function(b){ b.onclick = function(){ f.produto = b.dataset.prod; render(); }; });
+  var tc = document.getElementById('troca-com'); if (tc) tc.onclick = function(){ f.comunidade = ''; f.produto = ''; f.itens = []; render(); };
+  var tp = document.getElementById('troca-prod'); if (tp) tp.onclick = function(){ f.produto = ''; render(); };
+  var busca = document.getElementById('busca');
+  if (busca) {
+    busca.oninput = function(){ f.busca = busca.value; var pos = busca.selectionStart; render(); var b2 = document.getElementById('busca'); b2.focus(); b2.setSelectionRange(pos, pos); };
+    if (f._focoBusca) { busca.focus(); f._focoBusca = false; }
+  }
+  var cad = ler().cadastros[org.id];
+  document.querySelectorAll('[data-fam]').forEach(function(b){ b.onclick = function(){
+    var fa = cad.familias.find(function(x){ return x[0] === b.dataset.fam; });
+    f.itens.push({ familia: fa[0], nome: fa[1], kg:'' }); f.busca = ''; render();
+    var ins = document.querySelectorAll('[data-kg]'); if (ins.length) ins[ins.length-1].focus(); }; });
+  var fn = document.getElementById('fam-nova'); if (fn) fn.onclick = function(){
+    var nome = f.busca.trim(); f.itens.push({ familia: 'NOVA:' + nome, nome: nome, kg:'', nova:true }); f.busca = ''; render(); };
+  document.querySelectorAll('[data-kg]').forEach(function(inp){ inp.oninput = function(){
+    f.itens[+inp.dataset.kg].kg = inp.value;
+    document.getElementById('total').textContent = kgTxt(f.itens.reduce(function(a,i){ return a + numDe(i.kg); }, 0)) + ' kg';
+    atualizarGuardar(); }; });
+  document.querySelectorAll('[data-tira]').forEach(function(b){ b.onclick = function(){ f.itens.splice(+b.dataset.tira, 1); render(); }; });
+  var obs = document.getElementById('obs'); if (obs) obs.oninput = function(){ f.obs = obs.value; };
+  var sop = document.getElementById('sel-op'); if (sop) sop.onchange = function(){ mudar(function(db){ db.operador[org.id] = sop.value; }); atualizarGuardar(); };
+  var bg = document.getElementById('btn-guardar'); if (bg) bg.onclick = guardar;
+}
+function atualizarGuardar(){
+  var f = TELA.form, bg = document.getElementById('btn-guardar'), sop = document.getElementById('sel-op'); if (!bg) return;
+  bg.disabled = !(f.itens.length && f.itens.every(function(i){ return numDe(i.kg) > 0; }) && sop && sop.value);
+}
+
+function guardar(){
+  var f = TELA.form, org = orgAtual(), db = ler(), cad = db.cadastros[org.id];
+  var op = document.getElementById('sel-op').value;
+  var com = cad.comunidades.find(function(c){ return c[0] === f.comunidade; });
+  var item = {
+    token: novoToken(), tipo: 'receber', org: org.id, quando: new Date().toISOString(), estado: 'guardado',
+    payload: { operador: op, comunidade: f.comunidade, comunidadeNome: com ? com[1] : '', produto: f.produto,
+      itens: f.itens.map(function(i){ return { familia: i.familia, nome: i.nome, kg: numDe(i.kg), obs: (f.obs || '').trim() }; }) }
+  };
+  /* clique duplo: o mesmo conteúdo do último guardado não vira segundo lançamento (referência 08 §4.1) */
+  var ultimo = (db.fila || []).filter(function(i){ return i.org === org.id && i.estado === 'guardado'; }).pop();
+  if (ultimo && JSON.stringify(ultimo.payload) === JSON.stringify(item.payload) && Date.now() - Date.parse(ultimo.quando) < 60000) {
+    toast('Esse lançamento já está guardado.'); TELA = { nome:'inicio' }; render(); return;
+  }
+  var ok = mudar(function(d){ d.fila.push(item); d.operador[org.id] = op; });
+  var confere = ok && ler().fila.some(function(i){ return i.token === item.token; });   // lê de volta: guardar que não lança não é guardar que deu certo
+  if (!confere) { toast('O aparelho NÃO guardou (sem espaço ou modo privado). Anote no papel.'); return; }
+  TELA = { nome:'inicio' }; render();
+  toast('Guardado no aparelho ✓ — ainda não está na planilha.');
+}
+
+window.addEventListener('online', function(){ if (TELA.nome === 'inicio') render(); });
+window.addEventListener('offline', function(){ if (TELA.nome === 'inicio') render(); });
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+lerRetorno();
+render();
+</script>
+</body>
+</html>
