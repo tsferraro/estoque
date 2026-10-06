@@ -71,6 +71,11 @@
   .nota-linha{font-size:12px;color:var(--text2);margin:4px 0 0}
   .acabou{display:flex;align-items:center;gap:6px;font-size:13px;margin:6px 0 0} .acabou input{width:20px;height:20px;accent-color:var(--orange)}
   .aviso-saida{font-size:13px;background:var(--orange-bg);border:1.5px solid var(--orange);border-radius:10px;padding:10px;margin:10px 0 0;line-height:1.4}
+  .lista-fam{max-height:min(44vh,320px);overflow-y:auto;-webkit-overflow-scrolling:touch;border:1.5px solid var(--line);border-radius:12px;margin:8px 0 0}
+  label.fam{display:flex;align-items:center;gap:12px;min-height:48px;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer;line-height:1.3;overflow-wrap:anywhere}
+  label.fam:last-child{border-bottom:0} label.fam:active{background:var(--orange-bg)}
+  label.fam input{width:22px;height:22px;accent-color:var(--orange);flex:none;margin:0}
+  .vazio-fam{padding:14px 12px;font-size:14px;color:var(--text2)}
   .tudo{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:8px 10px;font-size:13px;font-weight:700;color:var(--navy)}
 </style>
 </head>
@@ -155,31 +160,39 @@ function lerRetorno(){
       var it = db.fila.find(function(i){ return i.token === res.token; }); if (!it) return;
       it.mensagem = res.mensagem || '';
       if (res.pendente) { it.estado = 'guardado'; it.aviso = res.mensagem || ''; espera++; }                 /* fica na fila: NÃO é recusa */
-      else if (res.ok) { it.estado = 'enviado'; it.codigos = res.codigos || []; it.codigo = res.codigo || (res.codigos||[])[0] || '';
+      else if (res.ok) { it.estado = 'enviado'; it.codigos = res.codigos || []; it.codigo = res.codigo || (res.codigos||[])[0] || ''; it.filhos = res.filhos || [];
                          it.repetido = !!res.repetido; it.alerta = !!res.jaFechada; it.enviadoEm = r.quando; it.erro = ''; it.aviso = ''; ok++; }
       else { it.estado = 'recusado'; it.erro = res.erro || 'recusado'; it.aviso = ''; rec++; }
     });
     trocarRefs(db);
-    if (r.cadastros) db.cadastros[r.org] = r.cadastros;
+    db.cadVelho = db.cadVelho || {};
+    if (r.cadastros) { db.cadastros[r.org] = r.cadastros; db.cadVelho[r.org] = false; }
+    else if (ok) db.cadVelho[r.org] = true;                   /* OFF3 · entrou item e os cadastros não vieram: o retrato do aparelho ficou velho */
     db.orgOffline = r.org;
     /* poda: só o JÁ ENVIADO sai, e só depois de 30 dias. Pendente nunca sai sozinho. */
     db.fila = db.fila.filter(function(i){ return i.estado !== 'enviado' || Date.now() - Date.parse(i.enviadoEm || i.quando) < 30 * 864e5; });
   });
   toast(!gravou ? 'O aparelho recusou guardar o retorno — confira o espaço livre.' :
-        (r.resultados||[]).length ? (ok + ' na planilha' + (rec ? ' · ' + rec + ' recusado(s)' : '') + (espera ? ' · ' + espera + ' esperando a origem' : '') + ' · cadastros atualizados') :
+        (r.resultados||[]).length ? (ok + ' na planilha' + (rec ? ' · ' + rec + ' recusado(s)' : '') + (espera ? ' · ' + espera + ' esperando a origem' : '') + (r.cadastros ? ' · cadastros atualizados' : ' · cadastros NÃO atualizados — toque em «Atualizar cadastros»')) :
         'Modo offline preparado · cadastros guardados no aparelho');
 }
 
 /* ── OFF2 · REF: o item que aponta para outro (`ref` = token do item de origem) ──────────────
    Depois que a origem ENTRA na planilha ela ganha código real, e o dependente que ainda não foi
    enviado passa a apontar para o código (a lançadora guarda o código que voltou). */
+function temFilho(l){ return l.filho !== undefined && l.filho !== null && l.filho !== ''; }
+function codDoFilho(filhos, filho){ var f = (filhos || []).find(function(x){ return String(x.filho) === String(filho); }); return f ? f.codigo : ''; }
 function trocarRefs(db){
-  var cod = {};
-  db.fila.forEach(function(i){ if (i.estado === 'enviado') { var c = i.codigo || (i.codigos || [])[0]; if (c) cod[i.token] = c; } });
+  var cod = {}, fil = {};
+  db.fila.forEach(function(i){ if (i.estado === 'enviado') { var c = i.codigo || (i.codigos || [])[0]; if (c) { cod[i.token] = c; fil[i.token] = i.filhos || []; } } });
   db.fila.forEach(function(i){
     if (i.estado === 'enviado') return;
     var p = i.payload || {};
-    if (i.tipo === 'abrir') (p.lotes || []).forEach(function(l){ if (l.ref && cod[l.ref]) { l.codigo = cod[l.ref]; delete l.ref; } });
+    /* OFF3 · `{ref, filho}` aponta para o lote que um FECHAR gerou: troca pelo código do filho que voltou */
+    if (i.tipo === 'abrir') (p.lotes || []).forEach(function(l){
+      if (!l.ref || !cod[l.ref]) return;
+      var c = temFilho(l) ? codDoFilho(fil[l.ref], l.filho) : cod[l.ref];
+      if (c) { l.codigo = c; delete l.ref; delete l.filho; } });
     if (i.tipo === 'fechar' && p.ref && cod[p.ref]) { p.codigo = cod[p.ref]; delete p.ref; }
   });
 }
@@ -234,7 +247,8 @@ function render(){
   h += '<div class="faixa" style="margin-top:12px">' +
        '<span class="pill ' + (navigator.onLine ? 'on' : 'off') + '" id="pill-rede">' + (navigator.onLine ? 'com rede' : 'sem rede') + '</span>' +
        '<span class="pill">' + (cad ? 'cadastros de ' + quandoTxt(cad.geradoEm, fusoDe(cad)) : 'cadastros: ainda não') + '</span>' +
-       (pend.length ? '<span class="pill laranja">' + pend.length + ' guardado(s) no aparelho</span>' : '') + '</div>';
+       (pend.length ? '<span class="pill laranja">' + pend.length + ' guardado(s) no aparelho</span>' : '') +
+       ((db.cadVelho || {})[org.id] ? '<span class="pill off" id="pill-velho">cadastros desatualizados · toque em «Atualizar cadastros»</span>' : '') + '</div>';
   if (!cad) {
     h += '<p class="aviso" style="margin:0 0 12px">Para lançar sem rede, o aparelho precisa guardar uma vez as comunidades, famílias e produtos desta organização. Faça isso agora, com sinal.</p>' +
          '<button class="grande" id="btn-preparar">Preparar o modo offline</button>';
@@ -322,6 +336,23 @@ function cadeiaDoProduto(cad, produto){
   var l = (cad.lotes || []).find(function(x){ return x[1] === produto; });
   return l ? l[2] : produto;
 }
+/* OFF3 · a chave de um lote na projeção: o código real, ou `ref:<token>` (Receber) / `ref:<token>#<filho>` (o que um Fechar gerou) */
+function chaveLote(l){ return l.codigo || ('ref:' + l.ref + (temFilho(l) ? '#' + l.filho : '')); }
+/* OFF3 · os lotes que um Fechar ainda não enviado GERA — o principal (saída única, ou o principal da multi-saída) e CADA subproduto
+   com peso > 0. `filho` é o que o servidor entende: 'principal' (o código da própria operação) ou o ÍNDICE do subproduto na lista
+   `subprodutos` do gesto (a posição, não o slot do cadastro: o app só manda os que têm peso). Cadeia herdada da operação; etapa de
+   origem = a da operação; subproduto só entra no Armazenamento (`sub`). */
+function filhosDoFechar(cad, it, p, op){
+  var cadeia = p.cadeia || (op && op.cadeia) || cadeiaDoProduto(cad, p.produtoEntrada || (op && op.produto)), out = [];
+  var novo = function(filho, produto, kg, sub){
+    return { chave:'ref:' + it.token + '#' + filho, codigo:'', ref:it.token, filho:filho, produto:produto, cadeia:cadeia, saldo:arred2(kg),
+             etapa:p.etapa, sub:sub, dias:null, local:true }; };
+  if (p.principal) {
+    if ((Number(p.principal.kg) || 0) > 0) out.push(novo('principal', p.principal.produto, Number(p.principal.kg), false));
+    (p.subprodutos || []).forEach(function(s, k){ if ((Number(s.kg) || 0) > 0) out.push(novo(k, s.produto, Number(s.kg), true)); });
+  } else if ((Number(p.pesoSaida) || 0) > 0) out.push(novo('principal', p.produtoSaida || p.produtoEntrada, Number(p.pesoSaida), false));
+  return out;
+}
 function projecao(db, org){
   var cad = db.cadastros[org.id], P = { lotes:{}, lista:[], abertas:{}, alista:[] };
   (cad.lotes || []).forEach(function(l){
@@ -339,7 +370,7 @@ function projecao(db, org){
     } else if (it.tipo === 'abrir') {
       var total = 0;
       (p.lotes || []).forEach(function(l){
-        var l0 = P.lotes[l.codigo || ('ref:' + l.ref)]; total += Number(l.kg) || 0;
+        var l0 = P.lotes[chaveLote(l)]; total += Number(l.kg) || 0;
         if (l0) l0.saldo = l.esgotou ? 0 : arred2(l0.saldo - l.kg);
       });
       var et = etapaDeCad(cad, p.etapa);
@@ -349,7 +380,10 @@ function projecao(db, org){
         P.alista.push(ka);
       }
     } else if (it.tipo === 'fechar') {
-      delete P.abertas[p.codigo || ('ref:' + p.ref)];
+      var opk = p.codigo || ('ref:' + p.ref), opx = P.abertas[opk];
+      delete P.abertas[opk];
+      /* OFF3 · o que o Fechar GERA vira lote projetado: a etapa seguinte o oferece sem rede */
+      filhosDoFechar(cad, it, p, opx).forEach(function(l){ P.lotes[l.chave] = l; P.lista.push(l.chave); });
     }
   });
   P.alista = P.alista.filter(function(k){ return !!P.abertas[k]; });
@@ -491,7 +525,7 @@ function guardarAbrir(){
   var lotes = Object.keys(f.lotes).filter(function(k){ return numDe(f.lotes[k].kg) > 0; }).map(function(k){
     var l = proj.lotes[k], o = { kg: numDe(f.lotes[k].kg), esgotou: !f.lotes[k].naoAcabou };
     produto = l.produto; cadeia = l.cadeia;
-    if (l.codigo) o.codigo = l.codigo; else o.ref = l.ref;
+    if (l.codigo) o.codigo = l.codigo; else { o.ref = l.ref; if (temFilho(l)) o.filho = l.filho; }
     return o; });
   var item = { token: novoToken(), tipo: 'abrir', org: org.id, quando: new Date().toISOString(), estado: 'guardado',
     payload: { etapa: f.etapa, etapaNome: et.nome, produto: produto, cadeia: cadeia, operador: op, obs: (f.obs || '').trim(), lotes: lotes } };
@@ -573,7 +607,7 @@ function guardarFechar(){
   var f = TELA.form, org = orgAtual(), db = ler(), cad = db.cadastros[org.id], op = projecao(db, org).abertas[f.op]; if (!op) return;
   var et = etapaDeCad(cad, op.etapa), cfg = cfgDe(et, op.cadeia, op.produto), multi = !!(cfg && (cfg[3] || cfg[4] || cfg[5]));
   var sop = document.getElementById('sel-op').value; if (!sop || !(saiuDoFechar(multi) > 0)) return;
-  var p = { etapa: op.etapa, etapaNome: et ? et.nome : op.etapa, produtoEntrada: op.produto, operador: sop, obs: (f.obs || '').trim() };
+  var p = { etapa: op.etapa, etapaNome: et ? et.nome : op.etapa, produtoEntrada: op.produto, cadeia: op.cadeia, operador: sop, obs: (f.obs || '').trim() };
   if (op.codigo) p.codigo = op.codigo; else p.ref = op.ref;
   if (multi) {                                                                         /* app: salvarFechar — principal + até 3 subprodutos com peso */
     p.principal = { produto: (cfg && cfg[2]) || op.produto, kg: numDe(f.principal) || 0 };
@@ -593,6 +627,12 @@ function guardarFechar(){
 }
 
 /* ── RECEBER simplificado: comunidade → produto → famílias e peso ─────────── */
+function semAcento(t){ return String(t == null ? '' : t).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
+/* as famílias da comunidade escolhida — pelo ID ou pelo NOME (o cadastro antigo guarda o nome: D-167) — em ordem alfabética */
+function familiasDaComunidade(cad, idCom, com){
+  return (cad.familias || []).filter(function(fa){ return fa[2] === idCom || (com && fa[2] === com[1]); })
+    .sort(function(a, b){ return String(a[1]).localeCompare(String(b[1]), 'pt-BR'); });
+}
 function telaReceber(db){
   var org = orgAtual(), cad = db.cadastros[org.id], f = TELA.form;
   var h = '<div class="topo"><button class="link" id="btn-voltar">‹ voltar</button></div><h2>Receber</h2>';
@@ -607,18 +647,24 @@ function telaReceber(db){
     return h + '<p class="lbl">Qual produto está entrando?</p><div class="grade">' + cad.materias.map(function(m){
       return '<button class="opc" data-prod="' + esc(m[0]) + '">' + esc(m[0]) + '</button>'; }).join('') + '</div>';
   }
-  var daCom = cad.familias.filter(function(fa){ return fa[2] === f.comunidade || (com && fa[2] === com[1]); });
+  /* OFF3 · a LISTA das famílias da comunidade (com caixa para marcar); a busca é só FILTRO, sem acento e sem maiúscula */
+  var daCom = familiasDaComunidade(cad, f.comunidade, com);
   var ja = f.itens.map(function(i){ return i.familia; });
-  var q = (f.busca || '').trim().toLowerCase();
-  var sug = q ? daCom.filter(function(fa){ return ja.indexOf(fa[0]) < 0 && fa[1].toLowerCase().indexOf(q) >= 0; }).slice(0, 6) : [];
-  h += '<p class="lbl">Famílias e peso</p>' +
-       '<input class="txt" id="busca" placeholder="buscar família de ' + esc(com ? com[1] : '') + '" value="' + esc(f.busca || '') + '" autocomplete="off">' +
-       '<div class="sug">' + sug.map(function(fa){ return '<button data-fam="' + esc(fa[0]) + '">' + esc(fa[1]) + '</button>'; }).join('') +
-       (q && !daCom.some(function(fa){ return fa[1].toLowerCase() === q; }) ? '<button class="nova" id="fam-nova">+ família nova: «' + esc(f.busca.trim()) + '»</button>' : '') + '</div>';
+  var q = (f.busca || '').trim(), qn = semAcento(q);
+  var restantes = daCom.filter(function(fa){ return ja.indexOf(fa[0]) < 0; });
+  var lista = restantes.filter(function(fa){ return !qn || semAcento(fa[1]).indexOf(qn) >= 0; });
+  h += '<p class="lbl">Famílias e peso' + (f.itens.length ? ' · ' + f.itens.length + ' marcada(s)' : '') + '</p>';
   h += f.itens.map(function(it, k){
     return '<div class="linha"><div class="nome">' + esc(it.nome) + (it.nova ? '<small>família nova · o gestor completa o cadastro</small>' : '') + '</div>' +
            '<input inputmode="decimal" data-kg="' + k + '" value="' + esc(it.kg) + '" placeholder="kg"><button class="x" data-tira="' + k + '" aria-label="tirar">×</button></div>';
   }).join('');
+  h += '<p class="lbl">Marcar famílias de ' + esc(com ? com[1] : '') + ' · ' + lista.length + (q ? ' de ' + restantes.length : '') + '</p>' +
+       '<input class="txt" id="busca" type="search" placeholder="filtrar pelo nome (sem acento)" value="' + esc(f.busca || '') + '" autocomplete="off">' +
+       '<div class="lista-fam" id="lista-fam" role="group" aria-label="Famílias da comunidade">' +
+       (lista.length ? lista.map(function(fa){ return '<label class="fam"><input type="checkbox" data-fam="' + esc(fa[0]) + '"><span>' + esc(fa[1]) + '</span></label>'; }).join('')
+         : '<div class="vazio-fam">' + (q ? 'Nenhuma família com «' + esc(q) + '» nesta comunidade.' : (daCom.length ? 'Todas as famílias da comunidade já estão marcadas.' : 'Nenhuma família cadastrada nesta comunidade.')) + '</div>') + '</div>';
+  h += '<div class="sug">' + (q && !daCom.some(function(fa){ return semAcento(fa[1]) === qn; }) && !f.itens.some(function(i){ return semAcento(i.nome) === qn; })
+       ? '<button class="nova" id="fam-nova">+ família nova: «' + esc(q) + '»</button>' : '') + '</div>';
   var total = f.itens.reduce(function(a,i){ return a + numDe(i.kg); }, 0);
   var pronto = f.itens.length > 0 && f.itens.every(function(i){ return numDe(i.kg) > 0; });
   h += '<div class="total">Total que entra: <b id="total">' + kgTxt(total) + ' kg</b></div>';
@@ -645,10 +691,12 @@ function ligarReceber(){
     if (f._focoBusca) { busca.focus(); f._focoBusca = false; }
   }
   var cad = ler().cadastros[org.id];
-  document.querySelectorAll('[data-fam]').forEach(function(b){ b.onclick = function(){
+  document.querySelectorAll('[data-fam]').forEach(function(b){ b.onchange = function(){
+    if (!b.checked) return;
     var fa = cad.familias.find(function(x){ return x[0] === b.dataset.fam; });
-    f.itens.push({ familia: fa[0], nome: fa[1], kg:'' }); f.busca = ''; render();
-    var ins = document.querySelectorAll('[data-kg]'); if (ins.length) ins[ins.length-1].focus(); }; });
+    var lf = document.getElementById('lista-fam'), rolou = lf ? lf.scrollTop : 0;      /* marcar não leva a lista de volta ao topo */
+    f.itens.push({ familia: fa[0], nome: fa[1], kg:'' }); render();
+    var lf2 = document.getElementById('lista-fam'); if (lf2) lf2.scrollTop = rolou; }; });
   var fn = document.getElementById('fam-nova'); if (fn) fn.onclick = function(){
     var nome = f.busca.trim(); f.itens.push({ familia: 'NOVA:' + nome, nome: nome, kg:'', nova:true }); f.busca = ''; render(); };
   document.querySelectorAll('[data-kg]').forEach(function(inp){ inp.oninput = function(){

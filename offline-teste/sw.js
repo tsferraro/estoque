@@ -4,7 +4,7 @@
  * mora no localStorage da página, e o envio é uma navegação que o usuário
  * dispara com rede).
  * Troca de versão = mudar CACHE; o activate apaga as antigas. */
-const CACHE = 'estoque-offline-v2';
+const CACHE = 'estoque-offline-v3';
 const CASCA = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', e => {
