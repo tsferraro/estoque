@@ -61,6 +61,17 @@
   .aviso{font-size:13px;color:var(--text2);line-height:1.5;margin:10px 0 0}
   .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);max-width:calc(100% - 32px);background:var(--navy);color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;box-shadow:0 4px 18px rgba(0,0,0,.2);display:none;z-index:9}
   select.txt{background:#fff}
+  ul.fila li.alerta{border-color:var(--orange);background:var(--orange-bg)} li.alerta .st{color:var(--orange-dark)}
+  ul.fila li.espera{border-color:var(--text2)} li.espera .st{color:var(--text2)}
+  .card{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-left:4px solid var(--orange);border-radius:12px;padding:12px;margin:8px 0 0;background:#fff;width:100%;text-align:left}
+  .card .m{flex:1} .card .m b{display:block;font-size:15px} .card .m small{display:block;color:var(--text2);font-size:12px;margin-top:2px}
+  .card .kg{font-weight:700;font-size:16px;white-space:nowrap} .card .mais{border:1.5px solid var(--orange);color:var(--orange-dark);border-radius:8px;padding:6px 12px;font-weight:700;font-size:18px;background:#fff}
+  .local{color:var(--orange-dark)!important;font-weight:700}
+  .erro-linha{font-size:12px;color:var(--erro);margin:4px 0 0}
+  .nota-linha{font-size:12px;color:var(--text2);margin:4px 0 0}
+  .acabou{display:flex;align-items:center;gap:6px;font-size:13px;margin:6px 0 0} .acabou input{width:20px;height:20px;accent-color:var(--orange)}
+  .aviso-saida{font-size:13px;background:var(--orange-bg);border:1.5px solid var(--orange);border-radius:10px;padding:10px;margin:10px 0 0;line-height:1.4}
+  .tudo{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:8px 10px;font-size:13px;font-weight:700;color:var(--navy)}
 </style>
 </head>
 <body>
@@ -114,7 +125,14 @@ function numDe(v){
   else if (sep.length === 1) { var p = s.split(/[.,]/); s = p[1].length === 3 ? p[0] + p[1] : p[0] + '.' + p[1]; }
   var n = Number(s); return isFinite(n) ? n : 0;
 }
-function quandoTxt(iso){ return new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+/* OFF2 · a hora que a tela mostra é a da ORGANIZAÇÃO (`cadastros.fuso`), não a do celular:
+   o iPhone na França mostrava 14:24 para um gesto que na planilha é 09:24. */
+var FUSO_PADRAO = 'America/Sao_Paulo';
+function quandoTxt(iso, fuso){
+  var o = {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'};
+  try { o.timeZone = fuso || FUSO_PADRAO; return new Date(iso).toLocaleString('pt-BR', o); }
+  catch(e){ delete o.timeZone; return new Date(iso).toLocaleString('pt-BR', o); }
+}
 function toast(msg){ var t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(toast._t); toast._t = setTimeout(function(){ t.style.display = 'none'; }, 4200); }
 
 var TELA = { nome:'inicio', form:null };
@@ -131,21 +149,54 @@ function lerRetorno(){
   var h = location.hash; if (h.indexOf('#r=') !== 0) return;
   history.replaceState(null, '', location.pathname + location.search);
   var r; try { r = JSON.parse(deB64url(h.slice(3))); } catch(e){ toast('O retorno do envio veio ilegível — nada foi marcado; envie de novo.'); return; }
-  var ok = 0, rec = 0;
+  var ok = 0, rec = 0, espera = 0;
   var gravou = mudar(function(db){
     (r.resultados || []).forEach(function(res){
       var it = db.fila.find(function(i){ return i.token === res.token; }); if (!it) return;
-      if (res.ok) { it.estado = 'enviado'; it.codigos = res.codigos || []; it.repetido = !!res.repetido; it.enviadoEm = r.quando; it.erro = ''; ok++; }
-      else { it.estado = 'recusado'; it.erro = res.erro || 'recusado'; rec++; }
+      it.mensagem = res.mensagem || '';
+      if (res.pendente) { it.estado = 'guardado'; it.aviso = res.mensagem || ''; espera++; }                 /* fica na fila: NÃO é recusa */
+      else if (res.ok) { it.estado = 'enviado'; it.codigos = res.codigos || []; it.codigo = res.codigo || (res.codigos||[])[0] || '';
+                         it.repetido = !!res.repetido; it.alerta = !!res.jaFechada; it.enviadoEm = r.quando; it.erro = ''; it.aviso = ''; ok++; }
+      else { it.estado = 'recusado'; it.erro = res.erro || 'recusado'; it.aviso = ''; rec++; }
     });
+    trocarRefs(db);
     if (r.cadastros) db.cadastros[r.org] = r.cadastros;
     db.orgOffline = r.org;
     /* poda: só o JÁ ENVIADO sai, e só depois de 30 dias. Pendente nunca sai sozinho. */
     db.fila = db.fila.filter(function(i){ return i.estado !== 'enviado' || Date.now() - Date.parse(i.enviadoEm || i.quando) < 30 * 864e5; });
   });
   toast(!gravou ? 'O aparelho recusou guardar o retorno — confira o espaço livre.' :
-        (r.resultados||[]).length ? (ok + ' na planilha' + (rec ? ' · ' + rec + ' recusado(s)' : '') + ' · cadastros atualizados') :
+        (r.resultados||[]).length ? (ok + ' na planilha' + (rec ? ' · ' + rec + ' recusado(s)' : '') + (espera ? ' · ' + espera + ' esperando a origem' : '') + ' · cadastros atualizados') :
         'Modo offline preparado · cadastros guardados no aparelho');
+}
+
+/* ── OFF2 · REF: o item que aponta para outro (`ref` = token do item de origem) ──────────────
+   Depois que a origem ENTRA na planilha ela ganha código real, e o dependente que ainda não foi
+   enviado passa a apontar para o código (a lançadora guarda o código que voltou). */
+function trocarRefs(db){
+  var cod = {};
+  db.fila.forEach(function(i){ if (i.estado === 'enviado') { var c = i.codigo || (i.codigos || [])[0]; if (c) cod[i.token] = c; } });
+  db.fila.forEach(function(i){
+    if (i.estado === 'enviado') return;
+    var p = i.payload || {};
+    if (i.tipo === 'abrir') (p.lotes || []).forEach(function(l){ if (l.ref && cod[l.ref]) { l.codigo = cod[l.ref]; delete l.ref; } });
+    if (i.tipo === 'fechar' && p.ref && cod[p.ref]) { p.codigo = cod[p.ref]; delete p.ref; }
+  });
+}
+function refsDe(i){
+  var p = i.payload || {}, r = [];
+  if (i.tipo === 'abrir') (p.lotes || []).forEach(function(l){ if (l.ref) r.push(l.ref); });
+  if (i.tipo === 'fechar' && p.ref) r.push(p.ref);
+  return r;
+}
+/* quem depende (direta ou indiretamente) do item `token` e ainda não foi enviado */
+function dependentesDe(fila, token){
+  var out = [], vistos = {}; vistos[token] = true;
+  var mudou = true;
+  while (mudou) { mudou = false;
+    fila.forEach(function(i){ if (vistos[i.token] || i.estado === 'enviado') return;
+      if (refsDe(i).some(function(r){ return vistos[r]; })) { vistos[i.token] = true; out.push(i); mudou = true; } }); }
+  return out;
 }
 
 /* ── ENVIO: navegação para o /exec da organização ─────────────────────────── */
@@ -153,7 +204,7 @@ function enviar(soCadastros){
   var org = orgAtual(), db = ler();
   var pend = soCadastros ? [] : (db.fila || []).filter(function(i){ return i.org === org.id && i.estado === 'guardado'; });
   if (!navigator.onLine) { toast('Sem rede agora. Está tudo guardado no aparelho — envie quando o sinal voltar.'); return; }
-  var pacote = { volta: location.origin + location.pathname, org: org.id,
+  var pacote = { volta: location.origin + location.pathname, org: org.id, fuso: (db.cadastros && db.cadastros[org.id] && db.cadastros[org.id].fuso) || FUSO_PADRAO,
                  fila: pend.map(function(i){ return { token:i.token, tipo:i.tipo, quando:i.quando, payload:i.payload }; }) };
   location.href = org.offline + '?modo=sincronizar#f=' + b64url(JSON.stringify(pacote));
 }
@@ -162,9 +213,11 @@ function enviar(soCadastros){
 function render(){
   var db = ler(), app = document.getElementById('app');
   if (TELA.nome === 'receber') { app.innerHTML = telaReceber(db); ligarReceber(); return; }
+  if (TELA.nome === 'abrir')   { app.innerHTML = telaAbrir(db);   ligarAbrir();   return; }
+  if (TELA.nome === 'fechar')  { app.innerHTML = telaFechar(db);  ligarFechar();  return; }
   var h = '<header><div class="u">Ū</div><div><h1>Gestão de Estoque</h1><small>Mandū Inovação Social</small></div></header>';
   h += '<label class="chave"><input type="checkbox" id="chk-off"' + (db.modoOffline ? ' checked' : '') + '>' +
-       '<div><b>Versão offline</b><span>Só os formulários. O que você lança fica guardado neste aparelho e vai para a planilha quando houver rede.</span></div></label>';
+       '<div><b>Versão offline</b><span>Receber, abrir e fechar. O que você lança fica guardado neste aparelho e vai para a planilha quando houver rede.</span></div></label>';
   if (!db.modoOffline) {
     h += '<p class="lbl">Escolha a organização</p><nav class="orgs">' + ORGS.map(function(o){
       return '<a class="org" href="' + esc(o.url) + '" data-org="' + esc(o.id) + '"><span><span class="n">' + esc(o.nome) + '</span><span class="d">' + esc(o.desc) + '</span></span><span class="seta">›</span></a>';
@@ -180,7 +233,7 @@ function render(){
        '<div><b>' + esc(org.nome) + '</b></div>');
   h += '<div class="faixa" style="margin-top:12px">' +
        '<span class="pill ' + (navigator.onLine ? 'on' : 'off') + '" id="pill-rede">' + (navigator.onLine ? 'com rede' : 'sem rede') + '</span>' +
-       '<span class="pill">' + (cad ? 'cadastros de ' + quandoTxt(cad.geradoEm) : 'cadastros: ainda não') + '</span>' +
+       '<span class="pill">' + (cad ? 'cadastros de ' + quandoTxt(cad.geradoEm, fusoDe(cad)) : 'cadastros: ainda não') + '</span>' +
        (pend.length ? '<span class="pill laranja">' + pend.length + ' guardado(s) no aparelho</span>' : '') + '</div>';
   if (!cad) {
     h += '<p class="aviso" style="margin:0 0 12px">Para lançar sem rede, o aparelho precisa guardar uma vez as comunidades, famílias e produtos desta organização. Faça isso agora, com sinal.</p>' +
@@ -188,18 +241,11 @@ function render(){
     app.innerHTML = h; ligarInicio(); return;
   }
   h += '<div class="acoes"><button class="acao prim" id="btn-receber">Receber</button>' +
-       '<button class="acao" disabled>Abrir<small>próxima etapa</small></button>' +
-       '<button class="acao" disabled>Fechar<small>próxima etapa</small></button></div>';
+       '<button class="acao prim" id="btn-abrir">Abrir</button>' +
+       '<button class="acao prim" id="btn-fechar">Fechar</button></div>';
   h += '<p class="lbl">Lançamentos deste aparelho</p>';
-  h += fila.length ? '<ul class="fila">' + fila.slice().reverse().map(function(i){
-      var p = i.payload, tot = p.itens.reduce(function(a,x){ return a + x.kg; }, 0);
-      var st = i.estado === 'enviado' ? ((i.repetido ? 'já estava na planilha · ' : 'na planilha · ') + i.codigos.join(', ')) :
-               i.estado === 'recusado' ? 'recusado pela planilha: ' + i.erro : 'guardado no aparelho · ainda não está na planilha';
-      return '<li class="' + i.estado + '"><b>Receber · ' + esc(p.produto) + ' · ' + kgTxt(tot) + ' kg</b>' +
-             esc(p.itens.length + ' família(s) · ' + (p.comunidadeNome || '') + ' · ' + quandoTxt(i.quando)) +
-             '<div class="st">' + esc(st) + '</div>' +
-             (i.estado === 'recusado' ? '<button class="link" data-descartar="' + esc(i.token) + '">descartar este lançamento</button>' : '') + '</li>';
-    }).join('') + '</ul>' : '<p class="aviso" style="margin:0 0 12px">Nada lançado neste aparelho ainda.</p>';
+  h += fila.length ? '<ul class="fila">' + fila.slice().reverse().map(function(i){ return linhaFila(i, fila, fusoDe(cad)); }).join('') + '</ul>'
+                   : '<p class="aviso" style="margin:0 0 12px">Nada lançado neste aparelho ainda.</p>';
   h += '<button class="grande' + (pend.length ? '' : ' sec') + '" id="btn-enviar">' +
        (pend.length ? 'Enviar ' + pend.length + ' para a planilha' : 'Atualizar cadastros') + '</button>';
   h += '<p class="aviso">Quem assina o envio é a conta Google aberta no celular na hora de enviar. Enviar de novo é seguro: o que já entrou não entra duas vezes.</p>';
@@ -217,10 +263,333 @@ function ligarInicio(){
   var sel = document.getElementById('sel-org'); if (sel) sel.onchange = function(){ mudar(function(db){ db.orgOffline = sel.value; }); render(); };
   var bp = document.getElementById('btn-preparar'); if (bp) bp.onclick = function(){ enviar(true); };
   var br = document.getElementById('btn-receber'); if (br) br.onclick = function(){ TELA = { nome:'receber', form:{ itens:[], busca:'' } }; render(); };
+  var ba = document.getElementById('btn-abrir'); if (ba) ba.onclick = function(){ TELA = { nome:'abrir', form:{ etapa:'', lotes:{}, obs:'' } }; render(); };
+  var bf = document.getElementById('btn-fechar'); if (bf) bf.onclick = function(){ TELA = { nome:'fechar', form:{ op:'', pesoSaida:'', principal:'', subs:['','',''], obs:'' } }; render(); };
   var be = document.getElementById('btn-enviar'); if (be) be.onclick = function(){ enviar(false); };
   document.querySelectorAll('[data-descartar]').forEach(function(b){ b.onclick = function(){
-    if (!confirm('Descartar este lançamento recusado? Ele sai do aparelho e não vai para a planilha.')) return;
-    mudar(function(db){ db.fila = db.fila.filter(function(i){ return i.token !== b.dataset.descartar; }); }); render(); }; });
+    var dep = dependentesDe(ler().fila || [], b.dataset.descartar);
+    if (!confirm('Descartar este lançamento? Ele sai do aparelho e não vai para a planilha.' +
+        (dep.length ? '\n\n' + dep.length + ' lançamento(s) que dependem dele também saem (não têm origem sem ele).' : ''))) return;
+    var fora = {}; fora[b.dataset.descartar] = true; dep.forEach(function(d){ fora[d.token] = true; });
+    mudar(function(db){ db.fila = db.fila.filter(function(i){ return !fora[i.token]; }); }); render(); }; });
+}
+
+/* ══ OFF2 · ESTOQUE PROJETADO NO APARELHO ══════════════════════════════════════════════════
+   lotes dos cadastros − kg usados por Abrir ainda NÃO enviados + lotes de Receber ainda não
+   enviados («guardado no aparelho · ainda sem código»).
+   Abertas = cadastros + Abrir não enviados − Fechar não enviados.
+   As regras abaixo COPIAM as do index.html do app (a fonte de cada uma está no comentário):
+   a lançadora não inventa a regra — ela a repete, e o portão compara os dois. */
+var MES_CURTO = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+function codData(cod){ var m = String(cod||'').match(/(\d{8})/); return m ? m[1] : '00000000'; }                 /* app: codData */
+function dataCurta(cod){ var d = codData(cod); return d === '00000000' ? '' : Number(d.slice(6,8)) + '/' + (MES_CURTO[Number(d.slice(4,6)) - 1] || ''); }   /* app: dataCurta */
+function diasTxt(n){ if (n == null) return 'sem data de entrada'; var d = Math.round(Number(n) || 0); return 'há ' + d + ' dia' + (Math.abs(d) === 1 ? '' : 's'); }   /* app: diasTxt */
+function arred2(n){ return Math.round(n * 100) / 100; }
+function fusoDe(cad){ return (cad && cad.fuso) || FUSO_PADRAO; }
+function etapaDeCad(cad, id){ return (cad.etapas || []).find(function(e){ return e.id === id; }) || null; }
+function ehMov(et){ return !!et && et.tipo === 'Movimentação'; }
+function ordDe(cad, et){ return (cad.ord && cad.ord[et]) || 9; }                                                  /* app: ordEtapa */
+/* app: podeEntrar — material só anda para FRENTE; subproduto só entra no Armazenamento */
+function podeEntrar(cad, l, etapa){
+  if (!l || !etapa || l.etapa === etapa) return false;
+  if (l.sub) return etapa === 'ARM' && ordDe(cad, etapa) > ordDe(cad, l.etapa);
+  return ordDe(cad, etapa) > ordDe(cad, l.etapa);
+}
+function aceitosDe(et){ var a = {}; (et.cad || []).forEach(function(c){ if (c[1]) a[c[1]] = true; }); return a; }
+/* app: lotesElegiveis — saldo > 0, o PRODUTO é aceito pela etapa (ADR-012) e a etapa vem depois de onde o lote está */
+function lotesElegiveis(cad, proj, etapaId){
+  var et = etapaDeCad(cad, etapaId); if (!et) return [];
+  var aceitos = aceitosDe(et), temConfig = Object.keys(aceitos).length > 0;
+  return proj.lista.map(function(k){ return proj.lotes[k]; }).filter(function(l){
+    if (!(l.saldo > 0.001)) return false;
+    if (!podeEntrar(cad, l, etapaId)) return false;
+    return temConfig ? !!aceitos[l.produto] : true;
+  });
+}
+/* app: cfgDe — casamento exato (cadeia, etapa, produto de entrada), senão a primeira linha da cadeia nessa etapa */
+function cfgDe(et, cadeia, produto){
+  var frouxo = null, cs = (et && et.cad) || [];
+  for (var i = 0; i < cs.length; i++) {
+    if (cs[i][0] !== cadeia) continue;
+    if (cs[i][1] === produto) return cs[i];
+    if (!frouxo) frouxo = cs[i];
+  }
+  return frouxo;
+}
+function cadeiaDoProduto(cad, produto){
+  var m = (cad.materias || []).find(function(x){ return x[0] === produto; });
+  if (m) return m[1] || produto;
+  var l = (cad.lotes || []).find(function(x){ return x[1] === produto; });
+  return l ? l[2] : produto;
+}
+function projecao(db, org){
+  var cad = db.cadastros[org.id], P = { lotes:{}, lista:[], abertas:{}, alista:[] };
+  (cad.lotes || []).forEach(function(l){
+    P.lotes[l[0]] = { chave:l[0], codigo:l[0], ref:'', produto:l[1], cadeia:l[2], saldo:l[3], etapa:l[4], sub:!!l[5], dias:l[6], local:false };
+    P.lista.push(l[0]); });
+  (cad.abertas || []).forEach(function(a){
+    P.abertas[a[0]] = { chave:a[0], codigo:a[0], ref:'', etapa:a[1], produto:a[2], cadeia:a[3], kg:a[4], local:false };
+    P.alista.push(a[0]); });
+  (db.fila || []).filter(function(i){ return i.org === org.id && i.estado === 'guardado'; }).forEach(function(it){
+    var p = it.payload || {};
+    if (it.tipo === 'receber') {
+      var k = 'ref:' + it.token, tot = (p.itens || []).reduce(function(a, x){ return a + x.kg; }, 0);
+      P.lotes[k] = { chave:k, codigo:'', ref:it.token, produto:p.produto, cadeia:cadeiaDoProduto(cad, p.produto), saldo:arred2(tot), etapa:'REC', sub:false, dias:null, local:true };
+      P.lista.push(k);
+    } else if (it.tipo === 'abrir') {
+      var total = 0;
+      (p.lotes || []).forEach(function(l){
+        var l0 = P.lotes[l.codigo || ('ref:' + l.ref)]; total += Number(l.kg) || 0;
+        if (l0) l0.saldo = l.esgotou ? 0 : arred2(l0.saldo - l.kg);
+      });
+      var et = etapaDeCad(cad, p.etapa);
+      if (et && !ehMov(et)) {          /* Movimentação abre e fecha no mesmo gesto: não fica aberta */
+        var ka = 'ref:' + it.token;
+        P.abertas[ka] = { chave:ka, codigo:'', ref:it.token, etapa:p.etapa, produto:p.produto, cadeia:p.cadeia, kg:arred2(total), local:true };
+        P.alista.push(ka);
+      }
+    } else if (it.tipo === 'fechar') {
+      delete P.abertas[p.codigo || ('ref:' + p.ref)];
+    }
+  });
+  P.alista = P.alista.filter(function(k){ return !!P.abertas[k]; });
+  return P;
+}
+var LOCAL_TXT = 'guardado no aparelho · ainda sem código';
+function rotuloLote(l){ return l.codigo ? l.codigo + (l.dias != null ? ' · ' + diasTxt(l.dias) : '') : LOCAL_TXT; }
+function nomeDaEtapa(cad, id){ var e = etapaDeCad(cad, id); return e ? e.nome : id; }
+
+/* Uma linha da fila, qualquer tipo. «Abrir Secagem · 9.000 kg · lote REC-…/guardado no aparelho». */
+function linhaFila(i, fila, fuso){
+  var p = i.payload || {}, cad = (ler().cadastros || {})[i.org] || {}, titulo = '', det = '';
+  if (i.tipo === 'receber') {
+    var tr = p.itens.reduce(function(a, x){ return a + x.kg; }, 0);
+    titulo = 'Receber · ' + p.produto + ' · ' + kgTxt(tr) + ' kg';
+    det = p.itens.length + ' família(s) · ' + (p.comunidadeNome || '');
+  } else if (i.tipo === 'abrir') {
+    var ta = (p.lotes || []).reduce(function(a, x){ return a + (Number(x.kg) || 0); }, 0);
+    titulo = 'Abrir ' + (p.etapaNome || p.etapa) + ' · ' + kgTxt(ta) + ' kg';
+    det = (p.lotes || []).map(function(l){ return 'lote ' + (l.codigo || 'guardado no aparelho'); }).join(' + ');
+  } else if (i.tipo === 'fechar') {
+    var tf = p.pesoSaida != null ? Number(p.pesoSaida) || 0 :
+      (Number((p.principal || {}).kg) || 0) + (p.subprodutos || []).reduce(function(a, x){ return a + (Number(x.kg) || 0); }, 0);
+    titulo = 'Fechar ' + (p.etapaNome || p.etapa) + ' · saiu ' + kgTxt(tf) + ' kg';
+    det = p.codigo ? p.codigo : 'operação guardada no aparelho';
+  }
+  var st;
+  if (i.estado === 'enviado') st = i.alerta ? (i.mensagem || 'já estava fechada — confira o peso no app') :
+        ((i.repetido ? 'já estava na planilha · ' : 'na planilha · ') + (i.codigos || []).join(', '));
+  else if (i.estado === 'recusado') {
+    st = 'recusado pela planilha: ' + i.erro;
+  } else if (i.aviso) st = 'esperando: ' + i.aviso;
+  else st = 'guardado no aparelho · ainda não está na planilha';
+  var depRecusado = i.estado === 'guardado' && refsDe(i).some(function(r){ var o = fila.find(function(x){ return x.token === r; }); return o && o.estado === 'recusado'; });
+  if (depRecusado) st = 'depende de um lançamento recusado — descarte o recusado e este sai junto';
+  return '<li class="' + i.estado + (i.alerta ? ' alerta' : '') + (i.aviso && i.estado === 'guardado' ? ' espera' : '') + '"><b>' + esc(titulo) + '</b>' +
+         esc(det + ' · ' + quandoTxt(i.quando, fuso)) + '<div class="st">' + esc(st) + '</div>' +
+         ((i.estado === 'recusado' || (i.estado === 'guardado' && i.aviso)) ? '<button class="link" data-descartar="' + esc(i.token) + '">descartar este lançamento</button>' : '') + '</li>';
+}
+
+function blocoOperador(db, org, cad){
+  var ops = cad.operadores || [], eu = cad.eu && cad.eu.operador, op = db.operador[org.id] || eu || '';
+  return '<p class="lbl">Quem está lançando</p><select class="txt" id="sel-op"><option value="">— escolha —</option>' + ops.map(function(o){
+    return '<option value="' + esc(o[0]) + '"' + (o[0] === op ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('') + '</select>';
+}
+
+/* ══ ABRIR ═════════════════════════════════════════════════════════════════════════════════ */
+function telaAbrir(db){
+  var org = orgAtual(), cad = db.cadastros[org.id], f = TELA.form, proj = projecao(db, org);
+  var h = '<div class="topo"><button class="link" id="btn-voltar">‹ voltar</button></div><h2>Abrir</h2>';
+  if (!(cad.etapas || []).length)
+    return h + '<p class="aviso">O aparelho ainda não guardou as etapas desta organização. Volte e toque em «Atualizar cadastros», com sinal.</p>';
+  if (!f.etapa)
+    return h + '<p class="lbl">Qual etapa vai abrir?</p><div class="grade">' + cad.etapas.map(function(e){
+      return '<button class="opc" data-etapa="' + esc(e.id) + '">' + esc(e.nome) + '</button>'; }).join('') + '</div>';
+  var et = etapaDeCad(cad, f.etapa), aceitos = Object.keys(aceitosDe(et));
+  h += '<div class="faixa"><button class="pill laranja" id="troca-etapa">' + esc(et.nome) + ' ✕</button></div>' +
+       (aceitos.length ? '<p class="nota-linha" style="margin:0 0 4px">consome ' + esc(aceitos.slice(0, 2).join(' e ') + (aceitos.length > 2 ? ' e mais ' + (aceitos.length - 2) : '')) + '</p>' : '');
+  /* o que já está na operação nunca some da lista (app: viewAbrir, R-491) */
+  var lts = lotesElegiveis(cad, proj, f.etapa);
+  Object.keys(f.lotes).forEach(function(k){ if (proj.lotes[k] && !lts.some(function(l){ return l.chave === k; })) lts.push(proj.lotes[k]); });
+  /* app: `prodTrava` — depois do 1º lote só o MESMO produto é oferecido */
+  var trava = null;
+  Object.keys(f.lotes).some(function(k){ if (proj.lotes[k]) { trava = proj.lotes[k].produto; return true; } return false; });
+  if (trava) lts = lts.filter(function(l){ return l.produto === trava || f.lotes[l.chave]; });
+  /* app: PEPS (R-32) — do mais VELHO ao mais novo; o que acabou de chegar ao aparelho fica por último */
+  lts = lts.slice().sort(function(a, b){ return (a.codigo ? codData(a.codigo) : '99999999').localeCompare(b.codigo ? codData(b.codigo) : '99999999'); });
+  var naOp = lts.filter(function(l){ return !!f.lotes[l.chave]; }), resto = lts.filter(function(l){ return !f.lotes[l.chave]; });
+  var max = cad.maxLotes || 8;
+  if (naOp.length) {
+    h += '<p class="lbl">Na operação · ' + naOp.length + '</p>' + naOp.map(function(l){
+      var s = f.lotes[l.chave];
+      return '<div class="linha" style="margin-bottom:0"><div class="nome">' + esc(l.produto) + '<small' + (l.local ? ' class="local"' : '') + '>' + esc(rotuloLote(l)) + ' · disponível ' + kgTxt(l.saldo) + ' kg</small></div>' +
+        '<input inputmode="decimal" data-kgde="' + esc(l.chave) + '" value="' + esc(s.kg) + '" placeholder="usar"><button class="x" data-tira="' + esc(l.chave) + '" aria-label="tirar">×</button></div>' +
+        '<div class="acabou"><input type="checkbox" data-acabou="' + esc(l.chave) + '"' + (s.naoAcabou ? '' : ' checked') + '><span>Acabou</span> ' +
+        '<button class="tudo" data-tudo="' + esc(l.chave) + '">todo o lote</button></div><div class="nota" data-nota="' + esc(l.chave) + '"></div>';
+    }).join('');
+  } else h += '<p class="aviso" style="margin:0 0 4px">Toque num lote abaixo para trazê-lo à operação.</p>';
+  h += '<p class="lbl">Disponíveis · ' + resto.length + ' · mais antigo primeiro' + (trava ? ' · só ' + esc(trava) + ' nesta operação' : '') + '</p>';
+  h += resto.length ? resto.map(function(l){
+    return '<button class="card" data-pega="' + esc(l.chave) + '"><span class="m"><b>' + esc(l.produto) + (l.codigo && dataCurta(l.codigo) ? ' · ' + dataCurta(l.codigo) : '') + '</b>' +
+           '<small' + (l.local ? ' class="local"' : '') + '>' + esc(rotuloLote(l)) + '</small></span><span class="kg">' + kgTxt(l.saldo) + ' kg</span><span class="mais">+</span></button>';
+  }).join('') : '<p class="aviso" style="margin:0">' + (naOp.length ? 'Nenhum outro lote disponível para esta etapa.' : 'Nenhum lote disponível para esta etapa. Todos estão sem saldo, em operação aberta, ou ainda não chegaram ao aparelho.') + '</p>';
+  if (naOp.length >= max) h += '<p class="nota-linha">No máximo ' + max + ' lotes por operação.</p>';
+  var tot = naOp.reduce(function(a, l){ return a + numDe(f.lotes[l.chave].kg); }, 0);
+  h += '<div class="total">Total que entra: <b id="total">' + kgTxt(tot) + ' kg</b></div>';
+  if (ehMov(et)) h += '<p class="aviso" style="margin:0 0 8px">Esta etapa não transforma o produto — ele entra e sai igual. Fecha num gesto só.</p>';
+  h += '<p class="lbl">Observação (opcional)</p><input class="txt" id="obs" value="' + esc(f.obs || '') + '" placeholder="algo fora do normal nesta operação">';
+  h += blocoOperador(db, org, cad);
+  h += '<div style="margin-top:16px"><button class="grande" id="btn-guardar" disabled>Guardar no aparelho</button></div>' +
+       '<p class="aviso">Fica guardado neste celular, mesmo sem rede. Vai para a planilha quando você tocar em «Enviar».</p>';
+  return h;
+}
+function podeGuardarAbrir(){
+  var f = TELA.form, org = orgAtual(), db = ler(), proj = projecao(db, org), n = 0, ruim = false;
+  Object.keys(f.lotes).forEach(function(k){
+    var l = proj.lotes[k], v = numDe(f.lotes[k].kg); if (!l) { ruim = true; return; }
+    if (v > 0) n++; if (v > l.saldo + 0.01) ruim = true; });
+  var sop = document.getElementById('sel-op');
+  return { ok: !ruim && n > 0 && !!f.etapa && !!(sop && sop.value), n: n, proj: proj };
+}
+function atualizarAbrir(){
+  var f = TELA.form, g = podeGuardarAbrir(), tot = 0;
+  Object.keys(f.lotes).forEach(function(k){
+    var l = g.proj.lotes[k], v = numDe(f.lotes[k].kg), el = document.querySelector('[data-nota="' + (window.CSS && CSS.escape ? CSS.escape(k) : k) + '"]');
+    tot += v; if (!el || !l) return;
+    el.className = 'nota';
+    if (v > l.saldo + 0.01) { el.className = 'erro-linha'; el.textContent = 'Maior que o disponível — o lote tem ' + kgTxt(l.saldo) + ' kg. Usar parte do lote é normal; usar mais do que existe, não.'; }
+    else if (!f.lotes[k].naoAcabou && v > 0 && l.saldo - v > 0.01) { el.className = 'nota-linha'; el.textContent = 'Sobra de ' + kgTxt(arred2(l.saldo - v)) + ' kg do lote será registrada como quebra. Desmarque «Acabou» se a sobra fica no lote.'; }
+    else el.textContent = '';
+  });
+  var t = document.getElementById('total'); if (t) t.textContent = kgTxt(tot) + ' kg';
+  var bg = document.getElementById('btn-guardar'); if (bg) bg.disabled = !g.ok;
+}
+function ligarAbrir(){
+  var f = TELA.form, org = orgAtual(), db = ler(), cad = db.cadastros[org.id], proj = projecao(db, org);
+  document.getElementById('btn-voltar').onclick = function(){ TELA = { nome:'inicio' }; render(); };
+  document.querySelectorAll('[data-etapa]').forEach(function(b){ b.onclick = function(){ f.etapa = b.dataset.etapa; f.lotes = {}; render(); }; });
+  var te = document.getElementById('troca-etapa'); if (te) te.onclick = function(){ f.etapa = ''; f.lotes = {}; render(); };
+  document.querySelectorAll('[data-pega]').forEach(function(b){ b.onclick = function(){
+    if (Object.keys(f.lotes).length >= (cad.maxLotes || 8)) { toast('No máximo ' + (cad.maxLotes || 8) + ' lotes por operação.'); return; }
+    var l = proj.lotes[b.dataset.pega]; if (!l) return;
+    f.lotes[l.chave] = { kg: String(l.saldo).replace('.', ','), naoAcabou: false };           /* app R-33: sobe CHEIO e «Acabou» marcado */
+    render(); }; });
+  document.querySelectorAll('[data-tira]').forEach(function(b){ b.onclick = function(){ delete f.lotes[b.dataset.tira]; render(); }; });
+  document.querySelectorAll('[data-kgde]').forEach(function(inp){ inp.oninput = function(){ f.lotes[inp.dataset.kgde].kg = inp.value; atualizarAbrir(); }; });
+  document.querySelectorAll('[data-acabou]').forEach(function(c){ c.onchange = function(){ f.lotes[c.dataset.acabou].naoAcabou = !c.checked; atualizarAbrir(); }; });
+  document.querySelectorAll('[data-tudo]').forEach(function(b){ b.onclick = function(){
+    var l = proj.lotes[b.dataset.tudo]; f.lotes[b.dataset.tudo].kg = String(l.saldo).replace('.', ','); render(); }; });
+  var obs = document.getElementById('obs'); if (obs) obs.oninput = function(){ f.obs = obs.value; };
+  var sop = document.getElementById('sel-op'); if (sop) sop.onchange = function(){ mudar(function(d){ d.operador[org.id] = sop.value; }); atualizarAbrir(); };
+  var bg = document.getElementById('btn-guardar'); if (bg) bg.onclick = guardarAbrir;
+  atualizarAbrir();
+}
+function guardarAbrir(){
+  var f = TELA.form, org = orgAtual(), db = ler(), cad = db.cadastros[org.id], g = podeGuardarAbrir(), proj = g.proj;
+  if (!g.ok) return;
+  var op = document.getElementById('sel-op').value, et = etapaDeCad(cad, f.etapa), produto = '', cadeia = '';
+  var lotes = Object.keys(f.lotes).filter(function(k){ return numDe(f.lotes[k].kg) > 0; }).map(function(k){
+    var l = proj.lotes[k], o = { kg: numDe(f.lotes[k].kg), esgotou: !f.lotes[k].naoAcabou };
+    produto = l.produto; cadeia = l.cadeia;
+    if (l.codigo) o.codigo = l.codigo; else o.ref = l.ref;
+    return o; });
+  var item = { token: novoToken(), tipo: 'abrir', org: org.id, quando: new Date().toISOString(), estado: 'guardado',
+    payload: { etapa: f.etapa, etapaNome: et.nome, produto: produto, cadeia: cadeia, operador: op, obs: (f.obs || '').trim(), lotes: lotes } };
+  var ultimo = (db.fila || []).filter(function(i){ return i.org === org.id && i.estado === 'guardado'; }).pop();
+  if (ultimo && ultimo.tipo === 'abrir' && JSON.stringify(ultimo.payload) === JSON.stringify(item.payload) && Date.now() - Date.parse(ultimo.quando) < 60000) {
+    toast('Essa operação já está guardada.'); TELA = { nome:'inicio' }; render(); return;
+  }
+  var ok = mudar(function(d){ d.fila.push(item); d.operador[org.id] = op; });
+  var confere = ok && ler().fila.some(function(i){ return i.token === item.token; });
+  if (!confere) { toast('O aparelho NÃO guardou (sem espaço ou modo privado). Anote no papel.'); return; }
+  TELA = { nome:'inicio' }; render();
+  toast('Guardado no aparelho ✓ — ainda não está na planilha.');
+}
+
+/* ══ FECHAR ════════════════════════════════════════════════════════════════════════════════ */
+function rotuloOp(o){ return o.codigo ? o.codigo : 'guardada no aparelho · ainda sem código'; }
+function telaFechar(db){
+  var org = orgAtual(), cad = db.cadastros[org.id], f = TELA.form, proj = projecao(db, org);
+  var h = '<div class="topo"><button class="link" id="btn-voltar">‹ voltar</button></div><h2>Fechar</h2>';
+  var op = f.op ? proj.abertas[f.op] : null;
+  if (!op) {
+    var ops = proj.alista.map(function(k){ return proj.abertas[k]; });
+    return h + (ops.length ? '<p class="lbl">Qual operação terminou?</p>' + ops.map(function(o){
+      return '<button class="card" data-op="' + esc(o.chave) + '"><span class="m"><b>' + esc(nomeDaEtapa(cad, o.etapa)) + ' · ' + esc(o.produto) + '</b>' +
+             '<small' + (o.local ? ' class="local"' : '') + '>' + esc(rotuloOp(o)) + '</small></span><span class="kg">' + kgTxt(o.kg) + ' kg</span><span class="mais">›</span></button>';
+    }).join('') : '<p class="aviso">Nenhuma operação aberta no aparelho. Se você abriu uma, toque em «Atualizar cadastros», com sinal, para ela aparecer aqui.</p>');
+  }
+  var et = etapaDeCad(cad, op.etapa), cfg = cfgDe(et, op.cadeia, op.produto);
+  var multi = !!(cfg && (cfg[3] || cfg[4] || cfg[5]));
+  h += '<div class="faixa"><button class="pill laranja" id="troca-op">' + esc(nomeDaEtapa(cad, op.etapa)) + ' · ' + esc(op.codigo || 'guardada no aparelho') + ' ✕</button></div>' +
+       '<p class="nota-linha" style="margin:0 0 8px">entrou ' + kgTxt(op.kg) + ' kg de ' + esc(op.produto) + '</p>';
+  var linha = function(nome, papel, attr, val){
+    return '<div class="linha"><div class="nome">' + esc(nome) + '<small>' + esc(papel) + '</small></div>' +
+           '<input inputmode="decimal" ' + attr + ' value="' + esc(val) + '" placeholder="kg"></div>'; };
+  if (multi) {
+    h += '<p class="lbl">O que saiu</p>' + linha((cfg && cfg[2]) || op.produto, 'principal', 'data-pprinc="1"', f.principal);
+    [cfg[3], cfg[4], cfg[5]].forEach(function(sn, k){ if (sn) h += linha(sn, 'subproduto', 'data-psub="' + k + '"', f.subs[k]); });
+  } else {
+    h += '<p class="lbl">Peso que saiu</p>' + linha((cfg && cfg[2]) || op.produto, 'saída única', 'data-psaida="1"', f.pesoSaida);
+  }
+  h += '<div class="total">Saiu: <b id="saiu">0 kg</b> <span id="quebra" class="nota-linha"></span></div><div id="aviso-saida"></div>';
+  h += '<p class="lbl">Observação (opcional)</p><input class="txt" id="obs" value="' + esc(f.obs || '') + '" placeholder="algo fora do normal">';
+  h += blocoOperador(db, org, cad);
+  h += '<div style="margin-top:16px"><button class="grande" id="btn-guardar" disabled>Guardar no aparelho</button></div>' +
+       '<p class="aviso">Fica guardado neste celular, mesmo sem rede. Quem confere o peso é a planilha, quando você tocar em «Enviar».</p>';
+  return h;
+}
+function saiuDoFechar(multi){
+  var f = TELA.form;
+  if (multi) return (numDe(f.principal) || 0) + f.subs.reduce(function(a, x){ return a + (numDe(x) || 0); }, 0);
+  return numDe(f.pesoSaida) || 0;
+}
+function atualizarFechar(){
+  var f = TELA.form, org = orgAtual(), db = ler(), cad = db.cadastros[org.id], op = projecao(db, org).abertas[f.op]; if (!op) return;
+  var et = etapaDeCad(cad, op.etapa), cfg = cfgDe(et, op.cadeia, op.produto), multi = !!(cfg && (cfg[3] || cfg[4] || cfg[5]));
+  var saiu = saiuDoFechar(multi), sop = document.getElementById('sel-op');
+  document.getElementById('saiu').textContent = kgTxt(saiu) + ' kg';
+  var q = document.getElementById('quebra');
+  q.textContent = (saiu > 0 && saiu <= op.kg + 0.01) ? '· quebra de ' + kgTxt(arred2(op.kg - saiu)) + ' kg' : '';
+  var av = document.getElementById('aviso-saida');
+  /* AVISA, não trava: quem barra saída > entrada é o servidor (rendimento acima de 100% é impossível) */
+  av.innerHTML = saiu > op.kg + 0.01 ? '<div class="aviso-saida">⚠️ A saída (' + kgTxt(saiu) + ' kg) passa da entrada (' + kgTxt(op.kg) + ' kg). A planilha vai recusar — confira os pesos. Se estiver certo, guarde assim mesmo.</div>' : '';
+  document.getElementById('btn-guardar').disabled = !(saiu > 0 && sop && sop.value);
+}
+function ligarFechar(){
+  var f = TELA.form, org = orgAtual();
+  document.getElementById('btn-voltar').onclick = function(){ TELA = { nome:'inicio' }; render(); };
+  document.querySelectorAll('[data-op]').forEach(function(b){ b.onclick = function(){ f.op = b.dataset.op; f.pesoSaida = ''; f.principal = ''; f.subs = ['','','']; render(); }; });
+  var to = document.getElementById('troca-op'); if (to) to.onclick = function(){ f.op = ''; render(); };
+  var ps = document.querySelector('[data-psaida]'); if (ps) ps.oninput = function(){ f.pesoSaida = ps.value; atualizarFechar(); };
+  var pp = document.querySelector('[data-pprinc]'); if (pp) pp.oninput = function(){ f.principal = pp.value; atualizarFechar(); };
+  document.querySelectorAll('[data-psub]').forEach(function(inp){ inp.oninput = function(){ f.subs[+inp.dataset.psub] = inp.value; atualizarFechar(); }; });
+  var obs = document.getElementById('obs'); if (obs) obs.oninput = function(){ f.obs = obs.value; };
+  var sop = document.getElementById('sel-op'); if (sop) sop.onchange = function(){ mudar(function(d){ d.operador[org.id] = sop.value; }); atualizarFechar(); };
+  var bg = document.getElementById('btn-guardar'); if (bg) bg.onclick = guardarFechar;
+  if (f.op) atualizarFechar();
+}
+function guardarFechar(){
+  var f = TELA.form, org = orgAtual(), db = ler(), cad = db.cadastros[org.id], op = projecao(db, org).abertas[f.op]; if (!op) return;
+  var et = etapaDeCad(cad, op.etapa), cfg = cfgDe(et, op.cadeia, op.produto), multi = !!(cfg && (cfg[3] || cfg[4] || cfg[5]));
+  var sop = document.getElementById('sel-op').value; if (!sop || !(saiuDoFechar(multi) > 0)) return;
+  var p = { etapa: op.etapa, etapaNome: et ? et.nome : op.etapa, produtoEntrada: op.produto, operador: sop, obs: (f.obs || '').trim() };
+  if (op.codigo) p.codigo = op.codigo; else p.ref = op.ref;
+  if (multi) {                                                                         /* app: salvarFechar — principal + até 3 subprodutos com peso */
+    p.principal = { produto: (cfg && cfg[2]) || op.produto, kg: numDe(f.principal) || 0 };
+    p.subprodutos = [];
+    [cfg[3], cfg[4], cfg[5]].forEach(function(sn, k){ if (sn && (numDe(f.subs[k]) || 0) > 0) p.subprodutos.push({ produto: sn, kg: numDe(f.subs[k]) }); });
+  } else { p.pesoSaida = numDe(f.pesoSaida) || 0; p.produtoSaida = (cfg && cfg[2]) || op.produto || ''; }
+  var item = { token: novoToken(), tipo: 'fechar', org: org.id, quando: new Date().toISOString(), estado: 'guardado', payload: p };
+  var ultimo = (db.fila || []).filter(function(i){ return i.org === org.id && i.estado === 'guardado'; }).pop();
+  if (ultimo && ultimo.tipo === 'fechar' && JSON.stringify(ultimo.payload) === JSON.stringify(item.payload) && Date.now() - Date.parse(ultimo.quando) < 60000) {
+    toast('Esse fechamento já está guardado.'); TELA = { nome:'inicio' }; render(); return;
+  }
+  var ok = mudar(function(d){ d.fila.push(item); d.operador[org.id] = sop; });
+  var confere = ok && ler().fila.some(function(i){ return i.token === item.token; });
+  if (!confere) { toast('O aparelho NÃO guardou (sem espaço ou modo privado). Anote no papel.'); return; }
+  TELA = { nome:'inicio' }; render();
+  toast('Guardado no aparelho ✓ — ainda não está na planilha.');
 }
 
 /* ── RECEBER simplificado: comunidade → produto → famílias e peso ─────────── */
