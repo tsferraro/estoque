@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teste dos vídeos · Camtauá</title>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* Página de teste (ADR-046 §4): os mesmos dois vídeos no GitHub Pages e no YouTube,
+     lado a lado, para abrir no celular com internet fraca. Mede o tempo do toque até tocar. */
+  :root { --laranja:#FF6E00; --laranja-texto:#B24D00; --azul:#1F3A6E; --fundo:#F6F7F9; --texto:#1d2330; --linha:#dfe3ea; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--fundo); color:var(--texto); font-family:Ubuntu, sans-serif; }
+  main { max-width:1100px; margin:0 auto; padding:16px; }
+  h1 { color:var(--laranja); font-size:1.5rem; margin:.2em 0; }
+  p { line-height:1.45; }
+  .grade { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px; }
+  .caixa { background:#fff; border:1px solid var(--linha); border-radius:12px; padding:12px; }
+  .caixa h2 { font-size:1rem; margin:0 0 8px; color:var(--azul); }
+  .onde { font-size:.8rem; color:var(--laranja-texto); font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+  video, iframe { width:100%; aspect-ratio:16/9; border:0; border-radius:8px; background:#000; display:block; }
+  .tempo { margin-top:8px; font-size:.95rem; }
+  .tempo b { color:var(--azul); }
+  .falta { padding:24px; text-align:center; color:#666; border:2px dashed var(--linha); border-radius:8px; }
+  ol { padding-left:1.2em; }
+</style>
+</head>
+<body>
+<main>
+  <span class="onde">Camtauá · Como usar</span>
+  <h1>Teste: onde os vídeos tocam melhor?</h1>
+  <p>Abra no <b>celular</b>, de preferência com a internet do galpão (ou ligue o modo de economia de dados). Toque no ▶ de cada um, um de cada vez.</p>
+  <ol>
+    <li><b>Tempo até tocar</b>: a página mede sozinha, do toque até a imagem andar.</li>
+    <li><b>Qualidade</b>: dá para ler o nome dos botões?</li>
+    <li><b>Anúncio</b>: apareceu propaganda antes ou no meio?</li>
+  </ol>
+  <p>No fim, tire um print desta página com os tempos.</p>
+
+  <div class="grade">
+    <section class="caixa"><span class="onde">GitHub Pages</span><h2>Receber semente</h2>
+      <video controls preload="none" playsinline poster="A1-ReceberSemente.jpg" src="A1-ReceberSemente.mp4" data-nome="pa1"></video>
+      <div class="tempo" id="t-pa1">tempo até tocar: —</div></section>
+    <section class="caixa"><span class="onde">YouTube</span><h2>Receber semente</h2>
+      <div id="yt-a1"></div><div class="tempo" id="t-ya1">tempo até tocar: —</div></section>
+    <section class="caixa"><span class="onde">GitHub Pages</span><h2>Fechar uma operação</h2>
+      <video controls preload="none" playsinline poster="A3-FecharOperacao.jpg" src="A3-FecharOperacao.mp4" data-nome="pa3"></video>
+      <div class="tempo" id="t-pa3">tempo até tocar: —</div></section>
+    <section class="caixa"><span class="onde">YouTube</span><h2>Fechar uma operação</h2>
+      <div id="yt-a3"></div><div class="tempo" id="t-ya3">tempo até tocar: —</div></section>
+  </div>
+  <p style="font-size:.85rem;color:#666">Os vídeos do YouTube entram pelo endereço desta página: <code>teste.html?a1=&lt;código do vídeo&gt;&amp;a3=&lt;código do vídeo&gt;</code> (o código é o que vem depois de <code>v=</code> ou de <code>youtu.be/</code>).</p>
+</main>
+<script>
+  // Pages: do toque (play) até o evento «playing».
+  document.querySelectorAll('video').forEach(function (v) {
+    var t0 = 0, alvo = document.getElementById('t-' + v.dataset.nome);
+    v.addEventListener('play', function () { if (!t0) t0 = performance.now(); alvo.innerHTML = 'carregando…'; });
+    v.addEventListener('playing', function () { if (t0) { alvo.innerHTML = 'tempo até tocar: <b>' + ((performance.now() - t0) / 1000).toFixed(1) + ' s</b>'; t0 = -1; } });
+  });
+  // YouTube: código vem pela URL; mede do «BUFFERING» (toque) até «PLAYING».
+  var q = new URLSearchParams(location.search), ids = { a1: q.get('a1'), a3: q.get('a3') };
+  Object.keys(ids).forEach(function (k) {
+    if (!ids[k]) document.getElementById('yt-' + k).outerHTML = '<div class="falta">vídeo do YouTube ainda não informado</div>';
+  });
+  if (ids.a1 || ids.a3) {
+    var s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s);
+  }
+  window.onYouTubeIframeAPIReady = function () {
+    Object.keys(ids).forEach(function (k) {
+      if (!ids[k]) return;
+      var t0 = 0, alvo = document.getElementById('t-y' + k);
+      new YT.Player('yt-' + k, { videoId: ids[k], playerVars: { playsinline: 1, rel: 0 },
+        events: { onStateChange: function (e) {
+          if (e.data === YT.PlayerState.BUFFERING && !t0) { t0 = performance.now(); alvo.innerHTML = 'carregando…'; }
+          if (e.data === YT.PlayerState.PLAYING && t0 > 0) { alvo.innerHTML = 'tempo até tocar: <b>' + ((performance.now() - t0) / 1000).toFixed(1) + ' s</b>'; t0 = -1; }
+        } } });
+    });
+  };
+</script>
+</body>
+</html>
