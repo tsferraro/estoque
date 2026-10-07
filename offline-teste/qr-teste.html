@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR de teste · lançadora offline</title>
+<style>
+  @page{size:A4;margin:10mm 12mm}
+  :root{--orange:#FF6E00;--orange-dark:#B24D00;--navy:#0E2A47;--text:#1A1A1A;--text2:#5A6472;--line:#E3E6EB}
+  *{box-sizing:border-box}
+  body{margin:0;padding:16px;color:var(--text);font-family:Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:14px;background:#fff}
+  h1{margin:0 0 4px;font-size:20px} .sub{margin:0 0 8px;color:var(--text2);font-size:13px;line-height:1.4}
+  .barra{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}
+  button,a.bt{font:inherit;border:1.5px solid var(--orange);background:var(--orange);color:#fff;font-weight:700;border-radius:10px;padding:10px 14px;text-decoration:none;cursor:pointer}
+  a.bt.sec{background:#fff;color:var(--navy);border-color:var(--line)}
+  .grade{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .qr{border:1.5px solid var(--line);border-radius:10px;padding:8px;break-inside:avoid;display:flex;gap:10px;align-items:center}
+  .qr canvas{width:36mm;height:36mm;flex:none;image-rendering:pixelated;image-rendering:crisp-edges;background:#fff}
+  .qr .t{min-width:0} .qr b{display:block;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;overflow-wrap:anywhere}
+  .qr span{display:block;font-size:12px;color:var(--text2);line-height:1.35;margin-top:3px}
+  .qr em{display:inline-block;font-style:normal;font-size:11px;font-weight:700;color:var(--orange-dark);border:1px solid var(--orange);border-radius:999px;padding:1px 7px;margin-top:4px}
+  .nota{font-size:12px;color:var(--text2);line-height:1.5;margin:12px 0 0}
+  @media (max-width:520px){.grade{grid-template-columns:1fr}}
+  @media print{body{padding:0}.barra,.nota.tela{display:none}.grade{gap:6mm 5mm}.qr{padding:3mm}h1{font-size:16px}}
+</style>
+</head>
+<body>
+<h1>QR de teste · lançadora offline</h1>
+<p class="sub">Lotes da base de demonstração (lidos em 07/10/2026). Cada QR é um link que abre a <b>ficha do lote</b> na lançadora; o último é só o código. Imprima em A4 e aponte a câmera da lançadora («Ler QR»).</p>
+<div class="barra"><button id="imprimir" type="button">Imprimir</button><a class="bt sec" href="./">Abrir a lançadora</a></div>
+<div class="grade" id="grade"></div>
+<p class="nota tela">iPhone: a câmera nativa abre o link no <b>Safari</b>, que não tem os cadastros guardados. Abra a lançadora que você usa (a da tela de início), toque em <b>Ler QR</b> e aponte para a folha.</p>
+<script src="vendor/qrcode.js"></script>
+<script>
+/* Os QR são desenhados AQUI, no navegador (qrcode-generator 2.0.4, MIT, vendorizado) — a folha sai igual sem rede.
+   O formato do link é o do briefing: <lançadora de teste>/?org=<org>&lote=<código>. */
+var BASE = 'https://tsferraro.github.io/estoque/offline-teste/';
+var ORG = (/[?&]org=([^&]+)/.exec(location.search) || [])[1] || 'demo';
+var LOTES = [
+  ['REC-20261001-002', 'recebido do teste do iPhone', '3.000 kg disponíveis · 3 famílias de origem'],
+  ['SEC-20261006-014', 'secado', '1.400 kg'],
+  ['QUE-20261006-002', 'amêndoa', '1.200 kg · aguardando armazenagem'],
+  ['1SUB-20261006-002', 'casca (subproduto)', '1.500 kg'],
+  ['ARM-20261006-001', 'armazenado', 'parte já vendida'],
+  ['ARM-20261006-002', 'armazenado hoje pela fila offline', '5 kg'],
+  ['SEC-20261006-015', 'saldo ZERO', 'todo consumido — a ficha tem de dizer isso'],
+  ['SEC-20261006-008', 'EM PROCESSAMENTO', 'a ficha oferece «Fechar esta operação»'],
+  ['REC-20990101-999', 'NÃO EXISTE', 'a ficha tem de dizer «não está nos cadastros deste aparelho»']
+];
+function link(cod){ return BASE + '?org=' + encodeURIComponent(ORG) + '&lote=' + encodeURIComponent(cod); }
+function desenhar(canvas, texto){
+  var qr = qrcode(0, 'M'); qr.addData(texto); qr.make();
+  var n = qr.getModuleCount(), cel = 8, margem = 4, lado = (n + margem * 2) * cel;
+  canvas.width = canvas.height = lado;
+  var x = canvas.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, lado, lado); x.fillStyle = '#000';
+  for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (qr.isDark(r, c)) x.fillRect((c + margem) * cel, (r + margem) * cel, cel, cel);
+}
+function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+var itens = LOTES.map(function(l){ return { cod: l[0], quem: l[1], nota: l[2], texto: link(l[0]), formato: 'link-QR · org ' + ORG }; });
+itens.push({ cod: 'REC-20261001-002', quem: 'o mesmo lote, SÓ O CÓDIGO', nota: 'o 2º formato aceito: sem link, usa a organização atual da lançadora', texto: 'REC-20261001-002', formato: 'só o código' });
+document.getElementById('grade').innerHTML = itens.map(function(it, i){
+  return '<div class="qr"><canvas data-i="' + i + '" data-lote="' + esc(it.cod) + '" data-formato="' + esc(it.formato) + '" data-texto="' + esc(it.texto) + '"></canvas>' +
+         '<div class="t"><b>' + esc(it.cod) + '</b><span>' + esc(it.quem) + ' · ' + esc(it.nota) + '</span><em>' + esc(it.formato) + '</em></div></div>';
+}).join('');
+[].forEach.call(document.querySelectorAll('canvas[data-texto]'), function(c){ desenhar(c, c.dataset.texto); });
+document.getElementById('imprimir').onclick = function(){ window.print(); };
+window.QR_TESTE_PRONTO = itens.length;
+</script>
+</body>
+</html>

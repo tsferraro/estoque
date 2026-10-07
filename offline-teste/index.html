@@ -77,6 +77,19 @@
   label.fam input{width:22px;height:22px;accent-color:var(--orange);flex:none;margin:0}
   .vazio-fam{padding:14px 12px;font-size:14px;color:var(--text2)}
   .tudo{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:8px 10px;font-size:13px;font-weight:700;color:var(--navy)}
+  .ficha{border:1.5px solid var(--line);border-left:4px solid var(--orange);border-radius:12px;padding:14px;margin:0 0 12px}
+  .ficha .cod{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;font-size:15px;overflow-wrap:anywhere}
+  .ficha h3{margin:2px 0 2px;font-size:18px} .ficha .et{color:var(--text2);font-size:13px;margin:0 0 10px}
+  .ficha dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px} .ficha dt{color:var(--text2)} .ficha dd{margin:0;font-weight:700;text-align:right}
+  .ficha ul{list-style:none;margin:6px 0 0;padding:0;font-size:14px} .ficha li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line)} .ficha li:last-child{border-bottom:0}
+  .ficha li b{white-space:nowrap}
+  .ficha .sub{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin:14px 0 2px}
+  .ficha .alerta-ficha{background:var(--orange-bg);border:1.5px solid var(--orange);border-radius:10px;padding:10px;margin:10px 0 0;font-size:14px;line-height:1.4}
+  .ficha .usado{font-size:13px;color:var(--orange-dark);margin:6px 0 0;line-height:1.4}
+  .visor{background:#0E2A47;border-radius:12px;overflow:hidden;aspect-ratio:3/4;max-height:60vh;display:flex;align-items:center;justify-content:center}
+  .visor video{width:100%;height:100%;object-fit:cover}
+  .erro-txt{color:var(--erro);font-weight:700}
+  .col-acoes{display:flex;flex-direction:column;gap:10px;margin:12px 0 0}
 </style>
 </head>
 <body>
@@ -217,7 +230,7 @@ function enviar(soCadastros){
   var org = orgAtual(), db = ler();
   var pend = soCadastros ? [] : (db.fila || []).filter(function(i){ return i.org === org.id && i.estado === 'guardado'; });
   if (!navigator.onLine) { toast('Sem rede agora. Está tudo guardado no aparelho — envie quando o sinal voltar.'); return; }
-  var pacote = { volta: location.origin + location.pathname, org: org.id, fuso: (db.cadastros && db.cadastros[org.id] && db.cadastros[org.id].fuso) || FUSO_PADRAO,
+  var pacote = { volta: location.origin + location.pathname + voltaDaFicha(), org: org.id, fuso: (db.cadastros && db.cadastros[org.id] && db.cadastros[org.id].fuso) || FUSO_PADRAO,
                  fila: pend.map(function(i){ return { token:i.token, tipo:i.tipo, quando:i.quando, payload:i.payload }; }) };
   location.href = org.offline + '?modo=sincronizar#f=' + b64url(JSON.stringify(pacote));
 }
@@ -225,12 +238,15 @@ function enviar(soCadastros){
 /* ── TELAS ────────────────────────────────────────────────────────────────── */
 function render(){
   var db = ler(), app = document.getElementById('app');
+  if (TELA.nome !== 'leitor') pararCamera();
+  if (TELA.nome === 'ficha')   { app.innerHTML = telaFicha(db);   ligarFicha();   return; }
+  if (TELA.nome === 'leitor')  { app.innerHTML = telaLeitor();    ligarLeitor();  return; }
   if (TELA.nome === 'receber') { app.innerHTML = telaReceber(db); ligarReceber(); return; }
   if (TELA.nome === 'abrir')   { app.innerHTML = telaAbrir(db);   ligarAbrir();   return; }
   if (TELA.nome === 'fechar')  { app.innerHTML = telaFechar(db);  ligarFechar();  return; }
   var h = '<header><div class="u">Ū</div><div><h1>Gestão de Estoque</h1><small>Mandū Inovação Social</small></div></header>';
   h += '<label class="chave"><input type="checkbox" id="chk-off"' + (db.modoOffline ? ' checked' : '') + '>' +
-       '<div><b>Versão offline</b><span>Receber, abrir e fechar. O que você lança fica guardado neste aparelho e vai para a planilha quando houver rede.</span></div></label>';
+       '<div><b>Versão offline</b><span>Receber, abrir e fechar. O que você lança fica guardado neste aparelho e vai para a planilha quando houver rede. Também mostra a ficha de um lote (botão «Ler QR»).</span></div></label>';
   if (!db.modoOffline) {
     h += '<p class="lbl">Escolha a organização</p><nav class="orgs">' + ORGS.map(function(o){
       return '<a class="org" href="' + esc(o.url) + '" data-org="' + esc(o.id) + '"><span><span class="n">' + esc(o.nome) + '</span><span class="d">' + esc(o.desc) + '</span></span><span class="seta">›</span></a>';
@@ -257,6 +273,7 @@ function render(){
   h += '<div class="acoes"><button class="acao prim" id="btn-receber">Receber</button>' +
        '<button class="acao prim" id="btn-abrir">Abrir</button>' +
        '<button class="acao prim" id="btn-fechar">Fechar</button></div>';
+  h += '<button class="grande sec" id="btn-lerqr" style="margin:10px 0 0">Ler QR do lote</button>';
   h += '<p class="lbl">Lançamentos deste aparelho</p>';
   h += fila.length ? '<ul class="fila">' + fila.slice().reverse().map(function(i){ return linhaFila(i, fila, fusoDe(cad)); }).join('') + '</ul>'
                    : '<p class="aviso" style="margin:0 0 12px">Nada lançado neste aparelho ainda.</p>';
@@ -280,6 +297,7 @@ function ligarInicio(){
   var ba = document.getElementById('btn-abrir'); if (ba) ba.onclick = function(){ TELA = { nome:'abrir', form:{ etapa:'', lotes:{}, obs:'' } }; render(); };
   var bf = document.getElementById('btn-fechar'); if (bf) bf.onclick = function(){ TELA = { nome:'fechar', form:{ op:'', pesoSaida:'', principal:'', subs:['','',''], obs:'' } }; render(); };
   var be = document.getElementById('btn-enviar'); if (be) be.onclick = function(){ enviar(false); };
+  var bq = document.getElementById('btn-lerqr'); if (bq) bq.onclick = function(){ abrirLeitor(); };
   document.querySelectorAll('[data-descartar]').forEach(function(b){ b.onclick = function(){
     var dep = dependentesDe(ler().fila || [], b.dataset.descartar);
     if (!confirm('Descartar este lançamento? Ele sai do aparelho e não vai para a planilha.' +
@@ -436,9 +454,14 @@ function telaAbrir(db){
   var h = '<div class="topo"><button class="link" id="btn-voltar">‹ voltar</button></div><h2>Abrir</h2>';
   if (!(cad.etapas || []).length)
     return h + '<p class="aviso">O aparelho ainda não guardou as etapas desta organização. Volte e toque em «Atualizar cadastros», com sinal.</p>';
-  if (!f.etapa)
-    return h + '<p class="lbl">Qual etapa vai abrir?</p><div class="grade">' + cad.etapas.map(function(e){
-      return '<button class="opc" data-etapa="' + esc(e.id) + '">' + esc(e.nome) + '</button>'; }).join('') + '</div>';
+  if (!f.etapa) {
+    /* OFF4 · veio da ficha de um lote: só as etapas onde ELE entra (a mesma elegibilidade do Abrir), e o lote já sobe na operação */
+    var pre = f.pre ? proj.lotes[f.pre] : null;
+    var etapasOk = pre ? cad.etapas.filter(function(e){ return lotesElegiveis(cad, proj, e.id).some(function(l){ return l.chave === f.pre; }); }) : cad.etapas;
+    return h + (pre ? '<div class="aviso-saida" id="abrir-pre" style="margin:0 0 12px">O lote <b>' + esc(pre.codigo) + '</b> (' + esc(pre.produto) + ' · ' + kgTxt(pre.saldo) + ' kg) já vai nesta operação. Escolha a etapa.</div>' : '') +
+      '<p class="lbl">Qual etapa vai abrir?</p>' + (etapasOk.length ? '<div class="grade">' + etapasOk.map(function(e){
+      return '<button class="opc" data-etapa="' + esc(e.id) + '">' + esc(e.nome) + '</button>'; }).join('') + '</div>' : '<p class="aviso" style="margin:0">Este lote não entra em nenhuma etapa que se abre daqui.</p>');
+  }
   var et = etapaDeCad(cad, f.etapa), aceitos = Object.keys(aceitosDe(et));
   h += '<div class="faixa"><button class="pill laranja" id="troca-etapa">' + esc(et.nome) + ' ✕</button></div>' +
        (aceitos.length ? '<p class="nota-linha" style="margin:0 0 4px">consome ' + esc(aceitos.slice(0, 2).join(' e ') + (aceitos.length > 2 ? ' e mais ' + (aceitos.length - 2) : '')) + '</p>' : '');
@@ -501,7 +524,7 @@ function atualizarAbrir(){
 function ligarAbrir(){
   var f = TELA.form, org = orgAtual(), db = ler(), cad = db.cadastros[org.id], proj = projecao(db, org);
   document.getElementById('btn-voltar').onclick = function(){ TELA = { nome:'inicio' }; render(); };
-  document.querySelectorAll('[data-etapa]').forEach(function(b){ b.onclick = function(){ f.etapa = b.dataset.etapa; f.lotes = {}; render(); }; });
+  document.querySelectorAll('[data-etapa]').forEach(function(b){ b.onclick = function(){ f.etapa = b.dataset.etapa; f.lotes = {}; puxarLotePre(f, cad, proj); render(); }; });
   var te = document.getElementById('troca-etapa'); if (te) te.onclick = function(){ f.etapa = ''; f.lotes = {}; render(); };
   document.querySelectorAll('[data-pega]').forEach(function(b){ b.onclick = function(){
     if (Object.keys(f.lotes).length >= (cad.maxLotes || 8)) { toast('No máximo ' + (cad.maxLotes || 8) + ' lotes por operação.'); return; }
@@ -626,6 +649,187 @@ function guardarFechar(){
   toast('Guardado no aparelho ✓ — ainda não está na planilha.');
 }
 
+/* ══ OFF4 · FICHA DO LOTE, LINK-QR E «LER QR» ══════════════════════════════════════════════════
+   O QR do saco/palete leva `?org=<org>&lote=<código>`; a ficha sai dos cadastros GUARDADOS no aparelho
+   (`cadastros.fichas`), sem rede, e diz de quando é o retrato. A leitura da câmera usa o `BarcodeDetector` nativo
+   quando ele sabe `qr_code` (Chrome Android) e, senão, o leitor de `vendor/` — carregado SÓ no toque em «Ler QR». */
+function paramDaUrl(q, nome){ var m = new RegExp('[?&]' + nome + '=([^&#]*)').exec(q || ''); if (!m) return ''; try { return decodeURIComponent(m[1].replace(/\+/g, ' ')).trim(); } catch(e){ return m[1]; } }
+/* o texto lido do QR: o link (pega `org` e `lote`) OU só o código (REC-…, SEC-…, 1SUB-…), que usa a organização atual */
+function interpretarQR(txt){
+  var t = String(txt == null ? '' : txt).trim(), lote = paramDaUrl(t, 'lote');
+  if (lote) return { org: paramDaUrl(t, 'org'), lote: lote.toUpperCase() };
+  if (/^[A-Za-z0-9]+-\d{8}-\d+$/.test(t)) return { org: '', lote: t.toUpperCase() };
+  return null;
+}
+function voltaDaFicha(){ return TELA.nome === 'ficha' && TELA.lote ? '?org=' + encodeURIComponent((orgDaFicha(TELA) || {}).id || TELA.org || '') + '&lote=' + encodeURIComponent(TELA.lote) : ''; }
+function limparEndereco(){ try { if (/[?&]lote=/.test(location.search)) history.replaceState(null, '', location.pathname); } catch(e){} }
+function orgDaFicha(f){ var id = String(f.org || (orgAtual() || {}).id || '').toLowerCase(); return ORGS.find(function(o){ return o.id === id; }) || null; }
+function abrirFicha(org, lote, via){
+  var o = ORGS.find(function(x){ return x.id === String(org || (orgAtual() || {}).id || '').toLowerCase(); });
+  if (o && o.offline) mudar(function(db){ db.orgOffline = o.id; });                 /* o QR escolhe a organização */
+  TELA = { nome:'ficha', org: org || '', lote: lote, via: via || '' }; render();
+}
+/* aberto com ?lote= no endereço: o link-QR (câmera nativa, outro app, mensagem) */
+function abrirDoEndereco(){
+  var lote = paramDaUrl(location.search, 'lote'); if (!lote) return;
+  abrirFicha(paramDaUrl(location.search, 'org'), lote.toUpperCase(), 'link');
+}
+function hojeNaOrg(fuso){ try { return new Date().toLocaleDateString('en-CA', { timeZone: fuso || FUSO_PADRAO }); } catch(e){ return new Date().toISOString().slice(0, 10); } }
+function diasDesde(iso, fuso){
+  if (!iso) return null; var h = hojeNaOrg(fuso).split('-'), d = String(iso).split('-'); if (d.length !== 3) return null;
+  return Math.round((Date.UTC(+h[0], +h[1] - 1, +h[2]) - Date.UTC(+d[0], +d[1] - 1, +d[2])) / 864e5);
+}
+function dataBR(iso){ var d = String(iso || '').split('-'); return d.length === 3 ? d[2] + '/' + d[1] + '/' + d[0] : ''; }
+function kgUsadoGuardado(db, org, cod){
+  var t = 0;
+  (db.fila || []).forEach(function(i){ if (i.org === org.id && i.estado === 'guardado' && i.tipo === 'abrir') (i.payload.lotes || []).forEach(function(l){ if (l.codigo === cod) t += Number(l.kg) || 0; }); });
+  return arred2(t);
+}
+function fechamentoGuardado(db, org, cod){ return (db.fila || []).some(function(i){ return i.org === org.id && i.estado === 'guardado' && i.tipo === 'fechar' && (i.payload || {}).codigo === cod; }); }
+function puxarLotePre(f, cad, proj){
+  if (!f.pre || !f.etapa) return; var l = proj.lotes[f.pre];
+  if (l && lotesElegiveis(cad, proj, f.etapa).some(function(x){ return x.chave === f.pre; })) f.lotes[f.pre] = { kg: String(l.saldo).replace('.', ','), naoAcabou: false };   /* app R-33: sobe CHEIO e «Acabou» marcado */
+}
+
+function telaFicha(db){
+  var f = TELA, cod = f.lote, org = orgDaFicha(f), rede = navigator.onLine;
+  var h = '<div class="topo"><button class="link" id="btn-voltar">‹ voltar</button></div><h2>Ficha do lote</h2><p class="ficha-cod cod" id="ficha-codigo" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;margin:0 0 10px;overflow-wrap:anywhere">' + esc(cod) + '</p>';
+  var ler_outro = '<div class="col-acoes"><button class="grande sec" id="btn-lerqr">Ler outro QR</button></div>';
+  if (!org) return h + '<p class="aviso" id="ficha-msg">Este QR é de uma organização que a lançadora não conhece («' + esc(f.org) + '»). Confira o QR.</p>' + ler_outro;
+  if (!org.offline) return h + '<p class="aviso" id="ficha-msg">O modo offline ainda não está liberado para ' + esc(org.nome) + '.</p>' + ler_outro;
+  var cad = db.cadastros && db.cadastros[org.id];
+  var atualizar = rede ? '<div class="col-acoes"><button class="grande sec" id="btn-atualizar">Atualizar agora</button></div>' : '<p class="aviso">Sem rede agora. Quando o sinal voltar, toque em «Atualizar agora» para buscar os cadastros mais novos.</p>';
+  if (!cad) {                                                                           /* este navegador nunca guardou os cadastros daquela organização */
+    return h + '<p class="aviso" id="ficha-msg">Este aparelho (neste navegador) ainda não guardou os cadastros de ' + esc(org.nome) + ', então não tenho de onde tirar a ficha do lote.</p>' +
+      '<p class="aviso" id="ficha-iphone">No iPhone, a câmera do celular abre o link no Safari, que não é a lançadora que você usa. <b>Abra a lançadora que você usa (a da tela de início) e toque em «Ler QR».</b></p>' +
+      (rede ? '<div class="col-acoes"><button class="grande" id="btn-buscar">Buscar os cadastros</button></div>' : '<p class="aviso">Sem rede agora: para buscar os cadastros é preciso sinal.</p>') + ler_outro;
+  }
+  var ret = quandoTxt(cad.geradoEm, fusoDe(cad));
+  h += '<div class="faixa"><span class="pill laranja">' + esc(org.nome) + '</span><span class="pill ' + (rede ? 'on' : 'off') + '">' + (rede ? 'com rede' : 'sem rede') + '</span><span class="pill" id="ficha-retrato">retrato de ' + esc(ret) + '</span></div>';
+  if (!cad.fichas) return h + '<p class="aviso" id="ficha-msg">Os cadastros deste aparelho são de antes das fichas de lote. Atualize os cadastros (com sinal) para ver a ficha.</p>' + atualizar + ler_outro;
+  var fi = cad.fichas[cod];
+  if (!fi) return h + '<p class="aviso" id="ficha-msg">Este lote não está nos cadastros deste aparelho (retrato de ' + esc(ret) + '). Ele pode ser mais novo que o retrato' + (rede ? '.' : ' — com sinal, atualize.') + (cad.fichasCorte ? ' Os lotes sem saldo e com mais de ' + esc(cad.fichasCorte.dias) + ' dias ficam de fora do retrato.' : '') + '</p>' + atualizar + ler_outro;
+  var P = projecao(db, org), pl = P.lotes[cod], aberta = P.abertas[cod], proc = /processamento/i.test(fi[2]);
+  var saldoRetrato = fi[5], saldoMostrado = pl ? pl.saldo : saldoRetrato, usado = kgUsadoGuardado(db, org, cod);
+  var etapaNome = (cad.etapaNomes || {})[fi[1]] || nomeDaEtapa(cad, fi[1]);
+  var d = diasDesde(fi[3], fusoDe(cad));
+  h += '<div class="ficha" id="ficha"><h3 id="ficha-produto">' + esc(fi[0]) + '</h3><p class="et" id="ficha-etapa">' + esc(etapaNome) + ' · ' + esc(fi[2]) + '</p><dl>' +
+       '<dt id="ficha-saldo-rot">' + (proc ? 'Na operação' : usado > 0 ? 'Disponível (projetado)' : 'Disponível') + '</dt><dd id="ficha-saldo">' + kgTxt(saldoMostrado) + ' kg</dd>' +
+       '<dt>Kg de origem</dt><dd id="ficha-base">' + kgTxt(fi[4]) + ' kg</dd>' +
+       '<dt>Entrou em</dt><dd id="ficha-data">' + (fi[3] ? esc(dataBR(fi[3])) + (d != null ? ' · ' + esc(diasTxt(d)) : '') : 'sem data de entrada') + '</dd></dl>';
+  if (usado > 0) h += '<p class="usado" id="ficha-usado">' + kgTxt(usado) + ' kg já usados em lançamentos guardados neste aparelho (no retrato eram ' + kgTxt(saldoRetrato) + ' kg).</p>';
+  if (proc) h += '<div class="alerta-ficha" id="ficha-alerta">Em processamento: a operação ainda não foi fechada.</div>';
+  else if (!(saldoRetrato > 0.001)) h += '<div class="alerta-ficha" id="ficha-alerta">Saldo zero: todo este lote já foi usado ou vendido.</div>';
+  h += '<p class="sub">Comunidades de origem</p>' + ((fi[6] || []).length ? '<ul id="ficha-comunidades">' + fi[6].map(function(c){ return '<li><span>' + esc(c[0]) + '</span><b>' + kgTxt(c[1]) + ' kg</b></li>'; }).join('') + '</ul>' : '<p class="nota-linha">sem origem registrada</p>');
+  var nF = fi[8] || 0, fs = fi[7] || [];
+  h += '<p class="sub">Famílias de origem' + (nF ? ' · ' + nF : '') + '</p>' + (fs.length ? '<ul id="ficha-familias">' + fs.map(function(x){ return '<li><span>' + esc(x[0]) + '</span><b>' + kgTxt(x[1]) + ' kg</b></li>'; }).join('') + '</ul>' + (nF > fs.length ? '<p class="nota-linha" id="ficha-mais">e mais ' + (nF - fs.length) + '</p>' : '') : '<p class="nota-linha">sem origem registrada</p>');
+  h += '</div>';
+  /* ações curtas: só as que fazem sentido para ESTE lote, neste aparelho */
+  var acoes = '';
+  if (proc && aberta) acoes += '<button class="grande" id="btn-fechar-op">Fechar esta operação</button>';
+  else if (proc && fechamentoGuardado(db, org, cod)) acoes += '<p class="aviso" id="ficha-fechando" style="margin:0">O fechamento desta operação já está guardado neste aparelho.</p>';
+  if (pl && pl.saldo > 0.001) {
+    var etapasOk = (cad.etapas || []).filter(function(e){ return lotesElegiveis(cad, P, e.id).some(function(l){ return l.chave === cod; }); });
+    acoes += etapasOk.length ? '<button class="grande" id="btn-usar-abrir">Usar num Abrir</button>' : '<p class="aviso" id="ficha-sem-abrir" style="margin:0">Este lote não entra em nenhuma etapa que se abre daqui.</p>';
+  }
+  h += '<div class="col-acoes">' + acoes + '</div><p class="aviso" style="margin-top:12px">O que aconteceu depois do retrato não aparece até atualizar os cadastros.</p>' + atualizar + ler_outro;
+  return h;
+}
+function ligarFicha(){
+  var org = orgDaFicha(TELA), db = ler(), cad = org && db.cadastros && db.cadastros[org.id], cod = TELA.lote;
+  var sair = function(){ limparEndereco(); TELA = { nome:'inicio' }; render(); };
+  document.getElementById('btn-voltar').onclick = sair;
+  var ba = document.getElementById('btn-atualizar'); if (ba) ba.onclick = function(){ enviar(true); };
+  var bb = document.getElementById('btn-buscar'); if (bb) bb.onclick = function(){ enviar(true); };
+  var bq = document.getElementById('btn-lerqr'); if (bq) bq.onclick = function(){ limparEndereco(); abrirLeitor(); };
+  var bu = document.getElementById('btn-usar-abrir'); if (bu) bu.onclick = function(){ limparEndereco(); TELA = { nome:'abrir', form:{ etapa:'', lotes:{}, obs:'', pre: cod } }; render(); };
+  var bf = document.getElementById('btn-fechar-op'); if (bf) bf.onclick = function(){ limparEndereco(); TELA = { nome:'fechar', form:{ op: cod, pesoSaida:'', principal:'', subs:['','',''], obs:'' } }; render(); };
+}
+
+/* ── «Ler QR»: a câmera traseira, um quadro a cada ~250 ms ─────────────────────────────────── */
+var LEITOR = { ativo:false, stream:null, timer:null, det:null, ocupado:false };
+function pararCamera(){
+  LEITOR.ativo = false; clearTimeout(LEITOR.timer); LEITOR.timer = null; LEITOR.ocupado = false;
+  if (LEITOR.stream) { LEITOR.stream.getTracks().forEach(function(t){ try { t.stop(); } catch(e){} }); LEITOR.stream = null; }
+}
+function carregarScript(src){
+  return new Promise(function(ok, falha){
+    var s = document.createElement('script'); s.src = src; s.onload = function(){ ok(); }; s.onerror = function(){ falha(new Error('não carregou ' + src)); };
+    document.head.appendChild(s);
+  });
+}
+/* o leitor do aparelho: nativo se ele sabe QR; senão o de vendor/, que só é baixado/lido AGORA (a página inicial não engorda) */
+function leitorDeQR(){
+  var polyfill = function(){
+    var pronto = window.LeitorQR ? Promise.resolve() : carregarScript('vendor/zxing-reader.iife.js').then(function(){ return carregarScript('leitor-qr.js'); });
+    return pronto.then(function(){ return new window.LeitorQR(); });
+  };
+  if (window.BarcodeDetector && BarcodeDetector.getSupportedFormats) {
+    return BarcodeDetector.getSupportedFormats().then(function(fs){ return (fs || []).indexOf('qr_code') >= 0 ? new BarcodeDetector({ formats:['qr_code'] }) : polyfill(); }, polyfill);
+  }
+  return polyfill();
+}
+function erroDaCamera(err){
+  var n = (err && err.name) || '';
+  if (/NotAllowed|PermissionDenied|Security/i.test(n)) return 'A câmera está bloqueada para este site. Libere a câmera nas configurações do navegador (ou do aparelho) e tente de novo — ou digite o código do lote abaixo.';
+  if (/NotFound|DevicesNotFound|Overconstrained/i.test(n)) return 'Este aparelho não tem câmera disponível. Digite o código do lote abaixo.';
+  if (/NotReadable|Abort|TrackStart/i.test(n)) return 'A câmera está em uso por outro aplicativo. Feche-o e tente de novo — ou digite o código do lote abaixo.';
+  return 'Não consegui abrir a câmera' + (err && err.message ? ' (' + err.message + ')' : '') + '. Digite o código do lote abaixo.';
+}
+function telaLeitor(){
+  return '<div class="topo"><button class="link" id="btn-cancelar">‹ cancelar</button></div><h2>Ler QR do lote</h2>' +
+    '<div class="visor"><video id="video" playsinline muted autoplay></video></div>' +
+    '<p class="aviso" id="leitor-msg" role="status">Abrindo a câmera…</p>' +
+    '<p class="lbl">Ou digite o código do lote</p><input class="txt" id="cod-manual" placeholder="REC-20261001-002" autocapitalize="characters" autocomplete="off">' +
+    '<div style="margin-top:10px"><button class="grande sec" id="btn-cod">Abrir a ficha</button></div>' +
+    '<div style="margin-top:10px"><button class="grande sec" id="btn-cancelar2">Cancelar</button></div>';
+}
+function msgLeitor(t, erro){ var e = document.getElementById('leitor-msg'); if (e) { e.textContent = t; e.className = 'aviso' + (erro ? ' erro-txt' : ''); } }
+function abrirLeitor(){ TELA = { nome:'leitor' }; render(); }
+/* um texto lido (câmera, imagem ou digitado) → a ficha; o que não for lote diz isso e continua lendo */
+function abrirLeitura(txt){
+  var p = interpretarQR(txt);
+  if (!p) return false;
+  pararCamera(); abrirFicha(p.org, p.lote, 'leitor'); return true;
+}
+function ligarLeitor(){
+  var voltar = function(){ pararCamera(); TELA = { nome:'inicio' }; render(); };
+  document.getElementById('btn-cancelar').onclick = voltar; document.getElementById('btn-cancelar2').onclick = voltar;
+  document.getElementById('btn-cod').onclick = function(){
+    var t = document.getElementById('cod-manual').value;
+    if (!abrirLeitura(t)) msgLeitor('Isso não parece um código de lote (como REC-20261001-002).', true);
+  };
+  iniciarLeitor();
+}
+function iniciarLeitor(){
+  LEITOR.ativo = true;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { msgLeitor('Este navegador não deixa abrir a câmera aqui (ela só funciona em página segura). Digite o código do lote abaixo.', true); return; }
+  navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' }, audio:false }).then(function(stream){
+    if (!LEITOR.ativo) { stream.getTracks().forEach(function(t){ t.stop(); }); return; }      /* cancelou enquanto o aparelho perguntava a permissão */
+    LEITOR.stream = stream;
+    var v = document.getElementById('video'); if (!v) { pararCamera(); return; }
+    v.srcObject = stream; if (v.play) v.play().catch(function(){});
+    msgLeitor('Preparando o leitor…');
+    return leitorDeQR().then(function(det){ LEITOR.det = det; msgLeitor('Aponte a câmera para o QR do lote.'); lacoLeitor(); },
+      function(){ msgLeitor('Não consegui carregar o leitor de QR neste aparelho. Digite o código do lote abaixo.', true); });
+  }, function(err){ if (LEITOR.ativo) msgLeitor(erroDaCamera(err), true); });
+}
+function lacoLeitor(){
+  if (!LEITOR.ativo) return;
+  LEITOR.timer = setTimeout(function(){
+    var v = document.getElementById('video');
+    if (!v || !LEITOR.ativo) return;
+    if (v.readyState < 2 || LEITOR.ocupado) return lacoLeitor();
+    LEITOR.ocupado = true;
+    LEITOR.det.detect(v).then(function(rs){
+      LEITOR.ocupado = false; if (!LEITOR.ativo) return;
+      var txt = rs && rs[0] && rs[0].rawValue;
+      if (!txt) return lacoLeitor();
+      if (!abrirLeitura(txt)) { msgLeitor('Li «' + String(txt).slice(0, 40) + '», mas isso não é o QR de um lote. Aponte para o QR do saco ou do palete.', true); lacoLeitor(); }
+    }, function(){ LEITOR.ocupado = false; lacoLeitor(); });
+  }, 250);
+}
+
 /* ── RECEBER simplificado: comunidade → produto → famílias e peso ─────────── */
 function semAcento(t){ return String(t == null ? '' : t).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
 /* as famílias da comunidade escolhida — pelo ID ou pelo NOME (o cadastro antigo guarda o nome: D-167) — em ordem alfabética */
@@ -734,10 +938,11 @@ function guardar(){
   toast('Guardado no aparelho ✓ — ainda não está na planilha.');
 }
 
-window.addEventListener('online', function(){ if (TELA.nome === 'inicio') render(); });
-window.addEventListener('offline', function(){ if (TELA.nome === 'inicio') render(); });
+window.addEventListener('online', function(){ if (TELA.nome === 'inicio' || TELA.nome === 'ficha') render(); });
+window.addEventListener('offline', function(){ if (TELA.nome === 'inicio' || TELA.nome === 'ficha') render(); });
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
 lerRetorno();
+abrirDoEndereco();
 render();
 </script>
 </body>
