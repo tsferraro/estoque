@@ -90,6 +90,61 @@
   .visor video{width:100%;height:100%;object-fit:cover}
   .erro-txt{color:var(--erro);font-weight:700}
   .col-acoes{display:flex;flex-direction:column;gap:10px;margin:12px 0 0}
+  /* OFF5 · a Básica no aparelho (mockup 07/10) */
+  .sync{display:flex;align-items:center;justify-content:center;width:100%;border:1.5px solid var(--orange);background:var(--orange-bg);color:var(--orange-dark);border-radius:12px;padding:13px 10px;font-weight:700;font-size:15px;position:sticky;top:8px;z-index:6;margin:0 0 12px;box-shadow:0 2px 10px rgba(14,42,71,.10);line-height:1.25;text-align:center}
+  .sync.pend{background:var(--orange);color:#fff}
+  .faixa-auto{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1.5px solid var(--orange);background:#fff;border-radius:12px;padding:9px 12px;margin:0 0 12px;font-size:14px;font-weight:700;color:var(--orange-dark)}
+  .faixa-auto button{border:1.5px solid var(--orange);background:var(--orange-bg);color:var(--orange-dark);border-radius:8px;padding:6px 12px;font-weight:700;font-size:14px}
+  .sec{border:1.5px solid var(--line);border-radius:14px;padding:12px;margin:12px 0 0;background:#fff}
+  .sec .lbl{margin:0 0 8px}
+  .chips{display:flex;gap:6px;overflow-x:auto;margin:10px 0 0;padding-bottom:2px}
+  .chip{font-size:12px;border:1.5px solid var(--line);border-radius:999px;padding:5px 11px;white-space:nowrap;background:#fff;color:var(--navy);flex:none}
+  .chip.on{border-color:var(--orange);background:var(--orange-bg);color:var(--orange-dark);font-weight:700}
+  .regua{display:flex;flex-direction:column;gap:9px}
+  .rl{display:grid;grid-template-columns:minmax(112px,1.5fr) minmax(40px,1fr) 62px;gap:8px;align-items:center;font-size:12.5px}
+  .rl .bar{height:10px;border-radius:5px;background:var(--bg);overflow:hidden}
+  .rl .bar i{display:block;height:100%;background:var(--orange);border-radius:5px}
+  .rl .bar i.proc{background:repeating-linear-gradient(135deg,var(--orange) 0 4px,#FFB27A 4px 8px)}
+  .rl .bar i.sub{background:#9AA4B1}
+  .rl .kg{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+  .rl .et small{display:block;color:var(--text2);font-size:11px;line-height:1.25}
+  .rl .et{min-width:0}
+  .ac3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .ac{border:1.5px solid var(--line);border-radius:12px;padding:10px 4px;text-align:center;background:#fff;color:var(--navy);display:flex;flex-direction:column;gap:2px;align-items:center}
+  .ac.prim{border-color:var(--orange);background:var(--orange-bg);color:var(--orange-dark)}
+  .ac .n{font-size:22px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;min-height:24px}
+  .ac .v{font-weight:700} .ac .s{font-size:11px;color:var(--text2);font-weight:400;line-height:1.25}
+  .botoes{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0 0}
+  .bt{border:1.5px solid var(--line);border-radius:11px;padding:11px 8px;font-weight:700;color:var(--navy);background:#fff;text-align:center;font-size:14px}
+  .bt.lar{background:var(--orange);border-color:var(--orange);color:#fff}
+  .guard{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1.5px solid var(--orange);border-radius:11px;padding:9px 10px;font-size:13px;margin:8px 0 0}
+  .guard button{background:none;border:0;color:var(--orange-dark);font-weight:700;font-size:14px;padding:2px 4px}
+  .grupo{display:flex;flex-direction:column;gap:6px;margin:0 0 6px}
+  .grupo h3{margin:8px 0 0;font-size:13.5px;display:flex;justify-content:space-between;gap:8px;color:var(--navy)}
+  .grupo h3 span{font-weight:400;color:var(--text2);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .lt{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;border:1.5px solid var(--line);border-left:4px solid var(--orange);border-radius:10px;padding:8px 10px;background:#fff;width:100%;text-align:left;font:inherit;color:inherit}
+  .lt b{font-size:13.5px} .lt .kg{font-weight:700;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .lt small{color:var(--text2);font-size:11.5px} .lt .mini{justify-self:end;font-size:11.5px;font-weight:700;color:var(--orange-dark);border:1.5px solid var(--orange);border-radius:999px;padding:3px 10px;background:var(--orange-bg)}
+  .lt.sub{border-left-color:#9AA4B1} .lt.local{border-left-style:dashed}
+  /* o Balanço de Massa (componente 91 do app, em miniatura) · quebra HACHURADA, nunca «perda» */
+  .bm{border:1.5px solid var(--line);border-radius:12px;padding:12px 12px 10px;background:#fff;margin:12px 0 0}
+  .bm-h{font-size:16px;font-weight:700;color:var(--orange-dark);margin:0 0 8px}
+  .bm-t{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);margin:10px 0 0}
+  .bm-t:first-of-type{margin-top:0}
+  .bm-cab{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:3px} .bm-cab b{font-size:18px;font-variant-numeric:tabular-nums} .bm-cab span{font-size:13px;color:var(--text2);text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bm-barra{display:flex;height:26px;border-radius:5px;overflow:hidden;margin-top:6px;background:var(--bg)}
+  .bm-seg{display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums;min-width:0;overflow:hidden}
+  .bm-leg{margin-top:8px;display:flex;flex-direction:column;gap:5px}
+  .bm-li{display:flex;align-items:center;gap:8px;font-size:13.5px}
+  .bm-pt{width:11px;height:11px;border-radius:3px;flex:none}
+  .bm-li .n{flex:1;min-width:0;overflow-wrap:anywhere;line-height:1.25} .bm-li .k{font-weight:700;font-variant-numeric:tabular-nums} .bm-li .p{color:var(--text2);font-variant-numeric:tabular-nums;min-width:44px;text-align:right}
+  .bm-selo{display:inline-flex;align-items:center;margin-top:10px;font-size:13px;font-weight:700;border-radius:20px;padding:5px 11px}
+  .bm-selo.ok{background:var(--ok-bg);color:var(--ok)} .bm-selo.at{background:#FFF4D6;color:#8A5A00} .bm-selo.ru{background:var(--erro-bg);color:var(--erro)}
+  .bm-linha{font-size:13.5px;margin:10px 0 0;line-height:1.4}
+  .bm-lote{margin:10px 0 0} .bm-lote .nm{font-size:13px;display:flex;justify-content:space-between;gap:8px} .bm-lote .nm b{overflow-wrap:anywhere}
+  .ficha .num{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 8px;margin:2px 0 6px} .ficha .num .g{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums} .ficha .num small{color:var(--text2);font-size:13px}
+  .ficha .barra{display:block;height:5px;border-radius:3px;background:var(--bg);overflow:hidden;flex-basis:100%} .ficha .barra u{display:block;height:100%;background:var(--navy);opacity:.7}
+  .ficha ul li.ob{flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -166,6 +221,7 @@ function orgAtual(){
 function lerRetorno(){
   var h = location.hash; if (h.indexOf('#r=') !== 0) return;
   history.replaceState(null, '', location.pathname + location.search);
+  sess('estoque_auto', 'tentou');                                  /* OFF5 · B6 · voltou do envio: o automático não tenta de novo nesta volta da rede */
   var r; try { r = JSON.parse(deB64url(h.slice(3))); } catch(e){ toast('O retorno do envio veio ilegível — nada foi marcado; envie de novo.'); return; }
   var ok = 0, rec = 0, espera = 0;
   var gravou = mudar(function(db){
@@ -239,14 +295,19 @@ function enviar(soCadastros){
 function render(){
   var db = ler(), app = document.getElementById('app');
   if (TELA.nome !== 'leitor') pararCamera();
+  if (TELA.nome !== 'inicio') pararAuto(true);                     /* OFF5 · B6 · nunca conta o envio automático dentro de um formulário ou de outra tela */
   if (TELA.nome === 'ficha')   { app.innerHTML = telaFicha(db);   ligarFicha();   return; }
+  if (TELA.nome === 'estoque') { app.innerHTML = telaEstoque(db); ligarEstoque(); return; }
   if (TELA.nome === 'leitor')  { app.innerHTML = telaLeitor();    ligarLeitor();  return; }
   if (TELA.nome === 'receber') { app.innerHTML = telaReceber(db); ligarReceber(); return; }
   if (TELA.nome === 'abrir')   { app.innerHTML = telaAbrir(db);   ligarAbrir();   return; }
   if (TELA.nome === 'fechar')  { app.innerHTML = telaFechar(db);  ligarFechar();  return; }
-  var h = '<header><div class="u">Ū</div><div><h1>Gestão de Estoque</h1><small>Mandū Inovação Social</small></div></header>';
-  h += '<label class="chave"><input type="checkbox" id="chk-off"' + (db.modoOffline ? ' checked' : '') + '>' +
-       '<div><b>Versão offline</b><span>Receber, abrir e fechar. O que você lança fica guardado neste aparelho e vai para a planilha quando houver rede. Também mostra a ficha de um lote (botão «Ler QR»).</span></div></label>';
+  var org0 = db.modoOffline ? orgAtual() : null, cad0 = org0 && db.cadastros && db.cadastros[org0.id];
+  var basica = !!(db.modoOffline && cad0);                      /* OFF5 · com os cadastros no aparelho o Início é a Básica (mockup 07/10) */
+  var h = '<header><div class="u">Ū</div><div><h1>' + (basica ? esc(org0.nome) : 'Gestão de Estoque') + '</h1><small>' + (basica ? 'Versão Básica · neste aparelho' : 'Mandū Inovação Social') + '</small></div></header>';
+  var chkOff = '<label class="chave"><input type="checkbox" id="chk-off"' + (db.modoOffline ? ' checked' : '') + '>' +
+       '<div><b>Versão offline</b><span>Receber, abrir e fechar. O que você lança fica guardado neste aparelho e vai para a planilha quando houver rede. Também mostra o estoque por etapa e a ficha de um lote (botão «Ler QR»).</span></div></label>';
+  if (!basica) h += chkOff;
   if (!db.modoOffline) {
     h += '<p class="lbl">Escolha a organização</p><nav class="orgs">' + ORGS.map(function(o){
       return '<a class="org" href="' + esc(o.url) + '" data-org="' + esc(o.id) + '"><span><span class="n">' + esc(o.nome) + '</span><span class="d">' + esc(o.desc) + '</span></span><span class="seta">›</span></a>';
@@ -257,30 +318,124 @@ function render(){
   var fila = (db.fila || []).filter(function(i){ return i.org === org.id; });
   var pend = fila.filter(function(i){ return i.estado === 'guardado'; });
   var lista = orgsOffline();
-  h += '<p class="lbl">Organização</p>' + (lista.length > 1 ?
-       '<select class="txt" id="sel-org">' + lista.map(function(o){ return '<option value="' + esc(o.id) + '"' + (o.id === org.id ? ' selected' : '') + '>' + esc(o.nome) + '</option>'; }).join('') + '</select>' :
-       '<div><b>' + esc(org.nome) + '</b></div>');
-  h += '<div class="faixa" style="margin-top:12px">' +
-       '<span class="pill ' + (navigator.onLine ? 'on' : 'off') + '" id="pill-rede">' + (navigator.onLine ? 'com rede' : 'sem rede') + '</span>' +
-       '<span class="pill">' + (cad ? 'cadastros de ' + quandoTxt(cad.geradoEm, fusoDe(cad)) : 'cadastros: ainda não') + '</span>' +
-       (pend.length ? '<span class="pill laranja">' + pend.length + ' guardado(s) no aparelho</span>' : '') +
-       ((db.cadVelho || {})[org.id] ? '<span class="pill off" id="pill-velho">cadastros desatualizados · toque em «Atualizar cadastros»</span>' : '') + '</div>';
   if (!cad) {
+    h += '<p class="lbl">Organização</p>' + (lista.length > 1 ?
+         '<select class="txt" id="sel-org">' + lista.map(function(o){ return '<option value="' + esc(o.id) + '"' + (o.id === org.id ? ' selected' : '') + '>' + esc(o.nome) + '</option>'; }).join('') + '</select>' :
+         '<div><b>' + esc(org.nome) + '</b></div>');
+    h += '<div class="faixa" style="margin-top:12px"><span class="pill ' + (navigator.onLine ? 'on' : 'off') + '" id="pill-rede">' + (navigator.onLine ? 'com rede' : 'sem rede') + '</span>' +
+         '<span class="pill">cadastros: ainda não</span></div>';
     h += '<p class="aviso" style="margin:0 0 12px">Para lançar sem rede, o aparelho precisa guardar uma vez as comunidades, famílias e produtos desta organização. Faça isso agora, com sinal.</p>' +
          '<button class="grande" id="btn-preparar">Preparar o modo offline</button>';
     app.innerHTML = h; ligarInicio(); return;
   }
-  h += '<div class="acoes"><button class="acao prim" id="btn-receber">Receber</button>' +
-       '<button class="acao prim" id="btn-abrir">Abrir</button>' +
-       '<button class="acao prim" id="btn-fechar">Fechar</button></div>';
-  h += '<button class="grande sec" id="btn-lerqr" style="margin:10px 0 0">Ler QR do lote</button>';
-  h += '<p class="lbl">Lançamentos deste aparelho</p>';
-  h += fila.length ? '<ul class="fila">' + fila.slice().reverse().map(function(i){ return linhaFila(i, fila, fusoDe(cad)); }).join('') + '</ul>'
-                   : '<p class="aviso" style="margin:0 0 12px">Nada lançado neste aparelho ainda.</p>';
-  h += '<button class="grande' + (pend.length ? '' : ' sec') + '" id="btn-enviar">' +
-       (pend.length ? 'Enviar ' + pend.length + ' para a planilha' : 'Atualizar cadastros') + '</button>';
-  h += '<p class="aviso">Quem assina o envio é a conta Google aberta no celular na hora de enviar. Enviar de novo é seguro: o que já entrou não entra duas vezes.</p>';
+  h += telaInicioBasica(db, org, cad, pend, fila, lista);
+  h += chkOff.replace('class="chave"', 'class="chave" style="margin-top:16px"');
   app.innerHTML = h; ligarInicio();
+  agendarAuto();
+}
+
+/* ══ OFF5 · INÍCIO DA BÁSICA ═══════════════════════════════════════════════════════════════════
+   Os mesmos três blocos do Início do app, menos Alertas (calculados no servidor): «No galpão agora» (régua por etapa, com o filtro de
+   cadeia), «O que fazer agora» (Receber · Abrir · Fechar, nesta ordem) e a faixa dos guardados. Os números somam o RETRATO do aparelho
+   + a PROJEÇÃO da fila guardada (`projecao`) — o mesmo que o Abrir e o Fechar mostram. */
+var FILTRO = '';                      /* a cadeia escolhida nos chips ('' = Todas) · vale no Início e no Estoque por etapa */
+/* (sugestão Claude · validar) o estado de cada etapa em palavra de chão de galpão; etapa fora desta lista cai em «Saiu da <etapa>» */
+var ESTADO_ETAPA = { REC:'Recebido', SEC:'Seco', QUE:'Quebrado', ARM:'Armazenado' };
+function ddmm(cod){ var d = codData(cod); return d === '00000000' ? '' : d.slice(6, 8) + '/' + d.slice(4, 6); }
+function horaTxt(iso, fuso){ try { return new Date(iso).toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit', timeZone: fuso || FUSO_PADRAO }); } catch(e){ return ''; } }
+function minusc1(t){ t = String(t || ''); return t.charAt(0).toLowerCase() + t.slice(1); }
+function acaoDaEtapa(e){ return e.id === 'ARM' ? 'Armazenar' : 'Abrir ' + e.nome; }
+function esperandoDa(e){ return e.id === 'ARM' ? 'esperando armazenar' : 'esperando ' + minusc1(e.nome); }
+function etapasOrdenadas(cad){ return (cad.etapas || []).slice().sort(function(a, b){ return ordDe(cad, a.id) - ordDe(cad, b.id); }); }
+function cadeiasDe(cad, proj){
+  var vistos = {}, out = [];
+  (cad.materias || []).forEach(function(m){ var c = m[1] || m[0]; if (c && !vistos[c]) { vistos[c] = 1; out.push(c); } });
+  proj.lista.forEach(function(k){ var c = proj.lotes[k].cadeia; if (c && !vistos[c]) { vistos[c] = 1; out.push(c); } });
+  return out;
+}
+function chipsHtml(cad, proj){
+  var cs = cadeiasDe(cad, proj);
+  if (FILTRO && cs.indexOf(FILTRO) < 0) FILTRO = '';
+  return '<div class="chips" id="chips-cadeia">' + ['' ].concat(cs).map(function(c){
+    return '<button class="chip' + (c === FILTRO ? ' on' : '') + '" data-cadeia="' + esc(c) + '">' + (c ? esc(c) : 'Todas') + '</button>'; }).join('') + '</div>';
+}
+/* o que cada etapa que se ABRE aceita, uma vez só: {etapaId: {chaveDoLote: true}} — a MESMA `lotesElegiveis` do Abrir */
+function elegiveisPorEtapa(cad, proj){
+  var m = {}; (cad.etapas || []).forEach(function(e){ m[e.id] = {}; lotesElegiveis(cad, proj, e.id).forEach(function(l){ m[e.id][l.chave] = true; }); });
+  return m;
+}
+function proximoDoLote(cad, eleg, l){
+  var ets = etapasOrdenadas(cad);
+  for (var i = 0; i < ets.length; i++) if (eleg[ets[i].id] && eleg[ets[i].id][l.chave]) return ets[i];
+  return null;
+}
+/* Abrir: os lotes que entram em ALGUMA etapa que se abre (o mesmo critério da lista do Abrir) · Fechar: as operações da lista do Fechar */
+function contagemAbrir(cad, proj){
+  var eleg = elegiveisPorEtapa(cad, proj), n = 0;
+  proj.lista.forEach(function(k){ if ((cad.etapas || []).some(function(e){ return eleg[e.id][k]; })) n++; });
+  return n;
+}
+function opsDoFechar(proj){ return proj.alista.map(function(k){ return proj.abertas[k]; }); }
+function resumoDoGalpao(cad, proj, filtro){
+  var lotes = proj.lista.map(function(k){ return proj.lotes[k]; }).filter(function(l){ return l.saldo > 0.001 && (!filtro || l.cadeia === filtro); });
+  var ops = opsDoFechar(proj).filter(function(o){ return !filtro || o.cadeia === filtro; });
+  var eleg = elegiveisPorEtapa(cad, proj), ids = {}, rows = [];
+  ids.REC = 1; (cad.etapas || []).forEach(function(e){ ids[e.id] = 1; }); lotes.forEach(function(l){ if (!l.sub) ids[l.etapa] = 1; });
+  Object.keys(ids).sort(function(a, b){ return ordDe(cad, a) - ordDe(cad, b); }).forEach(function(id){
+    var et = etapaDeCad(cad, id), nome = nomeDaEtapa(cad, id);
+    var daEtapa = ops.filter(function(o){ return o.etapa === id; });
+    if (daEtapa.length) rows.push({ chave:'op:' + id, tipo:'op', nome:'Na ' + minusc1(nome), sub: daEtapa.length + (daEtapa.length === 1 ? ' operação aberta' : ' operações abertas'), n: daEtapa.length,
+                                    kg: arred2(daEtapa.reduce(function(a, o){ return a + (Number(o.kg) || 0); }, 0)) });
+    var ls = lotes.filter(function(l){ return !l.sub && l.etapa === id; });
+    if (ls.length) {
+      var prox = null; ls.some(function(l){ var p = proximoDoLote(cad, eleg, l); if (p && (!prox || ordDe(cad, p.id) < ordDe(cad, prox.id))) prox = p; return false; });
+      rows.push({ chave:'lote:' + id, tipo:'lote', nome: ESTADO_ETAPA[id] || ('Saiu da ' + minusc1(nome)),
+                  sub: (prox ? esperandoDa(prox) : (id === 'ARM' || ehMov(et) ? 'em estoque' : 'sem próximo passo')) + ' · ' + ls.length,
+                  n: ls.length, kg: arred2(ls.reduce(function(a, l){ return a + l.saldo; }, 0)) });
+    }
+  });
+  var subs = lotes.filter(function(l){ return l.sub; });
+  if (subs.length) {
+    var nomes = []; subs.forEach(function(l){ if (nomes.indexOf(l.produto) < 0) nomes.push(l.produto); });
+    rows.push({ chave:'sub', tipo:'sub', nome:'Subprodutos', sub: nomes.slice(0, 2).join(' e ') + (nomes.length > 2 ? ' e mais ' + (nomes.length - 2) : '') + ' · ' + subs.length,
+                n: subs.length, kg: arred2(subs.reduce(function(a, l){ return a + l.saldo; }, 0)) });
+  }
+  return rows;
+}
+function reguaHtml(rows){
+  if (!rows.length) return '<p class="aviso" id="regua-vazia" style="margin:0">Nada no galpão' + (FILTRO ? ' desta cadeia' : '') + ' segundo o retrato deste aparelho.</p>';
+  var max = Math.max.apply(null, rows.map(function(r){ return r.kg; })) || 1;
+  return '<div class="regua" id="regua">' + rows.map(function(r){
+    return '<div class="rl" data-linha="' + esc(r.chave) + '" data-kg="' + r.kg + '" data-n="' + r.n + '"><span class="et">' + esc(r.nome) + '<small>' + esc(r.sub) + '</small></span>' +
+           '<span class="bar"><i class="' + (r.tipo === 'op' ? 'proc' : r.tipo === 'sub' ? 'sub' : '') + '" style="width:' + Math.max(2, r.kg / max * 100).toFixed(1) + '%"></i></span><span class="kg">' + kgTxt(Math.round(r.kg)) + ' kg</span></div>';
+  }).join('') + '</div>';
+}
+function telaInicioBasica(db, org, cad, pend, fila, lista){
+  var proj = projecao(db, org), fuso = fusoDe(cad), h = '';
+  var ret = quandoTxt(cad.geradoEm, fuso), hora = horaTxt(cad.geradoEm, fuso);
+  /* B7 · o botão do TOPO, sempre visível: um toque = Enviar + Atualizar cadastros numa ida só ao /exec (a página de envio já manda os cadastros depois dos itens) */
+  h += '<button class="sync' + (pend.length ? ' pend' : '') + '" id="btn-enviar">Sincronizar · ' + (pend.length ? pend.length + (pend.length === 1 ? ' guardado' : ' guardados') + ' · ' : '') + 'retrato de ' + esc(hora) + '</button>';
+  h += '<div id="slot-auto"></div>';
+  if (lista.length > 1) h += '<select class="txt" id="sel-org" style="margin:0 0 10px">' + lista.map(function(o){ return '<option value="' + esc(o.id) + '"' + (o.id === org.id ? ' selected' : '') + '>' + esc(o.nome) + '</option>'; }).join('') + '</select>';
+  h += '<div class="faixa"><span class="pill ' + (navigator.onLine ? 'on' : 'off') + '" id="pill-rede">' + (navigator.onLine ? 'com rede' : 'sem rede') + '</span>' +
+       '<span class="pill" id="pill-retrato">retrato de ' + esc(ret) + '</span>' +
+       ((db.cadVelho || {})[org.id] ? '<span class="pill off" id="pill-velho">cadastros desatualizados · toque em «Sincronizar»</span>' : '') + '</div>';
+  h += chipsHtml(cad, proj);
+  h += '<div class="sec"><p class="lbl">No galpão agora</p>' + reguaHtml(resumoDoGalpao(cad, proj, FILTRO)) + '</div>';
+  var nAbrir = contagemAbrir(cad, proj), ops = opsDoFechar(proj), nFechar = ops.length, maisVelha = null;
+  ops.forEach(function(o){ if (o.codigo && (!maisVelha || codData(o.codigo) < codData(maisVelha.codigo))) maisVelha = o; });
+  h += '<div class="sec"><p class="lbl">O que fazer agora</p><div class="ac3" id="acoes">' +
+       '<button class="ac" id="btn-receber"><span class="n">&nbsp;</span><span class="v">Receber</span><span class="s">entrega nova</span></button>' +
+       '<button class="ac' + (nAbrir ? ' prim' : '') + '" id="btn-abrir"><span class="n" id="n-abrir">' + nAbrir + '</span><span class="v">Abrir</span><span class="s">' + (nAbrir === 1 ? 'lote esperando' : 'lotes esperando') + '</span></button>' +
+       '<button class="ac' + (nFechar ? ' prim' : '') + '" id="btn-fechar"><span class="n" id="n-fechar">' + nFechar + '</span><span class="v">Fechar</span><span class="s">' +
+         (nFechar ? (maisVelha ? esc(nomeDaEtapa(cad, maisVelha.etapa)) + ' · desde ' + esc(ddmm(maisVelha.codigo)) : (nFechar === 1 ? 'operação aberta' : 'operações abertas')) : 'nenhuma aberta') + '</span></button></div>' +
+       '<div class="botoes"><button class="bt" id="btn-estoque">Estoque por etapa</button><button class="bt lar" id="btn-lerqr">Ler QR</button></div>' +
+       (pend.length ? '<div class="guard" id="guard"><span>' + pend.length + (pend.length === 1 ? ' lançamento guardado' : ' lançamentos guardados') + ' no aparelho</span><button id="btn-enviar-faixa">Enviar ›</button></div>' : '') + '</div>';
+  h += '<p class="lbl">Lançamentos deste aparelho</p>';
+  h += fila.length ? '<ul class="fila">' + fila.slice().reverse().map(function(i){ return linhaFila(i, fila, fuso); }).join('') + '</ul>'
+                   : '<p class="aviso" style="margin:0 0 12px">Nada lançado neste aparelho ainda.</p>';
+  h += '<p class="aviso">Quem assina o envio é a conta Google aberta no celular na hora de enviar. Enviar de novo é seguro: o que já entrou não entra duas vezes. O botão «Sincronizar» no topo envia o que está guardado e atualiza os cadastros numa ida só.</p>';
+  return h;
 }
 
 function ligarInicio(){
@@ -297,6 +452,9 @@ function ligarInicio(){
   var ba = document.getElementById('btn-abrir'); if (ba) ba.onclick = function(){ TELA = { nome:'abrir', form:{ etapa:'', lotes:{}, obs:'' } }; render(); };
   var bf = document.getElementById('btn-fechar'); if (bf) bf.onclick = function(){ TELA = { nome:'fechar', form:{ op:'', pesoSaida:'', principal:'', subs:['','',''], obs:'' } }; render(); };
   var be = document.getElementById('btn-enviar'); if (be) be.onclick = function(){ enviar(false); };
+  var bef = document.getElementById('btn-enviar-faixa'); if (bef) bef.onclick = function(){ enviar(false); };
+  var bs = document.getElementById('btn-estoque'); if (bs) bs.onclick = function(){ TELA = { nome:'estoque' }; render(); };
+  document.querySelectorAll('[data-cadeia]').forEach(function(b){ b.onclick = function(){ FILTRO = b.dataset.cadeia; render(); }; });
   var bq = document.getElementById('btn-lerqr'); if (bq) bq.onclick = function(){ abrirLeitor(); };
   document.querySelectorAll('[data-descartar]').forEach(function(b){ b.onclick = function(){
     var dep = dependentesDe(ler().fila || [], b.dataset.descartar);
@@ -304,6 +462,149 @@ function ligarInicio(){
         (dep.length ? '\n\n' + dep.length + ' lançamento(s) que dependem dele também saem (não têm origem sem ele).' : ''))) return;
     var fora = {}; fora[b.dataset.descartar] = true; dep.forEach(function(d){ fora[d.token] = true; });
     mudar(function(db){ db.fila = db.fila.filter(function(i){ return !fora[i.token]; }); }); render(); }; });
+}
+
+/* ══ OFF5 · ESTOQUE POR ETAPA (tela 2 do mockup) ═══════════════════════════════════════════════
+   Os lotes do retrato + os da fila guardada, em grupos «<estado> · esperando <próxima etapa>», com o total de kg no cabeçalho do grupo e,
+   em cada cartão, o próximo passo como botão — o que leva ao Abrir com a etapa escolhida e o lote já na operação. Tocar no cartão abre a ficha
+   (lote guardado no aparelho ainda não tem código: sem ficha). SEM o rótulo «parado»: ele é alerta calculado no servidor (média da etapa). */
+function gruposDoEstoque(cad, proj, filtro){
+  var eleg = elegiveisPorEtapa(cad, proj), mapa = {}, ordem = [];
+  proj.lista.forEach(function(k){
+    var l = proj.lotes[k]; if (!(l.saldo > 0.001) || (filtro && l.cadeia !== filtro)) return;
+    var g = l.etapa; if (!mapa[g]) { mapa[g] = { etapa:g, lotes:[], kg:0 }; ordem.push(g); }
+    mapa[g].lotes.push(l); mapa[g].kg += l.saldo;
+  });
+  ordem.sort(function(a, b){ return ordDe(cad, a) - ordDe(cad, b); });
+  return ordem.map(function(id){
+    var g = mapa[id], et = etapaDeCad(cad, id), prox = null;
+    g.lotes.forEach(function(l){ l.proximo = proximoDoLote(cad, eleg, l); if (l.proximo && (!prox || ordDe(cad, l.proximo.id) < ordDe(cad, prox.id))) prox = l.proximo; });
+    g.titulo = (ESTADO_ETAPA[id] || ('Saiu da ' + minusc1(nomeDaEtapa(cad, id)))) + ' · ' + (prox ? esperandoDa(prox) : (id === 'ARM' || ehMov(et) ? 'em estoque' : 'sem próximo passo'));
+    g.kg = arred2(g.kg);
+    /* mais antigo primeiro (PEPS, como o Abrir); o que é só do aparelho vai por último */
+    g.lotes.sort(function(a, b){ return (a.codigo ? codData(a.codigo) : '99999999').localeCompare(b.codigo ? codData(b.codigo) : '99999999'); });
+    return g;
+  });
+}
+function telaEstoque(db){
+  var org = orgAtual(), cad = db.cadastros[org.id], proj = projecao(db, org);
+  var h = '<div class="topo"><button class="link" id="btn-voltar">‹ voltar</button></div><h2>Estoque por etapa</h2><p class="nota-linha" style="margin:-6px 0 0">toque no lote para ver a ficha</p>';
+  h += chipsHtml(cad, proj);
+  var gs = gruposDoEstoque(cad, proj, FILTRO);
+  if (!gs.length) return h + '<p class="aviso" id="estoque-vazio">Nenhum lote com saldo' + (FILTRO ? ' nesta cadeia' : '') + ' no retrato deste aparelho.</p>';
+  h += '<div id="estoque">' + gs.map(function(g){
+    return '<div class="grupo" data-grupo="' + esc(g.etapa) + '" data-kg="' + g.kg + '"><h3><b>' + esc(g.titulo) + '</b><span>' + kgTxt(Math.round(g.kg)) + ' kg</span></h3>' + g.lotes.map(function(l){
+      var venda = acabaVendaDe(cad, l);
+      return '<' + (l.codigo ? 'div role="button" tabindex="0" data-ficha="' + esc(l.codigo) + '"' : 'div') + ' class="lt' + (l.sub ? ' sub' : '') + (l.local ? ' local' : '') + '" data-lote="' + esc(l.chave) + '">' +
+        '<b>' + esc(l.produto) + '</b><span class="kg">' + kgTxt(l.saldo) + ' kg</span>' +
+        '<small' + (l.local ? ' class="local"' : '') + '>' + esc(l.codigo ? l.codigo + ' · ' + (l.sub ? 'subproduto' : diasTxt(l.dias)) : LOCAL_TXT) + (venda ? ' · acaba na venda ' + esc(venda) : '') + '</small>' +
+        (l.proximo && !venda ? '<button class="mini" data-abrir="' + esc(l.chave) + '" data-etapa-abrir="' + esc(l.proximo.id) + '">' + esc(acaoDaEtapa(l.proximo)) + '</button>' : '<span></span>') + '</div>';
+    }).join('') + '</div>';
+  }).join('') + '</div>';
+  return h;
+}
+function ligarEstoque(){
+  var org = orgAtual(), db = ler(), cad = db.cadastros[org.id];
+  document.getElementById('btn-voltar').onclick = function(){ TELA = { nome:'inicio' }; render(); };
+  document.querySelectorAll('[data-cadeia]').forEach(function(b){ b.onclick = function(){ FILTRO = b.dataset.cadeia; render(); }; });
+  document.querySelectorAll('[data-ficha]').forEach(function(c){ c.onclick = function(){ abrirFicha(org.id, c.dataset.ficha, 'estoque'); }; });
+  document.querySelectorAll('[data-abrir]').forEach(function(b){ b.onclick = function(ev){
+    ev.stopPropagation();
+    var proj = projecao(ler(), org), f = { etapa: b.dataset.etapaAbrir, lotes:{}, obs:'', pre: b.dataset.abrir };
+    puxarLotePre(f, cad, proj); TELA = { nome:'abrir', form: f }; render(); }; });
+}
+
+/* ══ OFF5 · ENVIO AUTOMÁTICO QUANDO A REDE VOLTA (B6 · D5) ═════════════════════════════════════
+   A lançadora só fala com o Google NAVEGANDO ao /exec (fetch com login não passa; Background Sync não existe no iPhone) — então «sozinho» é em
+   PRIMEIRO PLANO, nunca escondido. Com rede, na tela inicial, e (há lançamento guardado OU os cadastros têm mais de 6 h): a faixa «Enviando em 5 s ·
+   Cancelar» e a página vai ao envio. Nunca no meio de um formulário; uma tentativa por volta da rede (falhou → fica o botão); «Cancelar» vale até a
+   próxima volta da rede. A marca da tentativa mora no sessionStorage da aba: a volta do /exec (que recarrega a página) não dispara de novo. */
+var AUTO_SEG = 5, CADASTROS_VELHOS_H = 6, AUTO = { timer:null, falta:0, motivo:'' };
+function sess(k, v){ try { if (v === undefined) return sessionStorage.getItem(k); if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch(e){} return null; }
+function autoDesligado(){ try { return localStorage.getItem('estoque_auto_off') === '1'; } catch(e){ return false; } }
+/* o que o automático enviaria agora: 'fila' | 'cadastros' | '' (nada) */
+function autoPrecisa(){
+  if (autoDesligado() || sess('estoque_auto') || !navigator.onLine || TELA.nome !== 'inicio') return '';
+  var db = ler(); if (!db.modoOffline) return '';
+  var org = orgAtual(), cad = org && db.cadastros && db.cadastros[org.id]; if (!cad || !org.offline) return '';
+  if ((db.fila || []).some(function(i){ return i.org === org.id && i.estado === 'guardado'; })) return 'fila';
+  var idade = Date.now() - Date.parse(cad.geradoEm);
+  return (idade <= CADASTROS_VELHOS_H * 3600e3) ? '' : 'cadastros';            /* data ilegível = velho */
+}
+function pararAuto(limpaFaixa){
+  clearInterval(AUTO.timer); AUTO.timer = null; AUTO.falta = 0; AUTO.motivo = '';
+  if (limpaFaixa) { var s0 = document.getElementById('slot-auto'); if (s0) s0.innerHTML = ''; }
+}
+function faixaAutoHtml(){
+  return '<div class="faixa-auto" id="faixa-auto" role="status"><span>' + (AUTO.motivo === 'cadastros' ? 'Atualizando os cadastros em ' : 'Enviando em ') + '<b id="auto-seg">' + AUTO.falta + '</b> s</span><button id="btn-auto-cancelar">Cancelar</button></div>';
+}
+function agendarAuto(){
+  var motivo = autoPrecisa();
+  if (!motivo) { pararAuto(true); return; }
+  var slot = document.getElementById('slot-auto'); if (!slot) return;
+  if (!AUTO.timer) { AUTO.falta = AUTO_SEG; AUTO.motivo = motivo;
+    AUTO.timer = setInterval(function(){
+      AUTO.falta--;
+      var m = autoPrecisa();                                   /* reconfere a CADA segundo: saiu da tela inicial, perdeu a rede ou já não há o que enviar → desiste calada */
+      if (!m) { pararAuto(true); return; }
+      if (AUTO.falta > 0) { var e = document.getElementById('auto-seg'); if (e) e.textContent = AUTO.falta; return; }
+      pararAuto(true); sess('estoque_auto', 'tentou');           /* a marca vai ANTES da navegação: se o envio falhar, a volta não tenta de novo */
+      enviar(m === 'cadastros');
+    }, 1000); }
+  AUTO.motivo = motivo; slot.innerHTML = faixaAutoHtml();
+  document.getElementById('btn-auto-cancelar').onclick = function(){ sess('estoque_auto', 'cancelou'); pararAuto(true); };
+}
+
+/* ══ OFF5 · BALANÇO DE MASSA (o componente 91 do app, em miniatura) ═════════════════════════════
+   Reproduz a linguagem do `balancoDeMassa` do app/index.html: uma barra «Entrou» e uma barra «Saiu» (principal · subproduto · QUEBRA), legenda com kg e % da
+   entrada, selo de rendimento × esperado. A QUEBRA vai HACHURADA — o que minguou não é coisa que se tem — e o nome dela é «Quebra», nunca «Perda» (ADR-033).
+   O rótulo só entra no segmento se couber (`rotuloCabeNoSegmento`: 14 %). Quem confere o balanço de verdade é o servidor; aqui ele só se VÊ. */
+var ROT_MIN_LARGURA = 14;
+var COR_BM = { principal:'#FF6E00', sub:'#7B5EA7', usado:'#0E2A47', guardado:'#5C7391', vendido:'#1E7A46', disp:'#FF6E00', ajuste:'#9AA4B1', fica:'#D9DDE3', quebra:'#5A6472', entrou:'#0E2A47' };
+function rotuloCabe(pct){ return Number(pct) >= ROT_MIN_LARGURA; }
+function pctTxt(f){ return (Math.round(f * 1000) / 10).toLocaleString('pt-BR', { maximumFractionDigits:1 }) + ' %'; }
+function fundoBM(g){ return g.quebra ? 'repeating-linear-gradient(45deg,' + COR_BM.quebra + ',' + COR_BM.quebra + ' 4px,transparent 4px,transparent 8px),var(--bg)' : g.cor; }
+function barraBM(segs, base, nome){
+  return '<div class="bm-barra" data-barra="' + esc(nome || '') + '">' + segs.map(function(g){
+    var w = base ? g.kg / base * 100 : 0;
+    return '<div class="bm-seg" data-seg="' + esc(g.id) + '" data-hachura="' + (g.quebra ? '1' : '0') + '" style="width:' + w.toFixed(2) + '%;background:' + fundoBM(g) + ';color:' + (g.quebra ? 'var(--text)' : (g.tinta || '#fff')) + '" title="' + esc(g.nome) + ' · ' + kgTxt(g.kg) + ' kg">' + (rotuloCabe(w) ? kgTxt(g.kg) : '') + '</div>';
+  }).join('') + '</div>';
+}
+function legendaBM(segs, ref){
+  return '<div class="bm-leg">' + segs.map(function(g){
+    var pt = g.quebra ? 'repeating-linear-gradient(45deg,' + COR_BM.quebra + ',' + COR_BM.quebra + ' 3px,transparent 3px,transparent 6px),var(--bg)' : g.cor;
+    return '<div class="bm-li" data-leg="' + esc(g.id) + '"><span class="bm-pt" style="background:' + pt + '"></span><span class="n">' + esc(g.nome) + '</span><span class="k">' + kgTxt(g.kg) + ' kg</span><span class="p">' + (ref ? pctTxt(g.kg / ref) : '') + '</span></div>';
+  }).join('') + '</div>';
+}
+/* o selo do rendimento (a régua do app: até 2 pontos abaixo do esperado = dentro · 4 = perto do limite · 6 = fora · além = muito fora; igual ou ACIMA é notícia boa) */
+function seloRendimento(nome, real, esperado){
+  var d = Math.abs(real - esperado), dpp = d * 100, acima = real >= esperado;
+  var cls = acima || dpp <= 2 ? 'ok' : (dpp <= 4 ? 'at' : 'ru');
+  var txt = acima ? (dpp <= 0.05 ? 'dentro do esperado' : 'acima do esperado') : (dpp <= 2 ? 'dentro do esperado' : (dpp <= 4 ? 'perto do limite' : (dpp <= 6 ? 'fora do esperado' : 'muito fora do esperado')));
+  return '<div class="bm-selo ' + cls + '" id="bm-selo">' + txt + ' &middot; ' + esc(minusc1(nome)) + ' ' + pctTxt(real) + ((acima ? dpp > 0.05 : d > 0.05) ? ' &middot; esperado ' + pctTxt(esperado) : '') + '</div>';
+}
+/* FECHAR: entrou X → principal · cada subproduto · quebra (hachurada). `esperado` só quando o cadastro o traz — sem ele, sem selo. */
+function balancoFecharHtml(entradaNome, entrada, saidas, quebra, esperado){
+  var segs = saidas.map(function(x){ return { id: x.sub ? 'sub' : 'principal', nome:x.nome, kg:x.kg, cor: x.sub ? COR_BM.sub : COR_BM.principal, tinta: x.sub ? '#fff' : '#1A1A1A' }; });
+  if (quebra > 0.004) segs.push({ id:'quebra', nome:'Quebra', kg:quebra, quebra:true });
+  var total = segs.reduce(function(a, g){ return a + g.kg; }, 0), base = Math.max(total, entrada) || 1;
+  var princ = saidas.filter(function(x){ return !x.sub; })[0];
+  var selo = (princ && entrada > 0 && esperado > 0 && Math.abs(entrada - total) <= 0.5) ? seloRendimento(princ.nome, princ.kg / entrada, esperado) : '';
+  return '<div class="bm" id="balanco-fechar"><div class="bm-h">Balanço de Massa</div><div class="bm-t">Entrou</div>' +
+    '<div class="bm-cab"><b>' + kgTxt(entrada) + ' kg</b><span>' + esc(entradaNome) + '</span></div>' +
+    '<div class="bm-barra"><div class="bm-seg" data-seg="entrou" style="width:100%;background:' + COR_BM.entrou + ';color:#fff">' + kgTxt(entrada) + '</div></div>' +
+    '<div class="bm-t">Saiu</div>' + barraBM(segs, base, 'saiu') + legendaBM(segs, entrada) + selo + '</div>';
+}
+/* ABRIR: de cada lote usado, quanto sai e quanto sobra. A sobra de quem foi marcado «Acabou» vira QUEBRA (hachurada); a que fica no lote, não. */
+function balancoAbrirHtml(linhas, total){
+  return '<div class="bm" id="balanco-abrir"><div class="bm-h">Balanço de Massa</div><div class="bm-t">Entra na operação</div>' +
+    '<div class="bm-cab"><b>' + kgTxt(total) + ' kg</b><span>' + linhas.length + (linhas.length === 1 ? ' lote' : ' lotes') + '</span></div>' +
+    linhas.map(function(x){
+      var segs = [{ id:'usado', nome:'sai do lote', kg:x.usa, cor:COR_BM.principal, tinta:'#1A1A1A' }];
+      if (x.sobra > 0.004) segs.push(x.acabou ? { id:'quebra', nome:'sobra → quebra', kg:x.sobra, quebra:true } : { id:'fica', nome:'fica no lote', kg:x.sobra, cor:COR_BM.fica, tinta:'#1A1A1A' });
+      return '<div class="bm-lote" data-bm-lote="' + esc(x.chave) + '"><div class="nm"><b>' + esc(x.nome) + '</b><span>' + kgTxt(x.disp) + ' kg no lote</span></div>' + barraBM(segs, x.disp, 'lote') +
+        '<div class="nota-linha">sai ' + kgTxt(x.usa) + ' kg' + (x.sobra > 0.004 ? (x.acabou ? ' · sobra ' + kgTxt(x.sobra) + ' kg vira quebra' : ' · sobra ' + kgTxt(x.sobra) + ' kg fica no lote') : '') + '</div></div>';
+    }).join('') + '</div>';
 }
 
 /* ══ OFF2 · ESTOQUE PROJETADO NO APARELHO ══════════════════════════════════════════════════
@@ -328,12 +629,14 @@ function podeEntrar(cad, l, etapa){
   return ordDe(cad, etapa) > ordDe(cad, l.etapa);
 }
 function aceitosDe(et){ var a = {}; (et.cad || []).forEach(function(c){ if (c[1]) a[c[1]] = true; }); return a; }
+function acabaVendaDe(cad, l){ var m = cad && cad.acabaVenda; return (m && l && l.codigo && m[l.codigo]) ? String(m[l.codigo]) : ''; }
 /* app: lotesElegiveis — saldo > 0, o PRODUTO é aceito pela etapa (ADR-012) e a etapa vem depois de onde o lote está */
 function lotesElegiveis(cad, proj, etapaId){
   var et = etapaDeCad(cad, etapaId); if (!et) return [];
   var aceitos = aceitosDe(et), temConfig = Object.keys(aceitos).length > 0;
   return proj.lista.map(function(k){ return proj.lotes[k]; }).filter(function(l){
     if (!(l.saldo > 0.001)) return false;
+    if (acabaVendaDe(cad, l)) return false;                  /* OFF5 · H10-119 · o lote que «acaba» numa venda não despachada: o servidor recusa o Abrir, então nem se oferece */
     if (!podeEntrar(cad, l, etapaId)) return false;
     return temConfig ? !!aceitos[l.produto] : true;
   });
@@ -492,7 +795,7 @@ function telaAbrir(db){
   }).join('') : '<p class="aviso" style="margin:0">' + (naOp.length ? 'Nenhum outro lote disponível para esta etapa.' : 'Nenhum lote disponível para esta etapa. Todos estão sem saldo, em operação aberta, ou ainda não chegaram ao aparelho.') + '</p>';
   if (naOp.length >= max) h += '<p class="nota-linha">No máximo ' + max + ' lotes por operação.</p>';
   var tot = naOp.reduce(function(a, l){ return a + numDe(f.lotes[l.chave].kg); }, 0);
-  h += '<div class="total">Total que entra: <b id="total">' + kgTxt(tot) + ' kg</b></div>';
+  h += '<div class="total">Total que entra: <b id="total">' + kgTxt(tot) + ' kg</b></div><div id="slot-balanco"></div>';
   if (ehMov(et)) h += '<p class="aviso" style="margin:0 0 8px">Esta etapa não transforma o produto — ele entra e sai igual. Fecha num gesto só.</p>';
   h += '<p class="lbl">Observação (opcional)</p><input class="txt" id="obs" value="' + esc(f.obs || '') + '" placeholder="algo fora do normal nesta operação">';
   h += blocoOperador(db, org, cad);
@@ -519,6 +822,16 @@ function atualizarAbrir(){
     else el.textContent = '';
   });
   var t = document.getElementById('total'); if (t) t.textContent = kgTxt(tot) + ' kg';
+  /* OFF5 · B4 · a barra dos lotes usados. Movimentação (Armazenamento): entra = sai, sem balanço de transformação. */
+  var sl = document.getElementById('slot-balanco');
+  if (sl) {
+    var et = etapaDeCad(ler().cadastros[orgAtual().id], f.etapa), linhas = [];
+    if (et && !ehMov(et)) Object.keys(f.lotes).forEach(function(k){
+      var l = g.proj.lotes[k], v = numDe(f.lotes[k].kg); if (!l || !(v > 0) || v > l.saldo + 0.01) return;
+      linhas.push({ chave:k, nome: l.produto + ' · ' + (l.codigo || 'guardado no aparelho'), disp: l.saldo, usa: v, sobra: Math.max(0, arred2(l.saldo - v)), acabou: !f.lotes[k].naoAcabou });
+    });
+    sl.innerHTML = linhas.length ? balancoAbrirHtml(linhas, tot) : '';
+  }
   var bg = document.getElementById('btn-guardar'); if (bg) bg.disabled = !g.ok;
 }
 function ligarAbrir(){
@@ -589,7 +902,7 @@ function telaFechar(db){
   } else {
     h += '<p class="lbl">Peso que saiu</p>' + linha((cfg && cfg[2]) || op.produto, 'saída única', 'data-psaida="1"', f.pesoSaida);
   }
-  h += '<div class="total">Saiu: <b id="saiu">0 kg</b> <span id="quebra" class="nota-linha"></span></div><div id="aviso-saida"></div>';
+  h += '<div class="total">Saiu: <b id="saiu">0 kg</b> <span id="quebra" class="nota-linha"></span></div><div id="aviso-saida"></div><div id="slot-balanco"></div>';
   h += '<p class="lbl">Observação (opcional)</p><input class="txt" id="obs" value="' + esc(f.obs || '') + '" placeholder="algo fora do normal">';
   h += blocoOperador(db, org, cad);
   h += '<div style="margin-top:16px"><button class="grande" id="btn-guardar" disabled>Guardar no aparelho</button></div>' +
@@ -611,6 +924,15 @@ function atualizarFechar(){
   var av = document.getElementById('aviso-saida');
   /* AVISA, não trava: quem barra saída > entrada é o servidor (rendimento acima de 100% é impossível) */
   av.innerHTML = saiu > op.kg + 0.01 ? '<div class="aviso-saida">⚠️ A saída (' + kgTxt(saiu) + ' kg) passa da entrada (' + kgTxt(op.kg) + ' kg). A planilha vai recusar — confira os pesos. Se estiver certo, guarde assim mesmo.</div>' : '';
+  /* OFF5 · B4 · o Balanço de Massa redesenha a cada dígito: quem preenche VÊ a barra fechando. Saída maior que a entrada: o aviso acima, sem barra. */
+  var sl = document.getElementById('slot-balanco');
+  if (sl) {
+    var saidas = [];
+    if (multi) { if ((numDe(f.principal) || 0) > 0) saidas.push({ nome: (cfg && cfg[2]) || op.produto, kg: numDe(f.principal) });
+                 [cfg[3], cfg[4], cfg[5]].forEach(function(sn, k){ if (sn && (numDe(f.subs[k]) || 0) > 0) saidas.push({ nome: sn, kg: numDe(f.subs[k]), sub: true }); }); }
+    else if (saiu > 0) saidas.push({ nome: (cfg && cfg[2]) || op.produto, kg: saiu });
+    sl.innerHTML = (saiu > 0 && saiu <= op.kg + 0.01) ? balancoFecharHtml(op.produto, op.kg, saidas, Math.max(0, op.kg - saiu), cfg && cfg[6]) : '';
+  }
   document.getElementById('btn-guardar').disabled = !(saiu > 0 && sop && sop.value);
 }
 function ligarFechar(){
@@ -713,17 +1035,26 @@ function telaFicha(db){
   var saldoRetrato = fi[5], saldoMostrado = pl ? pl.saldo : saldoRetrato, usado = kgUsadoGuardado(db, org, cod);
   var etapaNome = (cad.etapaNomes || {})[fi[1]] || nomeDaEtapa(cad, fi[1]);
   var d = diasDesde(fi[3], fusoDe(cad));
-  h += '<div class="ficha" id="ficha"><h3 id="ficha-produto">' + esc(fi[0]) + '</h3><p class="et" id="ficha-etapa">' + esc(etapaNome) + ' · ' + esc(fi[2]) + '</p><dl>' +
-       '<dt id="ficha-saldo-rot">' + (proc ? 'Na operação' : usado > 0 ? 'Disponível (projetado)' : 'Disponível') + '</dt><dd id="ficha-saldo">' + kgTxt(saldoMostrado) + ' kg</dd>' +
-       '<dt>Kg de origem</dt><dd id="ficha-base">' + kgTxt(fi[4]) + ' kg</dd>' +
-       '<dt>Entrou em</dt><dd id="ficha-data">' + (fi[3] ? esc(dataBR(fi[3])) + (d != null ? ' · ' + esc(diasTxt(d)) : '') : 'sem data de entrada') + '</dd></dl>';
+  /* o desenho aprovado (tela 3): produto · o número grande «X kg disponíveis de Y kg» · a faixa de etapa/estado · «Entrou em» e «Já usado» */
+  h += '<div class="ficha" id="ficha"><h3 id="ficha-produto">' + esc(fi[0]) + '</h3>' +
+       '<div class="num"><span class="g" id="ficha-saldo">' + kgTxt(saldoMostrado) + ' kg</span><small><span id="ficha-saldo-rot">' + (proc ? 'Na operação' : usado > 0 ? 'Disponível (projetado)' : 'Disponível') + '</span> · de <span id="ficha-base">' + kgTxt(fi[4]) + ' kg</span> de origem</small></div>' +
+       '<p class="et" id="ficha-etapa">' + esc(etapaNome) + ' · ' + esc(fi[2]) + '</p><dl>' +
+       '<dt>Entrou em</dt><dd id="ficha-data">' + (fi[3] ? esc(dataBR(fi[3])) + (d != null ? ' · ' + esc(diasTxt(d)) : '') : 'sem data de entrada') + '</dd>' +
+       (fi[9] > 0.004 ? '<dt>Já usado</dt><dd id="ficha-ja-usado">' + kgTxt(fi[9]) + ' kg em operações seguintes</dd>' : '') + '</dl>';
   if (usado > 0) h += '<p class="usado" id="ficha-usado">' + kgTxt(usado) + ' kg já usados em lançamentos guardados neste aparelho (no retrato eram ' + kgTxt(saldoRetrato) + ' kg).</p>';
   if (proc) h += '<div class="alerta-ficha" id="ficha-alerta">Em processamento: a operação ainda não foi fechada.</div>';
   else if (!(saldoRetrato > 0.001)) h += '<div class="alerta-ficha" id="ficha-alerta">Saldo zero: todo este lote já foi usado ou vendido.</div>';
-  h += '<p class="sub">Comunidades de origem</p>' + ((fi[6] || []).length ? '<ul id="ficha-comunidades">' + fi[6].map(function(c){ return '<li><span>' + esc(c[0]) + '</span><b>' + kgTxt(c[1]) + ' kg</b></li>'; }).join('') + '</ul>' : '<p class="nota-linha">sem origem registrada</p>');
+  /* OFF5 · D4 · o número ao lado de cada comunidade e de cada família é a matéria-prima que ELA ENTREGOU, rateada até este lote (um lote seco de 18 kg mostra
+     30 kg de quem entregou): por isso o título diz «kg entregues». A barrinha é a fração do que mais entregou. */
+  var lista = function(itens, id){
+    var mx = Math.max.apply(null, itens.map(function(x){ return Number(x[1]) || 0; })) || 1;
+    return '<ul id="' + id + '">' + itens.map(function(x){ return '<li class="ob"><span>' + esc(x[0]) + '</span><b>' + kgTxt(x[1]) + ' kg</b><span class="barra"><u style="width:' + Math.max(2, (Number(x[1]) || 0) / mx * 100).toFixed(1) + '%"></u></span></li>'; }).join('') + '</ul>';
+  };
+  h += '<p class="sub" id="ficha-sub-com">Comunidades de origem · kg entregues</p>' + ((fi[6] || []).length ? lista(fi[6], 'ficha-comunidades') : '<p class="nota-linha">sem origem registrada</p>');
   var nF = fi[8] || 0, fs = fi[7] || [];
-  h += '<p class="sub">Famílias de origem' + (nF ? ' · ' + nF : '') + '</p>' + (fs.length ? '<ul id="ficha-familias">' + fs.map(function(x){ return '<li><span>' + esc(x[0]) + '</span><b>' + kgTxt(x[1]) + ' kg</b></li>'; }).join('') + '</ul>' + (nF > fs.length ? '<p class="nota-linha" id="ficha-mais">e mais ' + (nF - fs.length) + '</p>' : '') : '<p class="nota-linha">sem origem registrada</p>');
+  h += '<p class="sub" id="ficha-sub-fam">Famílias de origem · kg entregues</p>' + (fs.length ? lista(fs, 'ficha-familias') + (nF > fs.length ? '<p class="nota-linha" id="ficha-mais">e mais ' + (nF - fs.length) + ' · ' + nF + ' famílias no total</p>' : '') : '<p class="nota-linha">sem origem registrada</p>');
   h += '</div>';
+  h += balancoDoLoteHtml(fi, cod, proc, saldoMostrado, saldoRetrato, usado);
   /* ações curtas: só as que fazem sentido para ESTE lote, neste aparelho */
   var acoes = '';
   if (proc && aberta) acoes += '<button class="grande" id="btn-fechar-op">Fechar esta operação</button>';
@@ -735,9 +1066,35 @@ function telaFicha(db){
   h += '<div class="col-acoes">' + acoes + '</div><p class="aviso" style="margin-top:12px">O que aconteceu depois do retrato não aparece até atualizar os cadastros.</p>' + atualizar + ler_outro;
   return h;
 }
+/* OFF5 · B3 · O BALANÇO DE MASSA DO LOTE. Uma barra «o que este lote virou» — usado em operações seguintes · vendido · disponível — sobre o kg de origem e,
+   quando o lote nasceu de uma operação que TRANSFORMA, a linha «Entrou X kg → saiu Y kg (rendimento Z %) · quebra Q kg». Fonte: as colunas da CALC_LOTES que o
+   servidor leva na ficha ([9] consumido · [10] vendido · [11] quebra da operação · [12] rendimento da operação). Ficha sem elas (retrato antigo): sem balanço, e a tela diz. */
+function balancoDoLoteHtml(fi, cod, proc, saldoMostrado, saldoRetrato, usadoGuardado){
+  var base = Number(fi[4]) || 0, cons = fi[9], vend = fi[10], qop = fi[11], rend = fi[12];
+  if (proc || !(base > 0)) return '';
+  if (cons == null || vend == null) return '<p class="aviso" id="ficha-sem-balanco">Os cadastros deste aparelho não trazem o balanço deste lote. Atualize os cadastros (com sinal).</p>';
+  var segs = [], ajuste = arred2(base - cons - vend - saldoRetrato);
+  if (cons > 0.004) segs.push({ id:'usado', nome:'Usado em operações seguintes', kg:cons, cor:COR_BM.usado });
+  if (usadoGuardado > 0.004) segs.push({ id:'guardado', nome:'Usado em lançamentos guardados neste aparelho', kg:usadoGuardado, cor:COR_BM.guardado });
+  if (vend > 0.004) segs.push({ id:'vendido', nome:'Vendido', kg:vend, cor:COR_BM.vendido });
+  if (ajuste > 0.5) segs.push({ id:'ajuste', nome:'Ajuste de estoque', kg:ajuste, cor:COR_BM.ajuste });
+  if (saldoMostrado > 0.004) segs.push({ id:'disp', nome:'Disponível', kg:saldoMostrado, cor:COR_BM.disp, tinta:'#1A1A1A' });
+  var total = segs.reduce(function(a, g){ return a + g.kg; }, 0), ref = Math.max(total, base) || 1;
+  var h = '<div class="bm" id="ficha-balanco"><div class="bm-h">Balanço de Massa</div><div class="bm-t">O que este lote virou</div>' +
+          '<div class="bm-cab"><b>' + kgTxt(base) + ' kg</b><span>de origem</span></div>' + barraBM(segs, ref, 'virou') + legendaBM(segs, base);
+  var sub = /^1SUB/i.test(String(cod || '')) || /subproduto/i.test(fi[2]);          /* a quebra/rendimento da operação é do PRINCIPAL; o subproduto não repete a linha */
+  if (!sub && rend != null && qop != null && rend > 0 && rend <= 1 && (qop > 0.5 || rend < 0.9995)) {
+    var entrou = arred2(base / rend);
+    h += '<p class="bm-linha" id="ficha-operacao">Entrou <b>' + kgTxt(entrou) + ' kg</b> → saiu <b>' + kgTxt(base) + ' kg</b> (rendimento ' + pctTxt(rend) + ') · quebra <b>' + kgTxt(qop) + ' kg</b></p>' +
+         barraBM([{ id:'saiu', nome:'Saiu (este lote)', kg:base, cor:COR_BM.principal, tinta:'#1A1A1A' }, { id:'quebra', nome:'Quebra', kg:qop, quebra:true }], Math.max(entrou, base + qop), 'operacao');
+  }
+  return h + '</div>';
+}
+
 function ligarFicha(){
   var org = orgDaFicha(TELA), db = ler(), cad = org && db.cadastros && db.cadastros[org.id], cod = TELA.lote;
-  var sair = function(){ limparEndereco(); TELA = { nome:'inicio' }; render(); };
+  var via = TELA.via;
+  var sair = function(){ limparEndereco(); TELA = { nome: via === 'estoque' ? 'estoque' : 'inicio' }; render(); };
   document.getElementById('btn-voltar').onclick = sair;
   var ba = document.getElementById('btn-atualizar'); if (ba) ba.onclick = function(){ enviar(true); };
   var bb = document.getElementById('btn-buscar'); if (bb) bb.onclick = function(){ enviar(true); };
@@ -938,8 +1295,8 @@ function guardar(){
   toast('Guardado no aparelho ✓ — ainda não está na planilha.');
 }
 
-window.addEventListener('online', function(){ if (TELA.nome === 'inicio' || TELA.nome === 'ficha') render(); });
-window.addEventListener('offline', function(){ if (TELA.nome === 'inicio' || TELA.nome === 'ficha') render(); });
+window.addEventListener('online', function(){ sess('estoque_auto', null); if (TELA.nome === 'inicio' || TELA.nome === 'ficha' || TELA.nome === 'estoque') render(); });   /* a rede VOLTOU: nova volta, nova tentativa */
+window.addEventListener('offline', function(){ pararAuto(true); if (TELA.nome === 'inicio' || TELA.nome === 'ficha' || TELA.nome === 'estoque') render(); });
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
 lerRetorno();
 abrirDoEndereco();
