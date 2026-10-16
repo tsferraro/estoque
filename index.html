@@ -29,6 +29,11 @@
   a.org.ultima{border-color:var(--orange);background:#FFF5EE}
   a.org .tag{font-size:11px;font-weight:700;color:var(--orange-dark);margin-left:6px}
   .nota{margin:18px 0 0;font-size:12px;color:var(--text2);line-height:1.5}
+  .nota + .nota{margin-top:6px}
+  .instalar-ios{margin:18px 0 0;border:1.5px solid var(--orange);background:#FFF5EE;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.45;text-align:left}
+  .instalar-ios[hidden]{display:none}
+  .instalar-ios b.t{display:block;color:var(--orange-dark);font-size:15px;margin:0 0 4px}
+  .instalar-ios ol{margin:6px 0;padding-left:20px} .instalar-ios li{margin:3px 0} .instalar-ios p{margin:6px 0 0;font-size:13px}
 </style>
 </head>
 <body>
@@ -38,8 +43,14 @@
     <p class="sub">Mandū Inovação Social</p>
     <p class="lbl">Escolha a organização</p>
     <nav class="orgs" id="orgs" aria-label="Organizações"></nav>
-    <p class="nota">Entre com a conta Google da organização (@mandusocial.org).
-       Adicione esta página à tela de início para ficar com o ícone do Ū.</p>
+    <div class="instalar-ios" id="instalar-ios" hidden>
+      <b class="t">Instale o ícone antes de usar</b>
+      <ol><li>No Safari, toque em <b>Compartilhar</b> (o quadrado com a seta para cima).</li>
+          <li>Toque em <b>Adicionar à Tela de Início</b> e confirme.</li></ol>
+      <p>Depois, abra o Estoque <b>sempre pelo ícone</b> da tela de início, nunca por esta página.</p>
+    </div>
+    <p class="nota" id="nota-conta">Entre com uma conta Google (Gmail serve), a mesma que a cooperativa cadastrou no app.</p>
+    <p class="nota" id="nota-icone">Adicione esta página à tela de início para ficar com o ícone do Ū e abrir sempre por ele.</p>
   </main>
 <script>
 /* Link LONGO sempre (/a/macros/<domínio>/): com duas contas Google no mesmo
@@ -51,8 +62,22 @@ var ORGS = [
   { id:'camtaua', nome:'Camtauá', desc:'Santo Antônio do Tauá, PA',
     url:'https://script.google.com/a/macros/mandusocial.org/s/AKfycbyw9syhEIyuaMaYT-ej95koauzv4hXlLJEyAXY6OMwL4Ba6socaChpIapRx9ekWcVve/exec' },
   { id:'demo', nome:'Camtauá · Demonstração', desc:'Base limpa para teste e apresentação',
-    url:'https://script.google.com/a/macros/mandusocial.org/s/AKfycbyVou5SnmL8RYNWqWWDIb0sY-WsiTW7zvCTnCd9mDnXg7vNj_onBWOKphDJlGR0TC2J/exec' }
+    url:'https://script.google.com/a/macros/mandusocial.org/s/AKfycbyVou5SnmL8RYNWqWWDIb0sY-WsiTW7zvCTnCd9mDnXg7vNj_onBWOKphDJlGR0TC2J/exec' },
+  /* versão de TESTE zerada (sem lançamentos e sem cadastros; H10-170/179/181): planilha e app próprios */
+  { id:'teste-limpo', nome:'Camtauá · Teste limpo', desc:'Começa do zero: sem lançamentos e sem cadastros',
+    url:'https://script.google.com/a/macros/mandusocial.org/s/AKfycbygH5ceyGiuQVlufaesjn0t4pVGfsgcAZ1-dCo-GffsohMI3PQwr46f_qGBm-LYwb9h/exec' }
 ];
+/* iPhone/iPad fora do ícone: instalar a partir DESTA página, aberta no Safari, e usar sempre o ícone depois (o /exec sozinho na
+   tela de início dá 403; o ícone e o Safari guardam coisas separadas). Dentro do ícone (navigator.standalone) o aviso nem aparece. */
+(function(){
+  var ios = false, icone = false;
+  try { ios = /iPhone|iPad|iPod/.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); } catch(e) {}
+  try { icone = navigator.standalone === true || !!(window.matchMedia && matchMedia('(display-mode: standalone)').matches); } catch(e) {}
+  var cx = document.getElementById('instalar-ios'), ni = document.getElementById('nota-icone');
+  if (icone) { cx.remove(); ni.remove(); }          /* já instalado: nada a ensinar */
+  else if (ios) { cx.hidden = false; ni.remove(); } /* iPhone/iPad no Safari: o passo a passo substitui a frase geral */
+  else cx.remove();
+})();
 var ultima = null;
 try { ultima = localStorage.getItem('estoque_org'); } catch(e) {}
 var nav = document.getElementById('orgs');
