@@ -1,0 +1,15 @@
+Arquivos de terceiros nesta pasta (copiados SEM alteração dos pacotes baixados em 07/10/2026; conferir pelo SHA-256).
+
+qrcode.js            qrcode-generator 2.0.4 (dist/qrcode.js) · Kazuhiko Arase · licença MIT (cabeçalho do próprio arquivo)
+                     https://github.com/kazuhikoarase/qrcode-generator
+                     sha256 79ec86f82856005b1c887905cfccfcfbec3821ca61c7fd5a952faa5f778f791c
+zxing-reader.iife.js zxing-wasm 3.1.5 (dist/iife/reader/index.js) · Ze-Zheng Wu · licença MIT (LICENSE-zxing-wasm.txt)
+                     https://github.com/Sec-ant/zxing-wasm
+zxing_reader.wasm    zxing-wasm 3.1.5 (dist/reader/zxing_reader.wasm) · compilado do ZXing-C++ (Apache License 2.0,
+                     https://github.com/zxing-cpp/zxing-cpp/blob/master/LICENSE)
+                     sha256 aecc1876de036c62c8419f67a5e1a16b1698a325bcd190aa84810d516e263931
+                     (é o mesmo valor que o `zxing-reader.iife.js` declara em ZXING_WASM_SHA256)
+
+O invólucro `../leitor-qr.js` (forma de BarcodeDetector sobre o leitor acima) é código do projeto, não de terceiro.
+O pacote `barcode-detector` 3.2.2 NÃO é usado: ele embute o glue do zxing-wasm 3.1.3 e não roda com o .wasm da 3.1.5
+(ver o comentário de `../leitor-qr.js`).
