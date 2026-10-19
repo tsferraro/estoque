@@ -16,13 +16,14 @@ if (/\.github\.io$/i.test(location.hostname)) location.replace('https://mandu-ap
 <meta property="og:title" content="SGO Mandū · Sistema de Gestão Operacional">
 <meta property="og:description" content="Sistema de Gestão Operacional da Mandū Inovação Social: escolha a sua organização e abra o Estoque pelo celular, mesmo com sinal fraco.">
 <meta property="og:url" content="https://mandu-apps.lp.agentesamanda.com/gestao-operacional/">
-<meta property="og:image" content="https://mandu-apps.lp.agentesamanda.com/gestao-operacional/u-mandu-180.png">
-<meta property="og:image:width" content="180">
-<meta property="og:image:height" content="180">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://mandu-apps.lp.agentesamanda.com/gestao-operacional/og-sgo-mandu.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="SGO Mandū · Sistema de Gestão Operacional">
 <meta name="twitter:description" content="Sistema de Gestão Operacional da Mandū Inovação Social: escolha a sua organização e abra o Estoque pelo celular.">
-<meta name="twitter:image" content="https://mandu-apps.lp.agentesamanda.com/gestao-operacional/u-mandu-180.png">
+<meta name="twitter:image" content="https://mandu-apps.lp.agentesamanda.com/gestao-operacional/og-sgo-mandu.png">
 <meta name="application-name" content="SGO Mandū">
 <meta name="apple-mobile-web-app-title" content="SGO Mandū">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -424,7 +425,7 @@ function avisoInstalarIOS(){
 }
 function avisoIcone(){
   if (modoIcone()) return '';
-  return '<details class="aviso-icone" id="aviso-icone"><summary><span class="t">Abra sempre pelo ícone «Estoque» da tela de início</span><span class="i" aria-label="como fazer">ⓘ</span></summary>' +
+  return '<details class="aviso-icone" id="aviso-icone"><summary><span class="t">Abra sempre pelo ícone «SGO Mandū»</span><span class="i" aria-label="como fazer">ⓘ</span></summary>' +
     '<div class="nota-icone"><p>O que você guarda no navegador fica só no navegador; o ícone da tela de início guarda o dele. Lançar num e abrir no outro mostra a lista vazia.</p>' +
     '<p><b>iPhone:</b> Safari › Compartilhar › Adicionar à Tela de Início.</p>' +
     '<p><b>Android:</b> Chrome › ⋮ › Adicionar à tela inicial.</p></div></details>';
@@ -1760,7 +1761,7 @@ function pedidoDe(w){
     'Nome: ' + w.nome + '\nCidade: ' + (w.local || '—') + '\nTipo: ' + (AMB_TXT[w.amb] || w.amb) + '\nNome curto (vai no link e no QR): ' + w.id + '\n' +
     'Cópia da planilha-modelo: ' + w.copia + '\n\n' +
     'A fazer (sessão): 1) conferir a cópia zerada e os administradores; 2) publicar o app próprio dela e anotar o /exec; ' +
-    '3) incluir a linha no organizacoes.json (id ' + w.id + ', deployment = código do /exec); 4) reempacotar o ZIP (empacotar-unica.sh); 5) subir o ZIP na plataforma. ' +
+    '3) incluir a linha no organizacoes.json (id ' + w.id + ', deployment = código do /exec); 4) reempacotar o ZIP (lancadora/scripts/gerar-zip.sh); 5) subir o ZIP na plataforma. ' +
     'O link ' + baseDaLancadora() + '?org=' + w.id + ' passa a abrir quando o ZIP subir.';
 }
 function criarHtml(){

@@ -9,6 +9,8 @@
   "background_color": "#F7F8FA",
   "theme_color": "#FF6E00",
   "icons": [
-    { "src": "u-mandu-180.png", "sizes": "180x180", "type": "image/png" }
+    { "src": "u-mandu-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "u-mandu-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "u-mandu-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
