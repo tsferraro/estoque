@@ -6,7 +6,7 @@
 <script>
 /* Um endereço só (19/10/2026): a lançadora mora em https://mandu-apps.lp.agentesamanda.com/gestao-operacional/. Quem abrir esta mesma página pelo
    GitHub Pages (tsferraro.github.io/estoque/unica/) é levado para lá, com o ?org= e o &lote= (QR impresso continua valendo). */
-if (/\.github\.io$/i.test(location.hostname)) location.replace('https://mandu-apps.lp.agentesamanda.com/gestao-operacional/' + location.search + location.hash);
+/* H10-341 (Tobia, 19/10 ~17h: «Vamos republicar o ZIP só qdo estiver terminado, enqto isso vai usando https://tsferraro.github.io/estoque pra eu ir visualizando»): o GitHub Pages é a PRÉVIA até o ZIP novo subir — não leva mais para o endereço da Mandū. */
 </script>
 <title>Sistema de Gestão Operacional · SGO Mandū</title>
 <meta name="description" content="SGO Mandū: Sistema de Gestão Operacional da Mandū Inovação Social para cooperativas e grupos produtivos. Escolha a sua organização e abra o Estoque pelo celular, mesmo com sinal fraco.">
@@ -1545,10 +1545,14 @@ function guardar(){
 function luEl(id){ return document.getElementById(id); }
 /* R1A-3 · o modo administrador vale SÓ nesta aba (sessionStorage): fechar a aba o encerra, e «Sair do modo administrador» encerra na hora.
    Antes ele ficava gravado no aparelho (`db.admin`) e o tablet do galpão passava a oferecer Demo e Teste para sempre. */
+/* H10-341 · H10-284 (Tobia: «eu sou administrador, eu teria que ver a tela de administrador»): o aparelho que entrou no painel FICA administrador
+   (marca `lu_admin_aparelho` no localStorage) até tocar «Sair do modo administrador». Supera o R1A-3 (só na aba): com as demonstrações visíveis a todos
+   (H10-316), o motivo dele (o tablet do galpão oferecer Demo para sempre) deixou de existir. */
 var ADMIN_MEM = false;
-function ehAdmin(){ return ADMIN_MEM || sess('lu_admin') === '1'; }
-function entrarAdmin(){ ADMIN_MEM = true; sess('lu_admin', '1'); }
-function sairAdmin(){ ADMIN_MEM = false; sess('lu_admin', null); aplicarNomes(); toast('Saiu do modo administrador.'); paraALista(); }
+function marcaAdm_(v){ try { if (v) localStorage.setItem('lu_admin_aparelho', '1'); else localStorage.removeItem('lu_admin_aparelho'); } catch(e){} }
+function ehAdmin(){ var m = null; try { m = localStorage.getItem('lu_admin_aparelho'); } catch(e){} return ADMIN_MEM || sess('lu_admin') === '1' || m === '1'; }
+function entrarAdmin(){ ADMIN_MEM = true; sess('lu_admin', '1'); marcaAdm_(true); }
+function sairAdmin(){ ADMIN_MEM = false; sess('lu_admin', null); marcaAdm_(false); aplicarNomes(); toast('Saiu do modo administrador.'); paraALista(); }
 function aplicarNomes(){ var adm = ehAdmin(); ORGS.forEach(function(o){ o.nome = adm ? o.nomeAdm : o.nomeCoop; }); }
 /* H10-284 (19/10) · 1ª visita = a LISTA de organizações: qualquer aparelho vê as organizações públicas (grupo «organizacoes», `listada`);
    e as demonstrações na seção «Demonstrações e testes» do mesmo seletor (H10-316, Tobia 19/10: «tudo deve ser fundido»; supera o R1A-3). */
@@ -1916,6 +1920,7 @@ function rotaInicial(){
   if (!paramDaUrl(q, 'lote') && !paramDaUrl(q, 'lista') && !ler().modoOffline) {
     /* H10-284 · nas próximas visitas abre direto na organização escolhida (guardada neste aparelho); `?lista=1` mostra a lista de novo.
        A organização histórica e a que ainda não tem app nunca abrem sozinhas. */
+    if (ehAdmin()) { aplicarNomes(); TELA = { nome:'painel' }; return; }   /* H10-341 · aparelho do administrador abre o Painel, nunca uma organização sozinho */
     var u = achaOrg(ultima);
     if (u && !u.pendente && !u.historico && disponiveis().indexOf(u) >= 0) { TELA = { nome:'sub', org:u.id }; return; }
   }

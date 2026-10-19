@@ -1,14 +1,9 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SGO Mandū · mudou de endereço</title>
+<title>SGO Mandū · prévia</title>
 <script>
-/* Endereço antigo (19/10/2026): este caminho foi apagado; a lançadora é UMA só e mora no endereço da Mandū. Este arquivo existe só para link e QR antigos não darem 404. */
-function destino(){ var q = location.search || '?lista=1'; if (q !== '?lista=1' && !/[?&]org=/.test(q)) q += '&org=teste-felipe';   /* H10-316: sem nada = a lista única; QR de lote antigo (?lote= sem org) continua na Demo Felipe (M9) */ return 'https://mandu-apps.lp.agentesamanda.com/gestao-operacional/' + q + location.hash; }
-location.replace(destino());
+/* H10-341 (19/10/2026): até o ZIP novo subir no endereço da Mandū, a PRÉVIA da lançadora única mora aqui, em unica/. Leva junto o ?org= e o &lote=. */
+var q = location.search || '?lista=1'; if (q !== '?lista=1' && !/[?&]org=/.test(q)) q += '&org=teste-felipe';   /* QR de lote antigo (?lote= sem org) continua na Demo Felipe (M9) */
+location.replace('../unica/' + q + location.hash);
 </script>
-<style>body{font-family:system-ui,sans-serif;margin:0;padding:32px 16px;text-align:center;color:#1f2a44;background:#f5f6fa}a{color:#e8650a;font-weight:700}</style>
-</head><body>
-<p>O SGO Mandū mudou de endereço.</p>
-<p><a id="ir" href="https://mandu-apps.lp.agentesamanda.com/gestao-operacional/?lista=1">Abrir no endereço da Mandū</a></p>
-<script>document.getElementById('ir').href=destino();</script>
-</body></html>
+</head><body><p><a id="ir" href="../unica/?lista=1">Abrir a lançadora</a></p></body></html>

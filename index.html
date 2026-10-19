@@ -1,13 +1,8 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SGO Mandū · mudou de endereço</title>
+<title>SGO Mandū · prévia</title>
 <script>
-/* Endereço antigo (19/10/2026): a lançadora única mora agora no endereço da Mandū. Leva junto o ?org= e o &lote= (QR impresso continua valendo). */
-location.replace('https://mandu-apps.lp.agentesamanda.com/gestao-operacional/' + location.search + location.hash);
+/* H10-341 (19/10/2026): até o ZIP novo subir no endereço da Mandū, a PRÉVIA da lançadora única mora aqui, em unica/. Leva junto o ?org= e o &lote=. */
+location.replace('unica/' + (location.search || '?lista=1') + location.hash);
 </script>
-<style>body{font-family:system-ui,sans-serif;margin:0;padding:32px 16px;text-align:center;color:#1f2a44;background:#f5f6fa}a{color:#e8650a;font-weight:700}</style>
-</head><body>
-<p>O SGO Mandū mudou de endereço.</p>
-<p><a id="ir" href="https://mandu-apps.lp.agentesamanda.com/gestao-operacional/">Abrir no endereço da Mandū</a></p>
-<script>document.getElementById('ir').href='https://mandu-apps.lp.agentesamanda.com/gestao-operacional/'+location.search+location.hash;</script>
-</body></html>
+</head><body><p><a id="ir" href="unica/?lista=1">Abrir a lançadora</a></p></body></html>
