@@ -342,17 +342,24 @@ var LISTA_ORIGEM = '';                         /* 'arquivo' (veio agora) · 'apa
 var CHAVE_LISTA = 'lu_organizacoes_v1';
 var AMB_TXT = { producao:'Produção', demonstracao:'Demonstração', teste:'Teste' };
 function execDe(dep){ dep = String(dep == null ? '' : dep).trim(); if (!dep || /^PREENCHER/i.test(dep)) return ''; return String(CFG.execModelo).replace('{deployment}', dep); }
+/* PROJETO ÚNICO (D35, c9): `u?org=x` + `modo=sincronizar` → `u?org=x&modo=sincronizar` (sem `?` repetido, que perderia a organização) */
+function juntaParam(u, kv){ u = String(u || ''); return u + (u.indexOf('?') < 0 ? '?' : '&') + kv; }
 function montarLista(j){
   if (!j || !Array.isArray(j.organizacoes) || !j.organizacoes.length) return false;
   if (j.execModelo) CFG.execModelo = String(j.execModelo);
   var lista = [];
   j.organizacoes.forEach(function(r){
     if (!r || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(String(r.id || ''))) return;
-    var exec = execDe(r.deployment);
+    /* PROJETO ÚNICO (D35, c9): com `deploymentUnico` e `orgApp` (o id no registro do projeto único) valendo, o endereço do app é o do ÚNICO com `?org=`;
+       o `deployment` antigo vira RESERVA (`urlReserva`). Sem os dois, tudo como antes. */
+    var app = String(r.orgApp || '').trim().toLowerCase(), depU = execDe(r.deploymentUnico);
+    var unico = !!depU && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(app);
+    var reserva = execDe(r.deployment);
+    var exec = unico ? juntaParam(depU, 'org=' + encodeURIComponent(app)) : reserva;
     lista.push({ id:r.id, nomeCoop:r.nome || r.id, nomeAdm:r.nomeAdmin || r.nome || r.id, nome:r.nome || r.id, desc:r.local || '', local:r.local || '',
       grupo: r.grupo === 'testes' ? 'testes' : 'organizacoes', ambiente:r.ambiente || 'teste', estado:r.estado || 'uso', estadoTxt:r.estadoTxt || '',
       apelidos:(r.apelidos || []).map(function(a){ return String(a).toLowerCase(); }), listada: r.listada !== false, historico: !!r.historico,
-      pendente: !exec, url:exec, offline:exec });
+      pendente: !exec, url:exec, offline:exec, orgApp: unico ? app : '', unico: unico, urlReserva: reserva });
   });
   if (!lista.length) return false;
   CFG.enderecoBase = String(j.enderecoBase || '');
@@ -508,9 +515,9 @@ function enviar(soCadastros){
   var org = orgAtual(), db = ler();
   var pend = soCadastros ? [] : (db.fila || []).filter(function(i){ return i.org === org.id && i.estado === 'guardado'; });
   if (!navigator.onLine) { toast('Sem rede agora. Está tudo guardado no aparelho — envie quando o sinal voltar.'); return; }
-  var pacote = { volta: location.origin + location.pathname + voltaDaFicha(), org: org.id, fuso: (db.cadastros && db.cadastros[org.id] && db.cadastros[org.id].fuso) || FUSO_PADRAO,
+  var pacote = { volta: location.origin + location.pathname + voltaDaFicha(), org: org.id, orgApp: org.orgApp || '', fuso: (db.cadastros && db.cadastros[org.id] && db.cadastros[org.id].fuso) || FUSO_PADRAO,
                  fila: pend.map(function(i){ return { token:i.token, tipo:i.tipo, quando:i.quando, payload:i.payload }; }) };
-  location.href = org.offline + '?modo=sincronizar#f=' + b64url(JSON.stringify(pacote));
+  location.href = juntaParam(org.offline, 'modo=sincronizar') + '#f=' + b64url(JSON.stringify(pacote));
 }
 
 /* LS · «igual com e sem rede» (D22 = S, 19/10): os 3 gestos da Básica (Receber, Abrir, Fechar) chamam isto DEPOIS de guardar na fila e conferir a leitura de volta.
