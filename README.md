@@ -32,7 +32,7 @@ Endereço único: `https://mandu-apps.lp.agentesamanda.com/gestao-operacional/` 
 |---|---|
 | Gerar o ZIP para a plataforma | `scripts/gerar-zip.sh` → `<camtaua>/lancadora-zip/gestao-operacional-AAAAMMDD-HHMM.zip` (binário, fora do git) |
 | Acrescentar uma organização | uma linha no array `organizacoes` de `unica/organizacoes.json`, depois ZIP novo |
-| Projeto único do app (D35, c9) | cada organização tem `deploymentUnico` (o `/exec` do projeto único) + `orgApp` (o id dela no registro do projeto único) → a lançadora abre `…/exec?org=<orgApp>`; o `deployment` antigo fica como **reserva**. Só suba o ZIP depois que o projeto único estiver publicado. Teste: `node scripts/teste-unico.js` |
+| Projeto único do app (D35, c9) | cada organização tem `deploymentUnico` (o `/exec` do projeto único) + `orgApp` (o id dela no registro do projeto único) → a lançadora abre `…/exec/<orgApp>`; o `deployment` antigo fica como **reserva**. Só suba o ZIP depois que o projeto único estiver publicado. Teste: `node scripts/teste-unico.js` |
 | Mostrar a lista em vez de entrar sozinho | `…/gestao-operacional/?lista=1` («Trocar de organização») |
 | Painel do administrador | `…/gestao-operacional/?painel=administrador` (ou `?admin=1`) |
 | Raiz do GitHub, `felipe/`, `offline-teste/`, `unica/` no GitHub | só levam ao endereço da Mandū (link e QR antigos não dão 404) |

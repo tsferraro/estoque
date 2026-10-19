@@ -342,7 +342,7 @@ var LISTA_ORIGEM = '';                         /* 'arquivo' (veio agora) · 'apa
 var CHAVE_LISTA = 'lu_organizacoes_v1';
 var AMB_TXT = { producao:'Produção', demonstracao:'Demonstração', teste:'Teste' };
 function execDe(dep){ dep = String(dep == null ? '' : dep).trim(); if (!dep || /^PREENCHER/i.test(dep)) return ''; return String(CFG.execModelo).replace('{deployment}', dep); }
-/* PROJETO ÚNICO (D35, c9): `u?org=x` + `modo=sincronizar` → `u?org=x&modo=sincronizar` (sem `?` repetido, que perderia a organização) */
+/* PROJETO ÚNICO (D35, c9): junta um parâmetro ao endereço com `?` ou `&`, conforme já houver `?` (`…/exec/x` + `modo=sincronizar` → `…/exec/x?modo=sincronizar`) */
 function juntaParam(u, kv){ u = String(u || ''); return u + (u.indexOf('?') < 0 ? '?' : '&') + kv; }
 function montarLista(j){
   if (!j || !Array.isArray(j.organizacoes) || !j.organizacoes.length) return false;
@@ -350,12 +350,12 @@ function montarLista(j){
   var lista = [];
   j.organizacoes.forEach(function(r){
     if (!r || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(String(r.id || ''))) return;
-    /* PROJETO ÚNICO (D35, c9): com `deploymentUnico` e `orgApp` (o id no registro do projeto único) valendo, o endereço do app é o do ÚNICO com `?org=`;
+    /* PROJETO ÚNICO (D35, c9): com `deploymentUnico` e `orgApp` (o id no registro do projeto único) valendo, o endereço do app é o do ÚNICO com `/<org>` (`…/exec/<org>`);
        o `deployment` antigo vira RESERVA (`urlReserva`). Sem os dois, tudo como antes. */
     var app = String(r.orgApp || '').trim().toLowerCase(), depU = execDe(r.deploymentUnico);
     var unico = !!depU && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(app);
     var reserva = execDe(r.deployment);
-    var exec = unico ? juntaParam(depU, 'org=' + encodeURIComponent(app)) : reserva;
+    var exec = unico ? depU + '/' + encodeURIComponent(app) : reserva;      /* …/exec/<org>: a organização no CAMINHO (o servidor lê `pathInfo`; `?org=` continua aceito lá) */
     lista.push({ id:r.id, nomeCoop:r.nome || r.id, nomeAdm:r.nomeAdmin || r.nome || r.id, nome:r.nome || r.id, desc:r.local || '', local:r.local || '',
       grupo: r.grupo === 'testes' ? 'testes' : 'organizacoes', ambiente:r.ambiente || 'teste', estado:r.estado || 'uso', estadoTxt:r.estadoTxt || '',
       apelidos:(r.apelidos || []).map(function(a){ return String(a).toLowerCase(); }), listada: r.listada !== false, historico: !!r.historico,

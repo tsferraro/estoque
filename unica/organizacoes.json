@@ -1,8 +1,8 @@
 {
-  "_leia": "A LISTA DE ORGANIZAÇÕES mora SÓ aqui (array \"organizacoes\" abaixo). Organização nova = uma linha nova no array + ZIP novo (lancadora/scripts/gerar-zip.sh). grupo \"organizacoes\" e listada:true aparecem para todo aparelho na 1ª visita; grupo \"testes\" (as demonstrações) aparece para todo aparelho numa seção própria, «Demonstrações e testes» (H10-316). deployment = código do /exec ANTIGO (o projeto de cada organização, que continua no ar com a org fixa: QR impresso e menu da planilha seguem abrindo) e fica como RESERVA; deploymentUnico = código do /exec do PROJETO ÚNICO (D35, 19/10) e orgApp = o id da organização no REGISTRO desse projeto (?org=): é para lá que a lançadora aponta; sem deploymentUnico/orgApp valendo, ela usa o deployment antigo. PREENCHER_... = ainda sem app.",
+  "_leia": "A LISTA DE ORGANIZAÇÕES mora SÓ aqui (array \"organizacoes\" abaixo). Organização nova = uma linha nova no array + ZIP novo (lancadora/scripts/gerar-zip.sh). grupo \"organizacoes\" e listada:true aparecem para todo aparelho na 1ª visita; grupo \"testes\" (as demonstrações) aparece para todo aparelho numa seção própria, «Demonstrações e testes» (H10-316). deployment = código do /exec ANTIGO (o projeto de cada organização, que continua no ar com a org fixa: QR impresso e menu da planilha seguem abrindo) e fica como RESERVA; deploymentUnico = código do /exec do PROJETO ÚNICO (D35, 19/10) e orgApp = o id da organização no REGISTRO desse projeto (o endereço fica …/exec/<orgApp>): é para lá que a lançadora aponta; sem deploymentUnico/orgApp valendo, ela usa o deployment antigo. PREENCHER_... = ainda sem app.",
   "versao": 1,
   "atualizadoEm": "2026-10-19",
-  "projetoUnico": "UNI-T (c9): cada organização aponta para deploymentUnico + ?org=<orgApp>; o endereço antigo (deployment) fica como reserva.",
+  "projetoUnico": "UNI-T (c9): cada organização aponta para deploymentUnico + /<orgApp>; o endereço antigo (deployment) fica como reserva.",
   "enderecoBase": "https://mandu-apps.lp.agentesamanda.com/gestao-operacional/",
   "execModelo": "https://script.google.com/a/macros/mandusocial.org/s/{deployment}/exec",
   "administradores": [

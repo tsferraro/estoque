@@ -3,10 +3,10 @@
  *   node scripts/teste-unico.js            (de dentro do repositório da lançadora; sai 0 se verde)
  *
  * Executa o texto de `unica/index.html` e de `unica/organizacoes.json`:
- *   · cada uma das 5 organizações aponta para o /exec do PROJETO ÚNICO com `?org=<orgApp>` (o id do registro do projeto único), e o endereço ANTIGO
+ *   · cada uma das 5 organizações aponta para o /exec do PROJETO ÚNICO em `/<orgApp>` (o id do registro do projeto único), e o endereço ANTIGO
  *     fica como reserva (`urlReserva`) — igual ao `deployment` que já estava no arquivo no `main`;
  *   · o arquivo ANTIGO (sem deploymentUnico/orgApp, como um aparelho que guardou a cópia velha) continua dando o endereço antigo, sem `?org=`;
- *   · o envio offline navega para `…/exec?org=<orgApp>&modo=sincronizar#f=…` (um `?` só — dois perderiam a organização) e o pacote leva `org` e `orgApp`.
+ *   · o envio offline navega para `…/exec/<orgApp>?modo=sincronizar#f=…` (um `?` só — dois perderiam a organização) e o pacote leva `org` e `orgApp`.
  * Os 3 mutantes no fim provam que o teste fica vermelho quando o defeito volta. */
 const fs = require('fs'), path = require('path'), vm = require('vm'), cp = require('child_process');
 const REPO = path.resolve(__dirname, '..');
@@ -40,8 +40,8 @@ function roda(indexTxt, jsonTxt, jsonAntigoTxt) {
     const L = N.ORGS.find(x => x.id === o.id), antigo = ANT.organizacoes.find(x => x.id === o.id);
     const app = ESPERADO[o.id];
     ok(!!L && REGISTRO.indexOf(app) >= 0, o.id + ' → orgApp `' + app + '` é um id do REGISTRO do projeto único');
-    eq('   ' + o.id + ': o app abre no ÚNICO com `?org=`', L && L.url, exec(UNICO) + '?org=' + app);
-    eq('   ' + o.id + ': o envio offline usa o mesmo endereço', L && L.offline, exec(UNICO) + '?org=' + app);
+    eq('   ' + o.id + ': o app abre no ÚNICO em `…/exec/<org>`', L && L.url, exec(UNICO) + '/' + app);
+    eq('   ' + o.id + ': o envio offline usa o mesmo endereço', L && L.offline, exec(UNICO) + '/' + app);
     eq('   ' + o.id + ': o endereço ANTIGO fica como reserva (o mesmo `deployment` do arquivo anterior)', L && L.urlReserva, exec(antigo.deployment));
     ok(o.deployment === antigo.deployment, '   ' + o.id + ': o campo `deployment` antigo não foi tocado');
     const La = A.ORGS.find(x => x.id === o.id);
@@ -58,7 +58,7 @@ function roda(indexTxt, jsonTxt, jsonAntigoTxt) {
     vm.createContext(ctx); vm.runInContext(FONTE, ctx);
     vm.runInContext('enviar(false)', ctx);
     const m = /^(.*)#f=(.*)$/.exec(nav.href);
-    eq(o.id + ': navega para `…/exec?org=<orgApp>&modo=sincronizar` (um `?` só)', m && m[1], exec(UNICO) + '?org=' + ESPERADO[o.id] + '&modo=sincronizar');
+    eq(o.id + ': navega para `…/exec/<orgApp>?modo=sincronizar` (um `?` só)', m && m[1], exec(UNICO) + '/' + ESPERADO[o.id] + '?modo=sincronizar');
     let pac = null; try { pac = JSON.parse(Buffer.from(m[2], 'base64url').toString('utf8')); } catch (e) {}
     eq(o.id + ': o pacote leva `org` (id da lançadora) e `orgApp` (id do registro)', pac && [pac.org, pac.orgApp], [o.id, ESPERADO[o.id]]);
   });
@@ -76,8 +76,8 @@ try { antigo = cp.execFileSync('git', ['-C', REPO, 'show', 'main:unica/organizac
 const base = roda(indexTxt, jsonTxt, antigo);
 console.log(base.log.join('\n'));
 const M = [
-  ['o link do app perde o `?org=` (cai na produção)', indexTxt, "var exec = unico ? juntaParam(depU, 'org=' + encodeURIComponent(app)) : reserva;", "var exec = unico ? depU : reserva;"],
-  ['o envio offline volta a emendar `?modo=` (dois `?` perdem a organização)', indexTxt, "location.href = juntaParam(org.offline, 'modo=sincronizar') + '#f='", "location.href = org.offline + '?modo=sincronizar' + '#f='"],
+  ['o link do app perde a organização (`/<org>`) e cai na produção', indexTxt, "var exec = unico ? depU + '/' + encodeURIComponent(app) : reserva;", "var exec = unico ? depU : reserva;"],
+  ['o envio offline navega para o endereço de RESERVA (antigo) em vez do único', indexTxt, "location.href = juntaParam(org.offline, 'modo=sincronizar') + '#f='", "location.href = juntaParam(org.urlReserva, 'modo=sincronizar') + '#f='"],
   ['o pacote deixa de levar `orgApp`', indexTxt, "org: org.id, orgApp: org.orgApp || '', fuso:", "org: org.id, fuso:"]
 ];
 let ruim = 0;
