@@ -1,97 +1,13 @@
 <!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Gestão de Estoque · Mandū</title>
-<link rel="icon" href="icones/u-mandu-32.png" sizes="32x32">
-<link rel="apple-touch-icon" href="icones/u-mandu-180.png">
-<meta name="theme-color" content="#FF6E00">
-<style>
-  :root{--orange:#FF6E00;--orange-dark:#B24D00;--navy:#0E2A47;--bg:#F7F8FA;--text:#1A1A1A;--text2:#5A6472;--line:#E3E6EB}
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);
-       font-family:Ubuntu,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-       display:flex;min-height:100dvh;align-items:center;justify-content:center;padding:24px 16px}
-  .cartao{width:100%;max-width:420px;background:#fff;border-radius:18px;padding:32px 24px 28px;
-          box-shadow:0 2px 24px rgba(14,42,71,.10);text-align:center}
-  img.marca{width:64px;height:auto;display:block;margin:0 auto 14px}
-  h1{margin:0 0 4px;font-size:22px;line-height:1.25}
-  .sub{margin:0 0 22px;color:var(--text2);font-size:14px}
-  .lbl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);text-align:left;margin:0 0 8px}
-  .orgs{display:flex;flex-direction:column;gap:10px;margin:0 0 6px}
-  a.org{display:flex;align-items:center;gap:12px;text-align:left;text-decoration:none;color:var(--text);
-        border:1.5px solid var(--line);border-radius:12px;padding:14px}
-  a.org:hover,a.org:focus-visible{border-color:var(--orange);outline:none}
-  a.org .n{font-weight:700;font-size:16px;display:block}
-  a.org .d{font-size:13px;color:var(--text2);display:block}
-  a.org .seta{margin-left:auto;color:var(--orange);font-weight:700;font-size:20px}
-  a.org.ultima{border-color:var(--orange);background:#FFF5EE}
-  a.org .tag{font-size:11px;font-weight:700;color:var(--orange-dark);margin-left:6px}
-  .nota{margin:18px 0 0;font-size:12px;color:var(--text2);line-height:1.5}
-  .nota + .nota{margin-top:6px}
-  .instalar-ios{margin:18px 0 0;border:1.5px solid var(--orange);background:#FFF5EE;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.45;text-align:left}
-  .instalar-ios[hidden]{display:none}
-  .instalar-ios b.t{display:block;color:var(--orange-dark);font-size:15px;margin:0 0 4px}
-  .instalar-ios ol{margin:6px 0;padding-left:20px} .instalar-ios li{margin:3px 0} .instalar-ios p{margin:6px 0 0;font-size:13px}
-</style>
-</head>
-<body>
-  <main class="cartao">
-    <img class="marca" src="icones/u-mandu-180.png" width="62" height="84" alt="Mandū">
-    <h1>Gestão de Estoque</h1>
-    <p class="sub">Mandū Inovação Social</p>
-    <p class="lbl">Escolha a organização</p>
-    <nav class="orgs" id="orgs" aria-label="Organizações"></nav>
-    <div class="instalar-ios" id="instalar-ios" hidden>
-      <b class="t">Instale o ícone antes de usar</b>
-      <ol><li>No Safari, toque em <b>Compartilhar</b> (o quadrado com a seta para cima).</li>
-          <li>Toque em <b>Adicionar à Tela de Início</b> e confirme.</li></ol>
-      <p>Depois, abra o Estoque <b>sempre pelo ícone</b> da tela de início, nunca por esta página.</p>
-    </div>
-    <p class="nota" id="nota-conta">Entre com uma conta Google (Gmail serve), a mesma que a cooperativa cadastrou no app.</p>
-    <p class="nota" id="nota-icone">Adicione esta página à tela de início para ficar com o ícone do Ū e abrir sempre por ele.</p>
-  </main>
 <script>
-/* Link LONGO sempre (/a/macros/<domínio>/): com duas contas Google no mesmo
-   navegador, o link curto abre na conta padrão — se for um Gmail pessoal, o
-   Google responde «unable to open the file». O longo força a conta do domínio.
-   Organização nova = uma linha aqui (até existir a sala de comando multi-org).
-   Fonte desta página: camtaua/copias/lancadora/index.html no repositório sistema. */
-var ORGS = [
-  { id:'camtaua', nome:'Camtauá', desc:'Santo Antônio do Tauá, PA',
-    url:'https://script.google.com/a/macros/mandusocial.org/s/AKfycbyw9syhEIyuaMaYT-ej95koauzv4hXlLJEyAXY6OMwL4Ba6socaChpIapRx9ekWcVve/exec' },
-  { id:'demo', nome:'Camtauá · Demonstração', desc:'Base limpa para teste e apresentação',
-    url:'https://script.google.com/a/macros/mandusocial.org/s/AKfycbyVou5SnmL8RYNWqWWDIb0sY-WsiTW7zvCTnCd9mDnXg7vNj_onBWOKphDJlGR0TC2J/exec' },
-  /* versão de TESTE zerada (sem lançamentos e sem cadastros; H10-170/179/181): planilha e app próprios */
-  { id:'teste-limpo', nome:'Camtauá · Teste limpo', desc:'Começa do zero: sem lançamentos e sem cadastros',
-    url:'https://script.google.com/a/macros/mandusocial.org/s/AKfycbygH5ceyGiuQVlufaesjn0t4pVGfsgcAZ1-dCo-GffsohMI3PQwr46f_qGBm-LYwb9h/exec' }
-];
-/* iPhone/iPad fora do ícone: instalar a partir DESTA página, aberta no Safari, e usar sempre o ícone depois (o /exec sozinho na
-   tela de início dá 403; o ícone e o Safari guardam coisas separadas). Dentro do ícone (navigator.standalone) o aviso nem aparece. */
-(function(){
-  var ios = false, icone = false;
-  try { ios = /iPhone|iPad|iPod/.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); } catch(e) {}
-  try { icone = navigator.standalone === true || !!(window.matchMedia && matchMedia('(display-mode: standalone)').matches); } catch(e) {}
-  var cx = document.getElementById('instalar-ios'), ni = document.getElementById('nota-icone');
-  if (icone) { cx.remove(); ni.remove(); }          /* já instalado: nada a ensinar */
-  else if (ios) { cx.hidden = false; ni.remove(); } /* iPhone/iPad no Safari: o passo a passo substitui a frase geral */
-  else cx.remove();
-})();
-var ultima = null;
-try { ultima = localStorage.getItem('estoque_org'); } catch(e) {}
-var nav = document.getElementById('orgs');
-ORGS.forEach(function(o){
-  var a = document.createElement('a');
-  a.className = 'org' + (o.id === ultima ? ' ultima' : '');
-  a.href = o.url;
-  a.innerHTML = '<span><span class="n"></span><span class="d"></span></span><span class="seta">›</span>';
-  a.querySelector('.n').textContent = o.nome;
-  if (o.id === ultima) { var t = document.createElement('span'); t.className = 'tag'; t.textContent = 'última usada'; a.querySelector('.n').appendChild(t); }
-  a.querySelector('.d').textContent = o.desc;
-  a.addEventListener('click', function(){ try { localStorage.setItem('estoque_org', o.id); } catch(e) {} });
-  nav.appendChild(a);
-});
+/* Endereço antigo (19/10/2026): a lançadora única mora agora no endereço da Mandū. Leva junto o ?org= e o &lote= (QR impresso continua valendo). */
+location.replace('https://mandu-apps.lp.agentesamanda.com/gestao-operacional/' + location.search + location.hash);
 </script>
-</body>
-</html>
+<style>body{font-family:system-ui,sans-serif;margin:0;padding:32px 16px;text-align:center;color:#1f2a44;background:#f5f6fa}a{color:#e8650a;font-weight:700}</style>
+</head><body>
+<p>O Estoque mudou de endereço.</p>
+<p><a id="ir" href="https://mandu-apps.lp.agentesamanda.com/gestao-operacional/">Abrir o Estoque no endereço da Mandū</a></p>
+<script>document.getElementById('ir').href='https://mandu-apps.lp.agentesamanda.com/gestao-operacional/'+location.search+location.hash;</script>
+</body></html>
