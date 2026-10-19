@@ -34,8 +34,9 @@
 <script>
 /* Os QR são desenhados AQUI, no navegador (qrcode-generator 2.0.4, MIT, vendorizado) — a folha sai igual sem rede.
    O formato do link é o do briefing: <lançadora de teste>/?org=<org>&lote=<código>. */
-var BASE = 'https://tsferraro.github.io/estoque/offline-teste/';
-var ORG = (/[?&]org=([^&]+)/.exec(location.search) || [])[1] || 'demo';
+/* o endereço da própria lançadora (a pasta desta página): no ar é .../gestao-operacional/ — sempre com a barra no fim */
+var BASE = location.origin + location.pathname.replace(/[^\/]*$/, '');
+var ORG = (/[?&]org=([^&]+)/.exec(location.search) || [])[1] || 'camtaua-demo';   /* os lotes da folha são os da base de demonstração */
 var LOTES = [
   ['REC-20261001-002', 'recebido do teste do iPhone', '3.000 kg disponíveis · 3 famílias de origem'],
   ['SEC-20261006-014', 'secado', '1.400 kg'],

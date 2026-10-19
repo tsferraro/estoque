@@ -20,3 +20,17 @@ Página pública da **Gestão de Estoque** (Camtauá · Mandū). Existe por dois
 
 Todos **RGBA com fundo transparente**, gerados a partir do glifo oficial `icone-mandu-05`
 (razão 182/246 ≈ 0,7398), que é o mesmo que a barra de cima do app desenha.
+
+## Uma lançadora só (19/10/2026)
+
+**Fonte única:** `unica/` (a página, o `organizacoes.json` com a lista de organizações, o Service Worker, o manifesto, o leitor de QR em `vendor/`).
+Endereço único: `https://mandu-apps.lp.agentesamanda.com/gestao-operacional/` (plataforma Mandū; sempre com a barra no fim).
+
+| O quê | Onde |
+|---|---|
+| Gerar o ZIP para a plataforma | `scripts/gerar-zip.sh` → `<camtaua>/lancadora-zip/gestao-operacional-AAAAMMDD-HHMM.zip` (binário, fora do git) |
+| Acrescentar uma organização | uma linha no array `organizacoes` de `unica/organizacoes.json`, depois ZIP novo |
+| Mostrar a lista em vez de entrar sozinho | `…/gestao-operacional/?lista=1` («Trocar de organização») |
+| Painel do administrador | `…/gestao-operacional/?painel=administrador` (ou `?admin=1`) |
+| Raiz do GitHub, `felipe/`, `offline-teste/`, `unica/` no GitHub | só levam ao endereço da Mandū (link e QR antigos não dão 404) |
+| `videos/` | os vídeos do «Como usar» tocam daqui |

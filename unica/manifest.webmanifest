@@ -1,0 +1,14 @@
+{
+  "name": "Sistema de Gestão Operacional",
+  "short_name": "SGO Mandū",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "description": "SGO Mandū: Sistema de Gestão Operacional da Mandū Inovação Social. Escolha a sua organização e abra o Estoque.",
+  "lang": "pt-BR",
+  "background_color": "#F7F8FA",
+  "theme_color": "#FF6E00",
+  "icons": [
+    { "src": "u-mandu-180.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

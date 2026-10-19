@@ -1,0 +1,69 @@
+{
+  "_leia": "A LISTA DE ORGANIZAÇÕES mora SÓ aqui (array \"organizacoes\" abaixo). Organização nova = uma linha nova no array + ZIP novo (lancadora/scripts/gerar-zip.sh). grupo \"organizacoes\" e listada:true aparecem para todo aparelho na 1ª visita; grupo \"testes\" só no modo administrador. deployment = código do /exec; PREENCHER_... = ainda sem app.",
+  "versao": 1,
+  "atualizadoEm": "2026-10-19",
+  "enderecoBase": "https://mandu-apps.lp.agentesamanda.com/gestao-operacional/",
+  "execModelo": "https://script.google.com/a/macros/mandusocial.org/s/{deployment}/exec",
+  "administradores": [
+    { "nome": "Tobia", "email": "" },
+    { "nome": "Felipe", "email": "" }
+  ],
+  "organizacoes": [
+    {
+      "id": "camtaua-oficial",
+      "nome": "Camtauá",
+      "nomeAdmin": "Camtauá",
+      "local": "Santo Antônio do Tauá, PA",
+      "grupo": "organizacoes",
+      "ambiente": "producao",
+      "estado": "zerada",
+      "estadoTxt": "zerada · pronta para a imersão de 19/10",
+      "deployment": "AKfycbw6FOaiIj43Eb8rtpsvj_d1wm7FMrBZTbtAET8bNerY3Et6sfYrTGJolp4nAPHGY8Xo",
+      "apelidos": [],
+      "listada": true,
+      "historico": false
+    },
+    {
+      "id": "camtaua-demo",
+      "nome": "Demo Camtauá",
+      "nomeAdmin": "Demo Camtauá",
+      "local": "Base de exemplo para apresentar",
+      "grupo": "testes",
+      "ambiente": "demonstracao",
+      "estado": "uso",
+      "estadoTxt": "em uso · dados de exemplo",
+      "deployment": "AKfycbyVou5SnmL8RYNWqWWDIb0sY-WsiTW7zvCTnCd9mDnXg7vNj_onBWOKphDJlGR0TC2J",
+      "apelidos": ["demo"],
+      "listada": true,
+      "historico": false
+    },
+    {
+      "id": "teste-felipe",
+      "nome": "Teste Felipe",
+      "nomeAdmin": "Teste Felipe",
+      "local": "Cópia de teste do Felipe",
+      "grupo": "testes",
+      "ambiente": "teste",
+      "estado": "uso",
+      "estadoTxt": "em uso · lançamentos de teste",
+      "deployment": "AKfycbygH5ceyGiuQVlufaesjn0t4pVGfsgcAZ1-dCo-GffsohMI3PQwr46f_qGBm-LYwb9h",
+      "apelidos": ["felipe", "teste-limpo"],
+      "listada": true,
+      "historico": false
+    },
+    {
+      "id": "camtaua",
+      "nome": "Camtauá · base antiga (até 18/10)",
+      "nomeAdmin": "Camtauá · base antiga (até 18/10)",
+      "local": "Santo Antônio do Tauá, PA",
+      "grupo": "organizacoes",
+      "ambiente": "producao",
+      "estado": "uso",
+      "estadoTxt": "planilha de produção de até 18/10 · histórico, nunca é zerada",
+      "deployment": "AKfycbyw9syhEIyuaMaYT-ej95koauzv4hXlLJEyAXY6OMwL4Ba6socaChpIapRx9ekWcVve",
+      "apelidos": [],
+      "listada": false,
+      "historico": true
+    }
+  ]
+}
