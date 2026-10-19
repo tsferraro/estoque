@@ -106,6 +106,12 @@
   .erro-linha{font-size:12px;color:var(--erro);margin:4px 0 0}
   .nota-linha{font-size:12px;color:var(--text2);margin:4px 0 0}
   .acabou{display:flex;align-items:center;gap:6px;font-size:13px;margin:6px 0 0} .acabou input{width:20px;height:20px;accent-color:var(--orange)}
+  .sobra-p{margin:14px 0 0;padding:14px;border:2px solid #f0b429;border-left:6px solid #e8a33d;border-radius:12px;background:#fff0cf;color:#4d2c00}
+  .sobra-p .sp-q{font-size:16px;line-height:1.45} .sobra-p .sp-l{font-size:14px;margin-top:4px}
+  .sobra-p .sp-b{display:block;width:100%;min-height:52px;margin-top:10px;padding:10px 14px;text-align:left;font-weight:700;font-size:16px;border:2px solid var(--line);border-radius:10px;background:#fff;color:var(--text)}
+  .sobra-p .sp-b small{display:block;margin-top:2px;font-weight:500;font-size:14px;color:var(--text2)}
+  .sobra-p .sp-b.sp-quebra{border-color:var(--erro)} .sobra-p .sp-b.sp-ficar{border-color:var(--ok)}
+  .sobra-p .sp-v{display:block;margin-top:10px;padding:8px 0;background:none;border:0;font-size:14px;color:var(--text2);text-decoration:underline}
   .aviso-saida{font-size:13px;background:var(--orange-bg);border:1.5px solid var(--orange);border-radius:10px;padding:10px;margin:10px 0 0;line-height:1.4}
   .lista-fam{max-height:min(44vh,320px);overflow-y:auto;-webkit-overflow-scrolling:touch;border:1.5px solid var(--line);border-radius:12px;margin:8px 0 0}
   label.fam{display:flex;align-items:center;gap:12px;min-height:48px;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer;line-height:1.3;overflow-wrap:anywhere}
@@ -1054,6 +1060,7 @@ function telaAbrir(db){
   if (ehMov(et)) h += '<p class="aviso" style="margin:0 0 8px">Esta etapa não transforma o produto — ele entra e sai igual. Fecha num gesto só.</p>';
   h += '<p class="lbl">Observação (opcional)</p><input class="txt" id="obs" value="' + esc(f.obs || '') + '" placeholder="algo fora do normal nesta operação">';
   h += blocoOperador(db, org, cad);
+  h += '<div id="slot-sobra"></div>';   /* CON-c9-r2 · G3 · a pergunta da sobra grande (a mesma do app) */
   h += '<div style="margin-top:16px"><button class="grande" id="btn-guardar" disabled>Guardar no aparelho</button></div>' +
        '<p class="aviso">Fica guardado neste celular, mesmo sem rede. Vai para a planilha quando você tocar em «Enviar».</p>';
   return h;
@@ -1087,19 +1094,25 @@ function atualizarAbrir(){
     });
     sl.innerHTML = linhas.length ? textoVisivel_(balancoAbrirHtml(linhas, tot)) : '';
   }
-  var bg = document.getElementById('btn-guardar'); if (bg) bg.disabled = !g.ok;
+  /* CON-c9-r2 · G3 · a pergunta da sobra, redesenhada com os números de AGORA; com ela aberta, «Guardar» fica desligado (responde-se nela) */
+  var grandes = sobraGrandeDoAbrir_(f, g.proj), ss = document.getElementById('slot-sobra'), aberta = !!(f.perguntaSobra && grandes.length);
+  if (ss) {
+    ss.innerHTML = aberta ? textoVisivel_(sobraPerguntaHtml_(grandes)) : '';
+    if (aberta) (ss.querySelectorAll ? ss.querySelectorAll('[data-sobra]') : []).forEach(function(b){ b.onclick = function(){ decidirSobraAbrir_(b.dataset.sobra, b.dataset.sig); }; });
+  }
+  var bg = document.getElementById('btn-guardar'); if (bg) bg.disabled = !g.ok || aberta;
 }
 function ligarAbrir(){
   var f = TELA.form, org = orgAtual(), db = ler(), cad = db.cadastros[org.id], proj = projecao(db, org);
   document.getElementById('btn-voltar').onclick = function(){ TELA = { nome:'inicio' }; render(); };
-  document.querySelectorAll('[data-etapa]').forEach(function(b){ b.onclick = function(){ f.etapa = b.dataset.etapa; f.lotes = {}; puxarLotePre(f, cad, proj); render(); }; });
-  var te = document.getElementById('troca-etapa'); if (te) te.onclick = function(){ f.etapa = ''; f.lotes = {}; render(); };
+  document.querySelectorAll('[data-etapa]').forEach(function(b){ b.onclick = function(){ f.etapa = b.dataset.etapa; f.lotes = {}; f.perguntaSobra = false; puxarLotePre(f, cad, proj); render(); }; });
+  var te = document.getElementById('troca-etapa'); if (te) te.onclick = function(){ f.etapa = ''; f.lotes = {}; f.perguntaSobra = false; render(); };
   document.querySelectorAll('[data-pega]').forEach(function(b){ b.onclick = function(){
     if (Object.keys(f.lotes).length >= (cad.maxLotes || 8)) { toast('No máximo ' + (cad.maxLotes || 8) + ' lotes por operação.'); return; }
     var l = proj.lotes[b.dataset.pega]; if (!l) return;
     f.lotes[l.chave] = { kg: String(l.saldo).replace('.', ','), naoAcabou: false };           /* app R-33: sobe CHEIO e «Acabou» marcado */
     render(); }; });
-  document.querySelectorAll('[data-tira]').forEach(function(b){ b.onclick = function(){ delete f.lotes[b.dataset.tira]; render(); }; });
+  document.querySelectorAll('[data-tira]').forEach(function(b){ b.onclick = function(){ delete f.lotes[b.dataset.tira]; f.perguntaSobra = false; render(); }; });
   document.querySelectorAll('[data-kgde]').forEach(function(inp){ inp.oninput = function(){ f.lotes[inp.dataset.kgde].kg = inp.value; atualizarAbrir(); }; });
   document.querySelectorAll('[data-acabou]').forEach(function(c){ c.onchange = function(){ f.lotes[c.dataset.acabou].naoAcabou = !c.checked; atualizarAbrir(); }; });
   document.querySelectorAll('[data-tudo]').forEach(function(b){ b.onclick = function(){
@@ -1109,9 +1122,72 @@ function ligarAbrir(){
   var bg = document.getElementById('btn-guardar'); if (bg) bg.onclick = guardarAbrir;
   atualizarAbrir();
 }
+/* ── CON-c9-r2 · G3 (crítica c9 r2) · A MESMA PERGUNTA DA SOBRA DO APP, NO ABRIR DA LANÇADORA ──────────────────────────────────────────────
+ * O app pergunta antes de encerrar lote com sobra grande (AVI · H10-330 e CON-c9 · G2: `sobraGrande_` em app/index.html). A lançadora era a 4ª porta:
+ * o lote sobe CHEIO com «Acabou» marcado, a pessoa digita 3.000 de 10.000 kg, guarda, e no envio o servidor baixa 7.000 kg de Quebra sem ninguém
+ * ter dito que perdia nada. Aqui vale a MESMA regra (sobra > 10 % do saldo de um lote que «acaba»), as MESMAS 3 respostas e os MESMOS textos, e nada
+ * vai à fila sem o toque. O servidor não muda (itens já guardados nos aparelhos não podem ficar presos). Portão: `scripts/teste-sobra.js`. */
+var SOBRA_PERGUNTA_PCT = 0.10;
+/** Os lotes da operação que «acabam» com sobra acima de `SOBRA_PERGUNTA_PCT` do saldo: [{lote, rotulo, saldo, kg, resto}]. */
+function sobraGrandeDoAbrir_(f, proj){
+  var out = [];
+  Object.keys((f && f.lotes) || {}).forEach(function(k){
+    var sel = f.lotes[k], l = proj && proj.lotes[k];
+    if (!sel || sel.naoAcabou || !l) return;             /* «não acabou»: a sobra FICA no lote, não há o que perguntar */
+    var v = numDe(sel.kg) || 0, s = Number(l.saldo);
+    if (!(v > 0) || !isFinite(s) || !(s > 0) || v > s + 0.01) return;
+    var resto = arred2(s - v);
+    if (resto - s * SOBRA_PERGUNTA_PCT > 0.005) out.push({ lote:k, rotulo:(l.codigo || 'guardado no aparelho'), saldo:s, kg:v, resto:resto });
+  });
+  return out;
+}
+/** A «assinatura» da pergunta: lote:sobra de cada um. Resposta dada a uma pergunta só vale para ELA — mexeu no peso, pergunta de novo. */
+function sobraAssinatura_(lista){ return (lista || []).map(function(x){ return x.lote + ':' + x.resto; }).join('|'); }
+/** A pergunta (os textos do app): a frase com os números do dado e as respostas com o EFEITO escrito no botão. */
+function sobraPerguntaHtml_(lista){
+  if (!lista || !lista.length) return '';
+  var tot = 0; lista.forEach(function(x){ tot = arred2(tot + x.resto); });
+  var sig = sobraAssinatura_(lista);
+  var frase = lista.length === 1
+    ? 'Sobraram <b>' + kgTxt(lista[0].resto) + ' kg</b> de <b>' + kgTxt(lista[0].saldo) + ' kg</b> do lote <b>' + esc(codigoExibicao(lista[0].rotulo)) + '</b>. '
+    : 'Sobraram <b>' + kgTxt(tot) + ' kg</b> em <b>' + lista.length + ' lotes</b>:' +
+      lista.map(function(x){ return '<div class="sp-l">' + esc(codigoExibicao(x.rotulo)) + ' · sobram <b>' + kgTxt(x.resto) + ' kg</b> de ' + kgTxt(x.saldo) + ' kg</div>'; }).join('') + '<div class="sp-l"></div>';
+  return '<div class="sobra-p" role="alert" data-sobra-card="1">' +
+    '<div class="sp-q">' + frase + 'Dar por perdidos (quebra) ou deixar no lote para a próxima operação?</div>' +
+    '<button type="button" class="sp-b sp-quebra" data-sobra="quebra" data-sig="' + esc(sig) + '">Dar por perdidos' +
+      '<small>vira Quebra de ' + kgTxt(tot) + ' kg e ' + (lista.length === 1 ? 'o lote acaba' : 'os lotes acabam') + '</small></button>' +
+    '<button type="button" class="sp-b sp-ficar" data-sobra="ficar" data-sig="' + esc(sig) + '">Deixar no lote' +
+      '<small>' + kgTxt(tot) + ' kg continuam no lote, para a próxima operação</small></button>' +
+    '<button type="button" class="sp-v" data-sobra="voltar" data-sig="' + esc(sig) + '">Voltar e ajustar o peso</button></div>';
+}
+/** As respostas. `quebra` guarda como sempre (o resto vira Quebra no envio); `ficar` desmarca «Acabou» nos lotes da pergunta e guarda; `voltar` fecha a
+ *  pergunta e não guarda. Se o peso mudou desde que a pergunta foi desenhada (a assinatura não bate), NADA é guardado: a tela refaz a pergunta. */
+function decidirSobraAbrir_(escolha, sig){
+  var f = TELA && TELA.nome === 'abrir' ? TELA.form : null; if (!f) return;
+  if (escolha !== 'quebra' && escolha !== 'ficar' && escolha !== 'voltar') return;
+  if (escolha === 'voltar') { f.perguntaSobra = false; atualizarAbrir(); return; }
+  var lista = sobraGrandeDoAbrir_(f, podeGuardarAbrir().proj);
+  if (!lista.length || sobraAssinatura_(lista) !== String(sig)) { atualizarAbrir(); return; }
+  if (escolha === 'ficar') lista.forEach(function(x){ f.lotes[x.lote].naoAcabou = true; });
+  else f.sobraDecidida = sobraAssinatura_(lista);
+  f.perguntaSobra = false;
+  guardarAbrir();
+  if (TELA.nome === 'abrir') render();                    /* não guardou (sem espaço): a tela mostra o «Acabou» como ficou */
+}
+/** O PORTÃO, chamado por `guardarAbrir` antes de pôr qualquer coisa na fila: sobra grande sem resposta a ESTA pergunta → abre a pergunta e devolve true. */
+function perguntarSobraSeGrandeAbrir_(f, proj){
+  var grandes = sobraGrandeDoAbrir_(f, proj);
+  if (grandes.length && f.sobraDecidida !== sobraAssinatura_(grandes)) {
+    f.perguntaSobra = true; f.sobraDecidida = null; atualizarAbrir();
+    var cx = document.querySelector('[data-sobra-card]'); if (cx && cx.scrollIntoView) cx.scrollIntoView({ block:'center' });
+    return true;
+  }
+  return false;
+}
 function guardarAbrir(){
   var f = TELA.form, org = orgAtual(), db = ler(), cad = db.cadastros[org.id], g = podeGuardarAbrir(), proj = g.proj;
   if (!g.ok) return;
+  if (perguntarSobraSeGrandeAbrir_(f, proj)) return;     /* CON-c9-r2 · G3 · nada vai à fila sem o toque */
   var op = document.getElementById('sel-op').value, et = etapaDeCad(cad, f.etapa), produto = '', cadeia = '';
   var lotes = Object.keys(f.lotes).filter(function(k){ return numDe(f.lotes[k].kg) > 0; }).map(function(k){
     var l = proj.lotes[k], o = { kg: numDe(f.lotes[k].kg), esgotou: !f.lotes[k].naoAcabou };

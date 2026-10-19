@@ -34,6 +34,7 @@ Endereço único: `https://mandu-apps.lp.agentesamanda.com/gestao-operacional/` 
 | Acrescentar uma organização | uma linha no array `organizacoes` de `unica/organizacoes.json`, depois ZIP novo |
 | Projeto único do app (D35, c9) | cada organização tem `deploymentUnico` (o `/exec` do projeto único) + `orgApp` (o id dela no registro do projeto único) → a lançadora abre `…/exec/<orgApp>`; o `deployment` antigo fica como **reserva**. Só suba o ZIP depois que o projeto único estiver publicado. Teste: `node scripts/teste-unico.js` |
 | «1SUB» nunca na tela (CON-c9 · M7) | a CHAVE do subproduto segue `1SUB-…` (planilha, QR, fila); a tela da lançadora escreve `SUB-…` (`codigoExibicao`/`textoVisivel_`, na saída de `render`, do `toast` e das faixas). Teste: `node scripts/teste-sub.js` |
+| Sobra grande no Abrir pergunta (CON-c9-r2 · G3) | lote que «acaba» com sobra acima de 10 % do saldo: a tela pergunta, com os textos do app («Dar por perdidos» · «Deixar no lote» · «Voltar e ajustar o peso»), e nada vai à fila sem o toque (`sobraGrandeDoAbrir_`, `perguntarSobraSeGrandeAbrir_`, `decidirSobraAbrir_`). Teste: `node scripts/teste-sobra.js` |
 | Mostrar a lista em vez de entrar sozinho | `…/gestao-operacional/?lista=1` («Trocar de organização») |
 | Painel do administrador | `…/gestao-operacional/?painel=administrador` (ou `?admin=1`) |
 | Raiz do GitHub, `felipe/`, `offline-teste/`, `unica/` no GitHub | só levam ao endereço da Mandū (link e QR antigos não dão 404) |
