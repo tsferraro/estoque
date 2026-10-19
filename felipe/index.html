@@ -3,12 +3,12 @@
 <title>SGO Mandū · mudou de endereço</title>
 <script>
 /* Endereço antigo (19/10/2026): este caminho foi apagado; a lançadora é UMA só e mora no endereço da Mandū. Este arquivo existe só para link e QR antigos não darem 404. */
-function destino(){ var q = location.search || '?org=teste-felipe'; if (!/[?&]org=/.test(q)) q += '&org=teste-felipe'; return 'https://mandu-apps.lp.agentesamanda.com/gestao-operacional/' + q + location.hash; }
+function destino(){ var q = location.search || '?lista=1'; if (q !== '?lista=1' && !/[?&]org=/.test(q)) q += '&org=teste-felipe';   /* H10-316: sem nada = a lista única; QR de lote antigo (?lote= sem org) continua na Demo Felipe (M9) */ return 'https://mandu-apps.lp.agentesamanda.com/gestao-operacional/' + q + location.hash; }
 location.replace(destino());
 </script>
 <style>body{font-family:system-ui,sans-serif;margin:0;padding:32px 16px;text-align:center;color:#1f2a44;background:#f5f6fa}a{color:#e8650a;font-weight:700}</style>
 </head><body>
 <p>O SGO Mandū mudou de endereço.</p>
-<p><a id="ir" href="https://mandu-apps.lp.agentesamanda.com/gestao-operacional/?org=teste-felipe">Abrir no endereço da Mandū</a></p>
+<p><a id="ir" href="https://mandu-apps.lp.agentesamanda.com/gestao-operacional/?lista=1">Abrir no endereço da Mandū</a></p>
 <script>document.getElementById('ir').href=destino();</script>
 </body></html>
