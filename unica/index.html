@@ -1013,9 +1013,15 @@ function linhaFila(i, fila, fuso){
     titulo = 'Fechar ' + (p.etapaNome || p.etapa) + ' · saiu ' + kgTxt(tf) + ' kg';
     det = p.codigo ? p.codigo : 'operação guardada no aparelho';
   }
-  var st;
-  if (i.estado === 'enviado') st = i.alerta ? (i.mensagem || 'já estava fechada — confira o peso no app') :
-        ((i.repetido ? 'já estava na planilha · ' : 'na planilha · ') + (i.codigos || []).join(', '));
+  var st, stH = null;
+  if (i.estado === 'enviado') {
+    if (i.alerta) st = i.mensagem || 'já estava fechada — confira o peso no app';
+    else {
+      /* C12-CON · menor 4 · «na planilha · <códigos>»: o código da casca que o Fechar acabou de gravar leva o chip «Subproduto» (o par do «Gravado: …» do app); o `Fechar` grava o filho com o próprio código `QUE-…` */
+      st = (i.repetido ? 'já estava na planilha · ' : 'na planilha · ') + (i.codigos || []).join(', ');
+      stH = esc(i.repetido ? 'já estava na planilha · ' : 'na planilha · ') + (i.codigos || []).map(function(c){ return esc(c) + chipSub(infoLoteDaFila_(cad, c, '').sub); }).join(', ');
+    }
+  }
   else if (i.estado === 'recusado') {
     st = 'recusado pela planilha: ' + i.erro;
   } else if (i.aviso) st = 'esperando: ' + i.aviso;
@@ -1023,7 +1029,7 @@ function linhaFila(i, fila, fuso){
   var depRecusado = i.estado === 'guardado' && refsDe(i).some(function(r){ var o = fila.find(function(x){ return x.token === r; }); return o && o.estado === 'recusado'; });
   if (depRecusado) st = 'depende de um lançamento recusado — descarte o recusado e este sai junto';
   return '<li class="' + i.estado + (i.alerta ? ' alerta' : '') + (i.aviso && i.estado === 'guardado' ? ' espera' : '') + '"><b>' + esc(titulo) + '</b>' +
-         (detH != null ? detH + esc(' · ' + quandoTxt(i.quando, fuso)) : esc(det + ' · ' + quandoTxt(i.quando, fuso))) + '<div class="st">' + esc(st) + '</div>' +
+         (detH != null ? detH + esc(' · ' + quandoTxt(i.quando, fuso)) : esc(det + ' · ' + quandoTxt(i.quando, fuso))) + '<div class="st">' + (stH != null ? stH : esc(st)) + '</div>' +
          ((i.estado === 'recusado' || (i.estado === 'guardado' && i.aviso)) ? '<button class="link" data-descartar="' + esc(i.token) + '">descartar este lançamento</button>' : '') + '</li>';
 }
 

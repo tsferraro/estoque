@@ -173,6 +173,21 @@ function roda(indexTxt) {
   const lfLocal = filaDe([{ kg:50, ref:'r1' }], 'Casca de Murumuru');
   ok(/lote guardado no aparelho · Casca de Murumuru/.test(lfLocal), 'fila › o lote ainda sem código diz «guardado no aparelho» e o produto');
 
+  /* ── C12-CON · menor 4 · a linha da fila do FECHAR já enviado: «na planilha · <códigos>» — o código da casca que o Fechar gravou leva o chip (o par do «Gravado: …» do app) ── */
+  const filaFechar = (estado, extra) => {
+    const P2 = pagina(js); monta(P2);
+    const it = Object.assign({ token:'t9', tipo:'fechar', org:P2.org, quando:'2026-10-20T10:00:00.000Z', estado, codigos:[PRINC, CASCA], payload:{ etapa:'QUE', etapaNome:'Quebra', codigo:PRINC, pesoSaida:1834 } }, extra || {});
+    return P2.run(`linhaFila(${JSON.stringify(it)}, [], 'America/Sao_Paulo')`);
+  };
+  const lfEnv = filaFechar('enviado'), stEnv = (lfEnv.match(/<div class="st">[\s\S]*?<\/div>/) || [''])[0];
+  ok(new RegExp('na planilha · ' + PRINC + ', ' + CASCA + '<span class="chip-sub"[^>]*>Subproduto</span>').test(stEnv) && (stEnv.match(/class="chip-sub"/g) || []).length === 1, 'fila › «na planilha · …» do Fechar enviado: o chip «Subproduto» fica SÓ no código da casca, o principal não · ' + visivel(stEnv).slice(0, 90));
+  const stRep = (filaFechar('enviado', { repetido:true }).match(/<div class="st">[\s\S]*?<\/div>/) || [''])[0];
+  ok(/já estava na planilha · /.test(stRep) && CHIP.test(stRep), 'fila › «já estava na planilha · …» (repetido) também leva o chip na casca');
+  ok(!CHIP.test(filaFechar('enviado', { codigos:[PRINC] })), 'fila › Fechar enviado só com o principal: sem chip');
+  const stAl = (filaFechar('enviado', { alerta:true, mensagem:'já estava fechada — confira o peso no app' }).match(/<div class="st">[\s\S]*?<\/div>/) || [''])[0];
+  ok(/já estava fechada/.test(stAl) && !CHIP.test(stAl), 'fila › o alerta («já estava fechada») segue só com a mensagem');
+  ok(/<div class="st">guardado no aparelho/.test(filaFechar('guardado')) && /<div class="st">recusado pela planilha: x/.test(filaFechar('recusado', { erro:'x' })), 'fila › guardado e recusado seguem iguais (texto simples)');
+
   /* ── m3 · o nome do app do aparelho em TODO texto visível = «Galpão/Campo» ── */
   const PV = pagina(js); monta(PV);
   PV.run("mudar(function(d){ delete d.cadastros[orgAtual().id]; d.modoOffline = true; d.orgOffline = orgAtual().id; }); TELA = { nome:'inicio' }; render();");
@@ -196,11 +211,11 @@ function roda(indexTxt) {
 
   /* ── a VARREDURA · todo ponto que escreve o CÓDIGO de um lote na tela passa por `chipSub(` (janela de ±2 linhas) ou está na lista de exceção ── */
   /* LIMITE DECLARADO da varredura (c12 · H10-436 (6)): ela só enxerga o código escrito por `esc(<acesso>)` com o último nome `codigo|lote|cod` (o acesso por ÍNDICE, `x[0].lote`, entra desde a c12),
-     por `esc(codigoExibicao(<acesso>))`, por `rotuloLote(`/`rotuloOp(` e por concatenação `x.codigo + '…'` / `'…' + x.codigo`. NÃO enxerga: (a) cartão de lote que mostra só produto + kg e leva o código apenas em
+     por `esc(codigoExibicao(<acesso>))`, por `rotuloLote(`/`rotuloOp(`, pela LISTA `x.codigos` (c12-con: o `join` da linha «na planilha · a, b» da fila) e por concatenação `x.codigo + '…'` / `'…' + x.codigo`. NÃO enxerga: (a) cartão de lote que mostra só produto + kg e leva o código apenas em
      `data-*`; (b) código montado por OUTRA função (`rotulo(l)`) fora desses nomes; (c) o código dentro de SVG; (d) a janela de ±2 linhas dá o chip por perto, não diz QUAL render dela o leva —
      cada render novo de lote se confere a olho e com um assert de elemento, como os de cima. */
   const linhasJs = js.split('\n'); const sitios = []; let fn = '(topo)';
-  const reSit = /esc\(\s*(codigoExibicao\(\s*)?(\w+(?:(?:\[\w+\])|(?:\.\w+))*)\s*\)|rotuloLote\(|rotuloOp\(|(\w+)\.codigo\s*\+\s*['"]|['"]\s*\+\s*(\w+)\.codigo\b|\(\s*(\w+)\.codigo\s*\|\|\s*'/g;
+  const reSit = /esc\(\s*(codigoExibicao\(\s*)?(\w+(?:(?:\[\w+\])|(?:\.\w+))*)\s*\)|rotuloLote\(|rotuloOp\(|(\w+)\.codigo\s*\+\s*['"]|['"]\s*\+\s*(\w+)\.codigo\b|\(\s*(\w+)\.codigo\s*\|\|\s*'|\b\w+\.codigos\b/g;   // c12-con: `x.codigos` (a LISTA de códigos que o servidor devolveu: a linha «na planilha · a, b» da fila) — era o `join` que a varredura não via
   linhasJs.forEach((ln, i) => {
     const f = ln.match(/^(?:async\s+)?function\s+(\w+)/); if (f) fn = f[1];
     if (/^\s*(\/\*|\*|\/\/)/.test(ln)) return;
@@ -221,6 +236,9 @@ function roda(indexTxt) {
     'rotuloOp|rotuloOp(':              'o código é o da OPERAÇÃO aberta (em processamento): subproduto só nasce no fechamento',
     'telaFechar|rotuloOp(':            'o código é o da OPERAÇÃO aberta (em processamento): subproduto só nasce no fechamento',
     'telaFechar|(op.codigo || \'':      'o código é o da OPERAÇÃO aberta (em processamento): subproduto só nasce no fechamento',
+    'lerRetorno|it.codigos':           'guarda no item da fila o que o servidor devolveu (dado, não tela); quem o desenha é `linhaFila` (com chip)',
+    'lerRetorno|res.codigos':          'guarda no item da fila o que o servidor devolveu (dado, não tela); quem o desenha é `linhaFila` (com chip)',
+    'trocarRefs|i.codigos':            'procura o código gravado para trocar a referência de um lançamento que depende de outro (dado, não tela)',
     'telaFicha|esc(codigoExibicao(':   'o código fica na linha do topo da ficha; o chip e a borda roxa estão no cabeçalho do PRODUTO da mesma ficha (afirmado acima, ficha › chip ao lado do nome)'
   };
   ok(sitios.length >= 10, 'varredura · controle verde · achou ' + sitios.length + ' pontos que escrevem código de lote (esperava ≥ 10; instrumento cego acusaria 0)');
@@ -265,7 +283,11 @@ const M = [
   ['a linha da fila perde o chip do lote', "esc(inf.produto) : '') + chipSub(inf.sub);", "esc(inf.produto) : '');"],
   ['a linha da fila perde o PRODUTO do lote', "(inf.produto ? ' · ' + esc(inf.produto) : '') + chipSub(inf.sub);", "'' + chipSub(inf.sub);"],
   ['a linha da fila só olha o pacote `lotes` (o lote que esgotou, só na ficha, perde o chip)', "  if (fi) return { produto: String(fi[0] || produtoPadrao || ''), sub: ehSubFicha(cod, fi) };\n", ""],
-  ['a ficha do QR ignora o campo aditivo `fi[13]` (casca com saldo 0)', " || (fi && Number(fi[13]) === 1));", ");"]
+  ['a ficha do QR ignora o campo aditivo `fi[13]` (casca com saldo 0)', " || (fi && Number(fi[13]) === 1));", ");"],
+  // ── c12-con · menor 4 · a linha da fila do Fechar ──
+  ['a linha «na planilha · …» do Fechar perde o chip da casca', "return esc(c) + chipSub(infoLoteDaFila_(cad, c, '').sub); })", "return esc(c); })"],
+  ['a linha «na planilha · …» do Fechar põe chip em todo código', "return esc(c) + chipSub(infoLoteDaFila_(cad, c, '').sub); })", "return esc(c) + chipSub(true); })"],
+  ['a linha «na planilha · …» volta a ser só texto (stH some)', "'<div class=\"st\">' + (stH != null ? stH : esc(st)) + '</div>'", "'<div class=\"st\">' + esc(st) + '</div>'"]
 ];
 let ruim = 0;
 console.log('\n── mutantes ──');
