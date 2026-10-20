@@ -139,6 +139,40 @@ function roda(indexTxt) {
   });
   ok(!CHIP.test(cabF(fPrinc)) && !ROXO.test(cabF(fPrinc)) && !/subproduto/i.test(visivel(cabF(fPrinc))), 'ficha › o principal `QUE-…` NÃO tem chip, nem roxo, nem a palavra no cabeçalho');
 
+  /* ── C12 · H10-436 (7) · a ficha do QR de uma casca com SALDO 0 (fora de `lotes`, sem `pl`): o campo ADITIVO `fi[13]` do pacote (0|1) diz o tipo ── */
+  const ficha0 = (cod, fi) => { const P2 = pagina(js); monta(P2, { fichas: { [cod]: fi } }); P2.run(`TELA = { nome:'ficha', org:'${P2.org}', lote:'${cod}', via:'' }; render();`); return P2.el('app').innerHTML; };
+  const ARM0 = 'ARM-20260910-002', ARM1 = 'ARM-20260629-001';
+  const fZero = ficha0(ARM0, ['Casca de Tucumã', 'ARM', 'Armazenado', '2026-09-10', 1028, 0, [], [], 0, 1028, 0, null, null, 1]);
+  const fZeroP = ficha0(ARM1, ['Semente de Andiroba Seca', 'ARM', 'Armazenado', '2026-06-29', 250, 0, [], [], 0, 250, 0, null, null, 0]);
+  const fAntigo = ficha0(ARM0, ['Casca de Tucumã', 'ARM', 'Armazenado', '2026-09-10', 1028, 0, [], [], 0]);   /* pacote de ANTES do campo: tolera a ausência (sem chip, como antes) */
+  ok(CHIP.test(cabF(fZero)) && ROXO.test(SEM_CHIP(cabF(fZero))), 'ficha › a casca armazenada com SALDO 0 e `fi[13] = 1` tem o chip e a borda roxa (sem `lotes`, sem `pl`) · ' + visivel(cabF(fZero)).slice(0, 60));
+  ok(!CHIP.test(cabF(fZeroP)) && !ROXO.test(cabF(fZeroP)), 'ficha › o principal com saldo 0 e `fi[13] = 0` NÃO tem chip nem roxo');
+  ok(cabF(fAntigo).length > 0 && !CHIP.test(cabF(fAntigo)) && !/ESTOUROU/.test(fAntigo), 'ficha › o pacote de antes do campo (`fi` sem [13]) ainda abre a ficha e não quebra (a lançadora tolera a ausência)');
+
+  /* ── C12 · H10-436 (1) · a pergunta da SOBRA (um lote e vários) leva o chip; o `sub` do lote chega até ela ── */
+  P = pagina(js);
+  const spCasca = P.run(`sobraPerguntaHtml_([{lote:'k1', rotulo:'${CASCA}', saldo:334, kg:200, resto:134, sub:true}])`), spPrinc = P.run(`sobraPerguntaHtml_([{lote:'k2', rotulo:'${PRINC}', saldo:1500, kg:1000, resto:500, sub:false}])`);
+  ok(new RegExp('do lote <b>' + CASCA + '</b><span class="chip-sub"').test(spCasca) && (spCasca.match(/class="chip-sub"/g) || []).length === 1, 'sobra › a pergunta de UM lote de casca tem o chip «Subproduto» colado ao código');
+  ok(!CHIP.test(spPrinc) && /do lote <b>QUE-20261019-001<\/b>\. /.test(spPrinc), 'sobra › e a de um principal NÃO tem chip');
+  const spVarios = P.run(`sobraPerguntaHtml_([{lote:'k1', rotulo:'${CASCA}', saldo:334, kg:200, resto:134, sub:true}, {lote:'k2', rotulo:'${PRINC}', saldo:1500, kg:1000, resto:500, sub:false}])`);
+  ok((spVarios.match(/class="chip-sub"/g) || []).length === 1 && new RegExp(CASCA + '<span class="chip-sub"').test(spVarios), 'sobra › com vários lotes o chip fica só na linha da casca');
+  const sg = P.run(`JSON.stringify(sobraGrandeDoAbrir_({ lotes: { k1: { kg:'200', naoAcabou:false }, k2: { kg:'1000', naoAcabou:false } } }, { lotes: { k1: { codigo:'${CASCA}', saldo:334, sub:1 }, k2: { codigo:'${PRINC}', saldo:1500, sub:0 } } }).map(function(x){ return [x.rotulo, x.sub]; }))`);
+  ok(sg === JSON.stringify([[CASCA, true], [PRINC, false]]), 'sobra › `sobraGrandeDoAbrir_` leva o sinal `sub` do lote até a pergunta · ' + sg);
+
+  /* ── C12 · H10-436 (2) · a linha da FILA («Abrir Armazenamento · 334 kg») diz o lote com PRODUTO e chip, não só o código ── */
+  const filaDe = (lotes, produto, extraCad) => {
+    const P2 = pagina(js); monta(P2, extraCad);
+    const it = { token:'t1', tipo:'abrir', org:P2.org, quando:'2026-10-20T10:00:00.000Z', estado:'recusado', erro:'x', payload:{ etapa:'ARM', etapaNome:'Armazenamento', produto, lotes } };
+    return P2.run(`linhaFila(${JSON.stringify(it)}, [], 'America/Sao_Paulo')`);
+  };
+  const lfCasca = filaDe([{ kg:334, codigo:CASCA, esgotou:true }], 'Casca de Murumuru'), lfPrinc = filaDe([{ kg:1500, codigo:PRINC, esgotou:true }], 'Amêndoa de Murumuru');
+  ok(/lote QUE-20261019-003 · Casca de Murumuru<span class="chip-sub"[^>]*>Subproduto<\/span>/.test(lfCasca), 'fila › a linha do Abrir de uma casca diz «lote QUE-… · Casca de Murumuru» com o chip «Subproduto» · ' + visivel(lfCasca).slice(0, 110));
+  ok(/lote QUE-20261019-001 · Amêndoa de Murumuru/.test(lfPrinc) && !CHIP.test(lfPrinc), 'fila › e a de um principal diz o produto e NÃO tem chip');
+  const lfZero = filaDe([{ kg:1028, codigo:ARM0, esgotou:true }], 'Casca de Tucumã', { fichas: { [ARM0]: ['Casca de Tucumã', 'ARM', 'Armazenado', '2026-09-10', 1028, 0, [], [], 0, 1028, 0, null, null, 1] } });
+  ok(CHIP.test(lfZero) && /Casca de Tucumã/.test(lfZero), 'fila › a casca esgotada (já fora de `lotes`, só na ficha com `fi[13] = 1`) também leva o chip');
+  const lfLocal = filaDe([{ kg:50, ref:'r1' }], 'Casca de Murumuru');
+  ok(/lote guardado no aparelho · Casca de Murumuru/.test(lfLocal), 'fila › o lote ainda sem código diz «guardado no aparelho» e o produto');
+
   /* ── m3 · o nome do app do aparelho em TODO texto visível = «Galpão/Campo» ── */
   const PV = pagina(js); monta(PV);
   PV.run("mudar(function(d){ delete d.cadastros[orgAtual().id]; d.modoOffline = true; d.orgOffline = orgAtual().id; }); TELA = { nome:'inicio' }; render();");
@@ -161,8 +195,12 @@ function roda(indexTxt) {
   ok(/chk-off/.test(indexTxt) && /db\.modoOffline/.test(indexTxt), 'a chave gravada `db.modoOffline` e o id `chk-off` continuam (só o texto mudou)');
 
   /* ── a VARREDURA · todo ponto que escreve o CÓDIGO de um lote na tela passa por `chipSub(` (janela de ±2 linhas) ou está na lista de exceção ── */
+  /* LIMITE DECLARADO da varredura (c12 · H10-436 (6)): ela só enxerga o código escrito por `esc(<acesso>)` com o último nome `codigo|lote|cod` (o acesso por ÍNDICE, `x[0].lote`, entra desde a c12),
+     por `esc(codigoExibicao(<acesso>))`, por `rotuloLote(`/`rotuloOp(` e por concatenação `x.codigo + '…'` / `'…' + x.codigo`. NÃO enxerga: (a) cartão de lote que mostra só produto + kg e leva o código apenas em
+     `data-*`; (b) código montado por OUTRA função (`rotulo(l)`) fora desses nomes; (c) o código dentro de SVG; (d) a janela de ±2 linhas dá o chip por perto, não diz QUAL render dela o leva —
+     cada render novo de lote se confere a olho e com um assert de elemento, como os de cima. */
   const linhasJs = js.split('\n'); const sitios = []; let fn = '(topo)';
-  const reSit = /esc\(\s*(codigoExibicao\(\s*)?(\w+(?:\.\w+)*)\s*\)|rotuloLote\(|rotuloOp\(|(\w+)\.codigo\s*\+\s*['"]|['"]\s*\+\s*(\w+)\.codigo\b|\(\s*(\w+)\.codigo\s*\|\|\s*'/g;
+  const reSit = /esc\(\s*(codigoExibicao\(\s*)?(\w+(?:(?:\[\w+\])|(?:\.\w+))*)\s*\)|rotuloLote\(|rotuloOp\(|(\w+)\.codigo\s*\+\s*['"]|['"]\s*\+\s*(\w+)\.codigo\b|\(\s*(\w+)\.codigo\s*\|\|\s*'/g;
   linhasJs.forEach((ln, i) => {
     const f = ln.match(/^(?:async\s+)?function\s+(\w+)/); if (f) fn = f[1];
     if (/^\s*(\/\*|\*|\/\/)/.test(ln)) return;
@@ -178,10 +216,8 @@ function roda(indexTxt) {
   /* A LISTA DE EXCEÇÃO · `função|trecho` → o porquê. Exceção que já tem chip ou que sumiu do código falha (a lista não envelhece calada). */
   const EXC = {
     'rotuloLote|rotuloLote(':          'é a DEFINIÇÃO do rótulo em texto (`código · há N dias`); quem o desenha em cartão/linha (Abrir) leva o chip ao lado',
-    'linhaFila|(l.codigo || \'':        'a linha da fila é o histórico do lançamento em texto corrido (`lote X + lote Y`), não um cartão de lote',
     'atualizarAbrir|(l.codigo || \'':   'rótulo da legenda do Balanço de Massa (texto da barra), não um cartão/linha de lote',
     'sobraGrandeDoAbrir_|(l.codigo || \'': 'rótulo que alimenta a frase da pergunta da sobra grande (texto corrido)',
-    'sobraPerguntaHtml_|esc(codigoExibicao(': 'a frase da pergunta da sobra grande (texto corrido: «sobram N kg do lote X»)',
     'rotuloOp|rotuloOp(':              'o código é o da OPERAÇÃO aberta (em processamento): subproduto só nasce no fechamento',
     'telaFechar|rotuloOp(':            'o código é o da OPERAÇÃO aberta (em processamento): subproduto só nasce no fechamento',
     'telaFechar|(op.codigo || \'':      'o código é o da OPERAÇÃO aberta (em processamento): subproduto só nasce no fechamento',
@@ -221,7 +257,15 @@ const M = [
   ['a ficha volta a dizer «O modo offline ainda não está liberado»', "O Galpão/Campo ainda não está liberado para ", "O modo offline ainda não está liberado para "],
   ['o cabeçalho volta a dizer «Versão Básica · neste aparelho»', "'Galpão/Campo · neste aparelho'", "'Versão Básica · neste aparelho'"],
   ['um render NOVO de lote sem chip (a varredura tem de acusá-lo)', "function codigoExibicao(cod){", "function linhaNovaSemChip(l){ return '<div class=\"nome\">' + esc(l.produto) + ' ' + esc(l.codigo) + '</div>'; }\nfunction codigoExibicao(cod){"],
-  ['«Abrir com o lote vindo da ficha» perde o chip', "'</b>' + chipSub(pre.sub) + ' ('", "'</b>' + ' ('"]
+  ['«Abrir com o lote vindo da ficha» perde o chip', "'</b>' + chipSub(pre.sub) + ' ('", "'</b>' + ' ('"],
+  // ── c12 · H10-436 · sobra de um lote, linha da fila, ficha com saldo 0 ──
+  ['a pergunta da sobra de UM lote perde o chip', "'</b>' + chipSub(lista[0].sub) + '. '", "'</b>' + '. '"],
+  ['a pergunta da sobra de vários lotes perde o chip', "esc(codigoExibicao(x.rotulo)) + chipSub(x.sub) + ' · sobram <b>'", "esc(codigoExibicao(x.rotulo)) + ' · sobram <b>'"],
+  ['`sobraGrandeDoAbrir_` esquece de levar o `sub` do lote', "resto:resto, sub:!!l.sub });", "resto:resto });"],
+  ['a linha da fila perde o chip do lote', "esc(inf.produto) : '') + chipSub(inf.sub);", "esc(inf.produto) : '');"],
+  ['a linha da fila perde o PRODUTO do lote', "(inf.produto ? ' · ' + esc(inf.produto) : '') + chipSub(inf.sub);", "'' + chipSub(inf.sub);"],
+  ['a linha da fila só olha o pacote `lotes` (o lote que esgotou, só na ficha, perde o chip)', "  if (fi) return { produto: String(fi[0] || produtoPadrao || ''), sub: ehSubFicha(cod, fi) };\n", ""],
+  ['a ficha do QR ignora o campo aditivo `fi[13]` (casca com saldo 0)', " || (fi && Number(fi[13]) === 1));", ");"]
 ];
 let ruim = 0;
 console.log('\n── mutantes ──');

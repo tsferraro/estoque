@@ -412,7 +412,9 @@ function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(
 function chipSub(sub){ return sub ? '<span class="chip-sub" data-chip-sub="1">Subproduto</span>' : ''; }
 function bordaSub(sub, extra){ var s = (extra || '') + (sub ? 'border-left-color:#8E5FB0' : ''); return s ? ' style="' + s + '"' : ''; }
 /* A ficha só tem o código, o estado (fi[2]) e, se o lote tem saldo no aparelho, a projeção (`pl.sub`, do pacote): os três sinais, qualquer um basta (`1SUB` antigo · «Subproduto em estoque» · `sub` do pacote). */
-function ehSubFicha(cod, fi, pl){ return !!((pl && pl.sub) || /^1SUB/i.test(String(cod || '')) || (fi && /subproduto/i.test(fi[2]))); }
+function ehSubFicha(cod, fi, pl){ return !!((pl && pl.sub) || /^1SUB/i.test(String(cod || '')) || (fi && /subproduto/i.test(fi[2])) || (fi && Number(fi[13]) === 1)); }
+/* C12 · H10-436 (7) · `fi[13]` é o campo ADITIVO do pacote (0|1, «é subproduto?» — Tipo, `1SUB` antigo ou Status): a ficha de uma casca com SALDO 0 (fora de `lotes`, sem `pl`) e estado «Armazenado» também sai roxa com o chip.
+   Pacote de antes do campo: `fi[13]` não existe e a ficha decide pelos três sinais de antes (tolera a ausência). */
 function codigoExibicao(cod){ return String(cod == null ? '' : cod).replace(/(^|[^A-Za-z0-9])1SUB-/g, '$1SUB-'); }
 function textoVisivel_(h){
   h = String(h == null ? '' : h);
@@ -983,9 +985,16 @@ var LOCAL_TXT = 'guardado no aparelho · ainda sem código';
 function rotuloLote(l){ return l.codigo ? l.codigo + (l.dias != null ? ' · ' + diasTxt(l.dias) : '') : LOCAL_TXT; }
 function nomeDaEtapa(cad, id){ var e = etapaDeCad(cad, id); return e ? e.nome : id; }
 
-/* Uma linha da fila, qualquer tipo. «Abrir Secagem · 9.000 kg · lote REC-…/guardado no aparelho». */
+/** O produto e o «é subproduto?» de um lote que está na fila: do pacote (`lotes`, saldo > 0) ou da ficha (`fichas`, todo lote); sem nenhum dos dois, o produto da operação e o `1SUB` antigo pelo prefixo. */
+function infoLoteDaFila_(cad, cod, produtoPadrao){
+  var t = cod ? (cad.lotes || []).filter(function(l){ return l[0] === cod; })[0] : null, fi = cod && cad.fichas ? cad.fichas[cod] : null;
+  if (t) return { produto: String(t[1] || produtoPadrao || ''), sub: !!t[5] };
+  if (fi) return { produto: String(fi[0] || produtoPadrao || ''), sub: ehSubFicha(cod, fi) };
+  return { produto: String(produtoPadrao || ''), sub: ehSubFicha(cod, null) };
+}
+/* Uma linha da fila, qualquer tipo. «Abrir Secagem · 9.000 kg · lote REC-… · Fruto de Açaí/guardado no aparelho». */
 function linhaFila(i, fila, fuso){
-  var p = i.payload || {}, cad = (ler().cadastros || {})[i.org] || {}, titulo = '', det = '';
+  var p = i.payload || {}, cad = (ler().cadastros || {})[i.org] || {}, titulo = '', det = '', detH = null;
   if (i.tipo === 'receber') {
     var tr = p.itens.reduce(function(a, x){ return a + x.kg; }, 0);
     titulo = 'Receber · ' + p.produto + ' · ' + kgTxt(tr) + ' kg';
@@ -993,7 +1002,11 @@ function linhaFila(i, fila, fuso){
   } else if (i.tipo === 'abrir') {
     var ta = (p.lotes || []).reduce(function(a, x){ return a + (Number(x.kg) || 0); }, 0);
     titulo = 'Abrir ' + (p.etapaNome || p.etapa) + ' · ' + kgTxt(ta) + ' kg';
-    det = (p.lotes || []).map(function(l){ return 'lote ' + (l.codigo || 'guardado no aparelho'); }).join(' + ');
+    /* C12 · H10-436 (2) · a linha diz QUAL lote (código + PRODUTO + chip «Subproduto» da casca): a pista `SUB-` que o código antigo dava sumiu com o código `QUE-…` (D44) e quem decide «descartar» precisa ver o que é */
+    detH = (p.lotes || []).map(function(l){
+      var inf = infoLoteDaFila_(cad, l.codigo, p.produto);
+      return 'lote ' + esc(l.codigo || 'guardado no aparelho') + (inf.produto ? ' · ' + esc(inf.produto) : '') + chipSub(inf.sub);
+    }).join(' + ');
   } else if (i.tipo === 'fechar') {
     var tf = p.pesoSaida != null ? Number(p.pesoSaida) || 0 :
       (Number((p.principal || {}).kg) || 0) + (p.subprodutos || []).reduce(function(a, x){ return a + (Number(x.kg) || 0); }, 0);
@@ -1010,7 +1023,7 @@ function linhaFila(i, fila, fuso){
   var depRecusado = i.estado === 'guardado' && refsDe(i).some(function(r){ var o = fila.find(function(x){ return x.token === r; }); return o && o.estado === 'recusado'; });
   if (depRecusado) st = 'depende de um lançamento recusado — descarte o recusado e este sai junto';
   return '<li class="' + i.estado + (i.alerta ? ' alerta' : '') + (i.aviso && i.estado === 'guardado' ? ' espera' : '') + '"><b>' + esc(titulo) + '</b>' +
-         esc(det + ' · ' + quandoTxt(i.quando, fuso)) + '<div class="st">' + esc(st) + '</div>' +
+         (detH != null ? detH + esc(' · ' + quandoTxt(i.quando, fuso)) : esc(det + ' · ' + quandoTxt(i.quando, fuso))) + '<div class="st">' + esc(st) + '</div>' +
          ((i.estado === 'recusado' || (i.estado === 'guardado' && i.aviso)) ? '<button class="link" data-descartar="' + esc(i.token) + '">descartar este lançamento</button>' : '') + '</li>';
 }
 
@@ -1145,7 +1158,7 @@ function sobraGrandeDoAbrir_(f, proj){
     var v = numDe(sel.kg) || 0, s = Number(l.saldo);
     if (!(v > 0) || !isFinite(s) || !(s > 0) || v > s + 0.01) return;
     var resto = arred2(s - v);
-    if (resto - s * SOBRA_PERGUNTA_PCT > 0.005) out.push({ lote:k, rotulo:(l.codigo || 'guardado no aparelho'), saldo:s, kg:v, resto:resto });
+    if (resto - s * SOBRA_PERGUNTA_PCT > 0.005) out.push({ lote:k, rotulo:(l.codigo || 'guardado no aparelho'), saldo:s, kg:v, resto:resto, sub:!!l.sub });   /* C12 · `sub` p/ o chip da pergunta */
   });
   return out;
 }
@@ -1157,9 +1170,9 @@ function sobraPerguntaHtml_(lista){
   var tot = 0; lista.forEach(function(x){ tot = arred2(tot + x.resto); });
   var sig = sobraAssinatura_(lista);
   var frase = lista.length === 1
-    ? 'Sobraram <b>' + kgTxt(lista[0].resto) + ' kg</b> de <b>' + kgTxt(lista[0].saldo) + ' kg</b> do lote <b>' + esc(codigoExibicao(lista[0].rotulo)) + '</b>. '
+    ? 'Sobraram <b>' + kgTxt(lista[0].resto) + ' kg</b> de <b>' + kgTxt(lista[0].saldo) + ' kg</b> do lote <b>' + esc(codigoExibicao(lista[0].rotulo)) + '</b>' + chipSub(lista[0].sub) + '. '
     : 'Sobraram <b>' + kgTxt(tot) + ' kg</b> em <b>' + lista.length + ' lotes</b>:' +
-      lista.map(function(x){ return '<div class="sp-l">' + esc(codigoExibicao(x.rotulo)) + ' · sobram <b>' + kgTxt(x.resto) + ' kg</b> de ' + kgTxt(x.saldo) + ' kg</div>'; }).join('') + '<div class="sp-l"></div>';
+      lista.map(function(x){ return '<div class="sp-l">' + esc(codigoExibicao(x.rotulo)) + chipSub(x.sub) + ' · sobram <b>' + kgTxt(x.resto) + ' kg</b> de ' + kgTxt(x.saldo) + ' kg</div>'; }).join('') + '<div class="sp-l"></div>';
   return '<div class="sobra-p" role="alert" data-sobra-card="1">' +
     '<div class="sp-q">' + frase + 'Dar por perdidos (quebra) ou deixar no lote para a próxima operação?</div>' +
     '<button type="button" class="sp-b sp-quebra" data-sobra="quebra" data-sig="' + esc(sig) + '">Dar por perdidos' +
