@@ -9,6 +9,8 @@
  *   1 · a casca `QUE-…` (sub = true, SEM normalizar) tem o chip «Subproduto» e o roxo #8E5FB0 na borda do elemento; o principal `QUE-…` vizinho, nem chip nem roxo
  *   2 · o `1SUB-…` antigo tem o mesmo chip e o mesmo roxo
  *   3 · o cartão da chave diz «Galpão/Campo» e o texto VISÍVEL do Início não diz mais «Versão offline» (nas duas formas do Início)
+ * CON-c10-r2 (continuação 12): G2 (Abrir › Armazenamento, «Na operação» e «Disponíveis»), m2 (ficha do QR), m3 (nenhum texto visível «modo offline»/«Versão offline»/«Versão Básica»)
+ * e a VARREDURA: todo ponto da `unica/index.html` que escreve o código de um lote na tela passa por `chipSub(` (janela de ±2 linhas) ou está na lista de exceção escrita aqui, com o porquê.
  * Os mutantes no fim provam que o portão fica vermelho quando o defeito volta. */
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const REPO = path.resolve(__dirname, '..');
@@ -87,6 +89,110 @@ function roda(indexTxt) {
   });
   formas.forEach(([nome, h]) => ok(!/vers(ã|&atilde;)o\s+offline/i.test(visivel(h)), 'Início (' + nome + ') › o texto VISÍVEL não diz «Versão offline»'));
   ok(!/<b>Vers(ã|&atilde;)o offline<\/b>/i.test(indexTxt), 'e o arquivo não tem mais o rótulo `<b>Versão offline</b>`');
+
+  /* ── G2 · Lançadora › Abrir › Armazenamento: «Na operação» (.linha) e «Disponíveis» (.card[data-pega]) — a casca nova, a antiga e o principal vizinho ── */
+  const CASCA = 'QUE-20261019-003', PRINC = 'QUE-20261019-001', VELHA = '1SUB-20260630-001', ARMZ = 'ARM-20261019-004';
+  const monta = (P2, extra) => P2.run(`mudar(function(d){ d.cadastros['${P2.org}'] = Object.assign({ etapas:[{id:'QUE', nome:'Quebra', tipo:'Beneficiamento', cad:[]}, {id:'ARM', nome:'Armazenamento', tipo:'Movimentação', cad:[]}], ord:{REC:1,QUE:3,ARM:4}, operadores:[['OP-1','Gilson']],
+    lotes:[['${CASCA}','Casca de Murumuru','Murumuru',334,'QUE',1,95], ['${PRINC}','Amêndoa de Murumuru','Murumuru',1500,'QUE',0,2], ['${VELHA}','Casca de Tucumã','Tucumã',800,'QUE',1,20], ['${ARMZ}','Casca de Tucumã','Tucumã',120,'ARM',1,3]] }, ${JSON.stringify(extra || {})}); d.orgOffline = '${P2.org}'; d.modoOffline = true; })`);
+  const pedaco = (h, abre, fim) => { const i = h.indexOf(abre); if (i < 0) return ''; const f = h.indexOf(fim, i + abre.length); return h.slice(i, f < 0 ? i + 2500 : f + fim.length); };
+  P = pagina(js); monta(P);
+  P.run("TELA = { nome:'abrir', form:{ etapa:'ARM', lotes:{}, obs:'' } }; render();");
+  const hAbrir = P.el('app').innerHTML;
+  const cardDe = c => pedaco(hAbrir, '<button class="card" data-pega="' + c + '"', '</button>');
+  const [cCasca, cPrinc, cVelha] = [cardDe(CASCA), cardDe(PRINC), cardDe(VELHA)];
+  ok(!!cCasca && !!cPrinc && !!cVelha, 'Abrir › Disponíveis · achei os 3 cartões (casca nova, principal, casca antiga)');
+  [['a casca `QUE-…`', cCasca], ['a casca antiga `1SUB-…`', cVelha]].forEach(([n, c]) => {
+    ok(CHIP.test(c), 'Abrir › Disponíveis › ' + n + ' tem o chip «Subproduto» NO cartão');
+    ok(ROXO.test(SEM_CHIP(c)), 'Abrir › Disponíveis › ' + n + ' tem o roxo #8E5FB0 na BORDA do cartão (fora do chip)');
+  });
+  ok(cCasca.indexOf('Casca de Murumuru') > -1, 'Abrir › Disponíveis › o nome do produto («Casca de Murumuru») continua no cartão');
+  ok(!CHIP.test(cPrinc) && !ROXO.test(cPrinc) && !/subproduto/i.test(visivel(cPrinc)), 'Abrir › Disponíveis › o principal `QUE-…` vizinho NÃO tem chip, nem roxo, nem a palavra');
+  /* «Na operação»: a casca e o principal trazidos para a operação (a .linha) */
+  P.run(`TELA.form.lotes['${CASCA}'] = { kg:'100', naoAcabou:true }; TELA.form.lotes['${PRINC}'] = { kg:'100', naoAcabou:true }; TELA.form.lotes['${VELHA}'] = { kg:'100', naoAcabou:true }; render();`);
+  const hOp = P.el('app').innerHTML;
+  const linhaDe = c => { const i = hOp.indexOf('data-tira="' + c + '"'); return i < 0 ? '' : hOp.slice(hOp.lastIndexOf('<div class="linha"', i), i + 80); };
+  const [lCasca, lPrinc, lVelha] = [linhaDe(CASCA), linhaDe(PRINC), linhaDe(VELHA)];
+  ok(!!lCasca && !!lPrinc && !!lVelha, 'Abrir › Na operação · achei as 3 linhas (casca nova, principal, casca antiga)');
+  [['a casca `QUE-…`', lCasca], ['a casca antiga `1SUB-…`', lVelha]].forEach(([n, c]) => {
+    ok(CHIP.test(c), 'Abrir › Na operação › ' + n + ' tem o chip «Subproduto» NA LINHA');
+    ok(ROXO.test(SEM_CHIP(c)), 'Abrir › Na operação › ' + n + ' tem o roxo #8E5FB0 na BORDA da linha (fora do chip)');
+  });
+  ok(/margin-bottom:0/.test(lCasca), 'Abrir › Na operação › a linha da casca conserva o `margin-bottom:0` que já tinha');
+  ok(!CHIP.test(lPrinc) && !ROXO.test(lPrinc) && !/subproduto/i.test(visivel(lPrinc)), 'Abrir › Na operação › o principal `QUE-…` vizinho NÃO tem chip, nem roxo, nem a palavra');
+
+  /* ── m2 · a ficha do QR: o cabeçalho com o produto + chip e a borda roxa; o principal, limpo ── */
+  const ficha = (cod, fi, extraLotes) => {
+    const P2 = pagina(js); monta(P2, { fichas: { [cod]: fi } });
+    P2.run(`TELA = { nome:'ficha', org:'${P2.org}', lote:'${cod}', via:'' }; render();`);
+    return P2.el('app').innerHTML;
+  };
+  const fCasca = ficha(CASCA, ['Casca de Murumuru', 'QUE', 'Subproduto em estoque', '2026-10-19', 334, 334, [], [], 0, 0]);
+  const fPrinc = ficha(PRINC, ['Amêndoa de Murumuru', 'QUE', 'Em estoque', '2026-10-19', 1500, 1500, [], [], 0, 0]);
+  const fVelha = ficha(VELHA, ['Casca de Tucumã', 'QUE', 'Subproduto em estoque', '2026-06-30', 800, 800, [], [], 0, 0]);
+  const fArmz = ficha(ARMZ, ['Casca de Tucumã', 'ARM', 'Armazenado', '2026-10-19', 120, 120, [], [], 0, 0]);
+  const cabF = h => pedaco(h, '<div class="ficha" id="ficha"', '<dl>');
+  ok(cabF(fCasca).length > 0 && cabF(fPrinc).length > 0, 'ficha › achei o cabeçalho da ficha da casca e o do principal (' + cabF(fCasca).length + ' / ' + cabF(fPrinc).length + ' car.)');
+  [['a casca `QUE-…` (estado «Subproduto em estoque»)', fCasca], ['a casca antiga `1SUB-…`', fVelha], ['a casca armazenada `ARM-…` (estado «Armazenado», `sub` só no pacote)', fArmz]].forEach(([n, h]) => {
+    const c = cabF(h);
+    ok(CHIP.test(c) && /id="ficha-produto"[^>]*>[^<]*Casca[^<]*<span class="chip-sub"/.test(c), 'ficha › ' + n + ' · o chip «Subproduto» está ao lado do NOME do produto');
+    ok(ROXO.test(SEM_CHIP(c)), 'ficha › ' + n + ' · e o roxo #8E5FB0 está na BORDA da ficha (fora do chip)');
+  });
+  ok(!CHIP.test(cabF(fPrinc)) && !ROXO.test(cabF(fPrinc)) && !/subproduto/i.test(visivel(cabF(fPrinc))), 'ficha › o principal `QUE-…` NÃO tem chip, nem roxo, nem a palavra no cabeçalho');
+
+  /* ── m3 · o nome do app do aparelho em TODO texto visível = «Galpão/Campo» ── */
+  const PV = pagina(js); monta(PV);
+  PV.run("mudar(function(d){ delete d.cadastros[orgAtual().id]; d.modoOffline = true; d.orgOffline = orgAtual().id; }); TELA = { nome:'inicio' }; render();");
+  const hPrep = PV.el('app').innerHTML;
+  ok(/id="btn-preparar">Preparar o Galpão\/Campo<\/button>/.test(hPrep), 'Início (ligada, sem cadastros) › o botão diz «Preparar o Galpão/Campo»');
+  PV.run("mudar(function(d){ d.cadastros[orgAtual().id] = { etapas:[], ord:{}, operadores:[], lotes:[] }; }); TELA = { nome:'inicio' }; render();");
+  const hBas = PV.el('app').innerHTML;
+  ok(/<small>Galpão\/Campo · neste aparelho<\/small>/.test(hBas), 'Início (a Básica, cadastros no aparelho) › o cabeçalho diz «Galpão/Campo · neste aparelho»');
+  const PN = pagina(js);
+  PN.ctx.__o2 = JSON.parse(JSON.stringify(PN.ctx.__orgs)); PN.ctx.__o2.organizacoes.forEach(o => { o.deployment = ''; o.deploymentUnico = ''; });
+  PN.run('montarLista(__o2)');
+  PN.run(`TELA = { nome:'ficha', org:'${PN.run('disponiveis()[0].id')}', lote:'${CASCA}', via:'' }; render();`);
+  const hNaoLib = PN.el('app').innerHTML;
+  ok(/id="ficha-msg">O Galpão\/Campo ainda não está liberado para /.test(hNaoLib), 'ficha (organização sem o Galpão/Campo liberado) › a frase diz «O Galpão/Campo ainda não está liberado para …»');
+  const todos = [['Início sem a versão ligada', formas[0][1]], ['Início ligada, cadastros no aparelho', hBas], ['Início ligada, sem cadastros', hPrep], ['ficha sem liberação', hNaoLib], ['ficha da casca', fCasca]];
+  todos.forEach(([n, h]) => ok(!/(modo offline|vers(ã|&atilde;)o offline|vers(ã|&atilde;)o b(á|&aacute;)sica)/i.test(visivel(h)), n + ' › nenhum texto visível «modo offline», «Versão offline» ou «Versão Básica»'));
+  ok(!/Modo offline preparado/.test(indexTxt) && /Galpão\/Campo preparado · cadastros guardados no aparelho/.test(indexTxt), 'o aviso depois de preparar diz «Galpão/Campo preparado · cadastros guardados no aparelho» (e não mais «Modo offline preparado»)');
+  const visFonte = indexTxt.split('\n').filter(l => !/^\s*(\/\*|\*|\/\/)/.test(l)).join('\n');
+  ok(!/modo offline/i.test(visFonte) && !/Vers(ã|&atilde;)o B(á|&aacute;)sica/i.test(visFonte), 'e NENHUMA linha de código do arquivo (fora de comentário) escreve «modo offline» ou «Versão Básica»');
+  ok(/chk-off/.test(indexTxt) && /db\.modoOffline/.test(indexTxt), 'a chave gravada `db.modoOffline` e o id `chk-off` continuam (só o texto mudou)');
+
+  /* ── a VARREDURA · todo ponto que escreve o CÓDIGO de um lote na tela passa por `chipSub(` (janela de ±2 linhas) ou está na lista de exceção ── */
+  const linhasJs = js.split('\n'); const sitios = []; let fn = '(topo)';
+  const reSit = /esc\(\s*(codigoExibicao\(\s*)?(\w+(?:\.\w+)*)\s*\)|rotuloLote\(|rotuloOp\(|(\w+)\.codigo\s*\+\s*['"]|['"]\s*\+\s*(\w+)\.codigo\b|\(\s*(\w+)\.codigo\s*\|\|\s*'/g;
+  linhasJs.forEach((ln, i) => {
+    const f = ln.match(/^(?:async\s+)?function\s+(\w+)/); if (f) fn = f[1];
+    if (/^\s*(\/\*|\*|\/\/)/.test(ln)) return;
+    let m; reSit.lastIndex = 0;
+    while ((m = reSit.exec(ln))) {
+      if (m[2]) { const ult = m[2].split('.').pop(); if (!m[1] && !/^(codigo|lote|cod)$/.test(ult)) continue; }
+      const ant = ln.slice(Math.max(0, m.index - 40), m.index);
+      if (/="\s*(['"]\s*\+\s*|\$\{)?$/.test(ant) || /="\s*['"]?\s*\+\s*$/.test(ant) || (/['"]\s*\+\s*$/.test(ant) && /="[^"]*$/.test(ant))) continue;   // atributo, não texto
+      const jan = linhasJs.slice(Math.max(0, i - 2), i + 3).join('\n');
+      sitios.push({ fn, trecho: m[2] ? 'esc(' + (m[1] ? 'codigoExibicao(' : '') : m[0].slice(0, 24), chip: /chipSub\(/.test(jan) });
+    }
+  });
+  /* A LISTA DE EXCEÇÃO · `função|trecho` → o porquê. Exceção que já tem chip ou que sumiu do código falha (a lista não envelhece calada). */
+  const EXC = {
+    'rotuloLote|rotuloLote(':          'é a DEFINIÇÃO do rótulo em texto (`código · há N dias`); quem o desenha em cartão/linha (Abrir) leva o chip ao lado',
+    'linhaFila|(l.codigo || \'':        'a linha da fila é o histórico do lançamento em texto corrido (`lote X + lote Y`), não um cartão de lote',
+    'atualizarAbrir|(l.codigo || \'':   'rótulo da legenda do Balanço de Massa (texto da barra), não um cartão/linha de lote',
+    'sobraGrandeDoAbrir_|(l.codigo || \'': 'rótulo que alimenta a frase da pergunta da sobra grande (texto corrido)',
+    'sobraPerguntaHtml_|esc(codigoExibicao(': 'a frase da pergunta da sobra grande (texto corrido: «sobram N kg do lote X»)',
+    'rotuloOp|rotuloOp(':              'o código é o da OPERAÇÃO aberta (em processamento): subproduto só nasce no fechamento',
+    'telaFechar|rotuloOp(':            'o código é o da OPERAÇÃO aberta (em processamento): subproduto só nasce no fechamento',
+    'telaFechar|(op.codigo || \'':      'o código é o da OPERAÇÃO aberta (em processamento): subproduto só nasce no fechamento',
+    'telaFicha|esc(codigoExibicao(':   'o código fica na linha do topo da ficha; o chip e a borda roxa estão no cabeçalho do PRODUTO da mesma ficha (afirmado acima, ficha › chip ao lado do nome)'
+  };
+  ok(sitios.length >= 10, 'varredura · controle verde · achou ' + sitios.length + ' pontos que escrevem código de lote (esperava ≥ 10; instrumento cego acusaria 0)');
+  ['telaEstoque', 'telaAbrir', 'telaFicha'].forEach(n => ok(sitios.some(s => s.fn === n), 'varredura · controle verde · enxerga `' + n + '` (um lugar já conhecido)'));
+  const semChip = sitios.filter(s => !s.chip && !EXC[s.fn + '|' + s.trecho]);
+  ok(semChip.length === 0, 'varredura · TODO ponto que escreve código de lote tem `chipSub(` por perto ou está na lista de exceção' + (semChip.length ? ' · SEM CHIP: ' + semChip.map(s => s.fn + ' «' + s.trecho + '»').join('; ') : ''));
+  Object.keys(EXC).forEach(k => { const f2 = k.slice(0, k.indexOf('|')), tr = k.slice(k.indexOf('|') + 1); const s = sitios.filter(x => x.fn === f2 && x.trecho === tr);
+    ok(s.length > 0 && s.every(x => !x.chip), 'varredura · a exceção `' + k.replace(/\n/g, ' ') + '` segue valendo (existe e não tem chip por perto) · ' + EXC[k]); });
   return { falhas, log };
 }
 
@@ -94,14 +200,28 @@ const indexTxt = fs.readFileSync(process.argv[2] || path.join(REPO, 'unica/index
 const base = roda(indexTxt);
 console.log(base.log.join('\n'));
 const M = [
-  ['a casca perde o chip', "(l.sub ? '<span class=\"chip-sub\" data-chip-sub=\"1\">Subproduto</span>' : '')", "''"],
-  ['a casca perde a borda roxa inline (volta ao CSS)', "(l.sub ? ' style=\"border-left-color:#8E5FB0\"' : '')", "''"],
-  ['o CSS `.lt.sub` volta ao cinza antigo e a borda inline some', ".lt.sub{border-left-color:#8E5FB0}", ".lt.sub{border-left-color:#9AA4B1}", [["(l.sub ? ' style=\"border-left-color:#8E5FB0\"' : '')", "''"]]],
-  ['o chip decide por prefixo `1SUB` (o `QUE-…` de subproduto fica sem chip)', "(l.sub ? '<span class=\"chip-sub\"", "(/^1SUB/.test(l.codigo || '') ? '<span class=\"chip-sub\""],
-  ['o chip escreve «subproduto» minúsculo', ">Subproduto</span>' : '')", ">subproduto</span>' : '')"],
-  ['o chip pinta em todo lote (o principal vizinho ganha chip)', "(l.sub ? '<span class=\"chip-sub\"", "(true ? '<span class=\"chip-sub\""],
+  ['a casca perde o chip (Estoque)', "chipSub(l.sub) + '</b><span class=\"kg\">'", "'</b><span class=\"kg\">'"],
+  ['a casca perde a borda roxa inline (Estoque, volta ao CSS)', "'\"' + bordaSub(l.sub) + ' data-lote=\"", "'\"' + ' data-lote=\""],
+  ['o CSS `.lt.sub` volta ao cinza antigo e a borda inline some', ".lt.sub{border-left-color:#8E5FB0}", ".lt.sub{border-left-color:#9AA4B1}", [["'\"' + bordaSub(l.sub) + ' data-lote=\"", "'\"' + ' data-lote=\""]]],
+  ['o chip do Estoque decide por prefixo `1SUB` (o `QUE-…` de subproduto fica sem chip)', "chipSub(l.sub) + '</b><span class=\"kg\">'", "chipSub(/^1SUB/.test(l.codigo || '')) + '</b><span class=\"kg\">'"],
+  ['o chip escreve «subproduto» minúsculo', "data-chip-sub=\"1\">Subproduto</span>' : ''; }", "data-chip-sub=\"1\">subproduto</span>' : ''; }"],
+  ['o chip pinta em todo lote (o principal vizinho ganha chip)', "function chipSub(sub){ return sub ? ", "function chipSub(sub){ return true ? "],
   ['o cartão da chave volta a dizer «Versão offline»', "<div><b>Galpão/Campo</b><span>", "<div><b>Versão offline</b><span>"],
-  ['a frase de explicação do cartão sai', "Receber, abrir e fechar. O que você lança", "O que você lança"]
+  ['a frase de explicação do cartão sai', "Receber, abrir e fechar. O que você lança", "O que você lança"],
+  // ── G2 · m2 · m3 · a varredura (continuação 12) ──
+  ['Abrir › Disponíveis perde o chip da casca', "chipSub(l.sub) + '</b>' +\n           '<small'", "'</b>' +\n           '<small'"],
+  ['Abrir › Disponíveis perde a borda roxa da casca', "data-pega=\"' + esc(l.chave) + '\"' + bordaSub(l.sub) + '>", "data-pega=\"' + esc(l.chave) + '\"' + '>"],
+  ['Abrir › Na operação perde o chip da casca', "esc(l.produto) + chipSub(l.sub) + '<small' + (l.local", "esc(l.produto) + '<small' + (l.local"],
+  ['Abrir › Na operação perde a borda roxa da casca', "'<div class=\"linha\"' + bordaSub(l.sub, 'margin-bottom:0;') + '>", "'<div class=\"linha\"' + ' style=\"margin-bottom:0\"' + '>"],
+  ['a ficha do QR perde o chip ao lado do nome', "esc(fi[0]) + chipSub(subFicha) + '</h3>'", "esc(fi[0]) + '</h3>'"],
+  ['a ficha do QR perde a borda roxa', "<div class=\"ficha\" id=\"ficha\"' + bordaSub(subFicha) + '>", "<div class=\"ficha\" id=\"ficha\"' + '>"],
+  ['a ficha só reconhece o `1SUB` antigo (a casca `QUE-…`/`ARM-…` do pacote some)', "return !!((pl && pl.sub) || /^1SUB/i.test", "return !!((false) || /^1SUB/i.test"],
+  ['o botão volta a dizer «Preparar o modo offline»', "Preparar o Galpão/Campo</button>", "Preparar o modo offline</button>"],
+  ['o aviso volta a dizer «Modo offline preparado»', "'Galpão/Campo preparado · cadastros guardados no aparelho'", "'Modo offline preparado · cadastros guardados no aparelho'"],
+  ['a ficha volta a dizer «O modo offline ainda não está liberado»', "O Galpão/Campo ainda não está liberado para ", "O modo offline ainda não está liberado para "],
+  ['o cabeçalho volta a dizer «Versão Básica · neste aparelho»', "'Galpão/Campo · neste aparelho'", "'Versão Básica · neste aparelho'"],
+  ['um render NOVO de lote sem chip (a varredura tem de acusá-lo)', "function codigoExibicao(cod){", "function linhaNovaSemChip(l){ return '<div class=\"nome\">' + esc(l.produto) + ' ' + esc(l.codigo) + '</div>'; }\nfunction codigoExibicao(cod){"],
+  ['«Abrir com o lote vindo da ficha» perde o chip', "'</b>' + chipSub(pre.sub) + ' ('", "'</b>' + ' ('"]
 ];
 let ruim = 0;
 console.log('\n── mutantes ──');

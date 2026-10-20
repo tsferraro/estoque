@@ -10,7 +10,7 @@
  * mora no localStorage da página; o envio é uma navegação que o usuário dispara com rede).
  * Se a plataforma servir este arquivo errado (ex.: `text/html`, medido uma vez em 16/10) o registro falha e a lançadora segue
  * funcionando COM SINAL — a página diz isso (`?sonda=1` mostra a tabela). Troca de versão = mudar CACHE. */
-const CACHE = 'mandu-unica-v4';
+const CACHE = 'mandu-unica-v5';
 const CASCA = ['./', './index.html', './manifest.webmanifest', './organizacoes.json', './qr-teste.html', './leitor-qr.js',
   './vendor/qrcode.js', './vendor/zxing-reader.iife.js', './vendor/zxing_reader.wasm',
   './u-mandu-32.png', './u-mandu-180.png', './u-mandu-glifo.png'];
