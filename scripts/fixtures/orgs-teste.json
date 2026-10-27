@@ -1,0 +1,113 @@
+{
+ "_leia": "FIXTURE DOS TESTES (sintética): nomes e códigos antigos de /exec são inventados; só o id do projeto único é o real. Não é lida pela página.",
+ "versao": 2,
+ "atualizadoEm": "2026-10-27",
+ "enderecoBase": "https://mandu-apps.lp.agentesamanda.com/gestao-operacional/",
+ "execModelo": "https://script.google.com/a/macros/mandusocial.org/s/{deployment}/exec",
+ "administradores": [],
+ "organizacoes": [
+  {
+   "id": "camtaua-oficial",
+   "nome": "Teste · camtaua-oficial",
+   "nomeAdmin": "Teste · camtaua-oficial (administrador)",
+   "local": "Local de teste",
+   "grupo": "organizacoes",
+   "ambiente": "producao",
+   "estado": "zerada",
+   "estadoTxt": "estado de teste",
+   "deployment": "AKfycbTESTEcamtauaoficial",
+   "deploymentUnico": "AKfycbyw9syhEIyuaMaYT-ej95koauzv4hXlLJEyAXY6OMwL4Ba6socaChpIapRx9ekWcVve",
+   "orgApp": "camtaua-oficial",
+   "apelidos": [],
+   "listada": true,
+   "historico": false
+  },
+  {
+   "id": "camtaua-demo",
+   "nome": "Teste · camtaua-demo",
+   "nomeAdmin": "Teste · camtaua-demo (administrador)",
+   "local": "Local de teste",
+   "grupo": "testes",
+   "ambiente": "demonstracao",
+   "estado": "uso",
+   "estadoTxt": "estado de teste",
+   "deployment": "AKfycbTESTEcamtauademo",
+   "deploymentUnico": "AKfycbyw9syhEIyuaMaYT-ej95koauzv4hXlLJEyAXY6OMwL4Ba6socaChpIapRx9ekWcVve",
+   "orgApp": "demo",
+   "apelidos": [
+    "demo",
+    "demo-tobia"
+   ],
+   "listada": true,
+   "historico": false
+  },
+  {
+   "id": "teste-felipe",
+   "nome": "Teste · teste-felipe",
+   "nomeAdmin": "Teste · teste-felipe (administrador)",
+   "local": "Local de teste",
+   "grupo": "testes",
+   "ambiente": "demonstracao",
+   "estado": "uso",
+   "estadoTxt": "estado de teste",
+   "deployment": "AKfycbTESTEtestefelipe",
+   "deploymentUnico": "AKfycbyw9syhEIyuaMaYT-ej95koauzv4hXlLJEyAXY6OMwL4Ba6socaChpIapRx9ekWcVve",
+   "orgApp": "felipe",
+   "apelidos": [
+    "felipe",
+    "teste-limpo",
+    "demo-felipe"
+   ],
+   "listada": true,
+   "historico": false
+  },
+  {
+   "id": "demo-rodrigo",
+   "nome": "Teste · demo-rodrigo",
+   "nomeAdmin": "Teste · demo-rodrigo (administrador)",
+   "local": "Local de teste",
+   "grupo": "testes",
+   "ambiente": "demonstracao",
+   "estado": "uso",
+   "estadoTxt": "estado de teste",
+   "deployment": "AKfycbTESTEdemorodrigo",
+   "deploymentUnico": "AKfycbyw9syhEIyuaMaYT-ej95koauzv4hXlLJEyAXY6OMwL4Ba6socaChpIapRx9ekWcVve",
+   "orgApp": "rodrigo",
+   "apelidos": [
+    "rodrigo"
+   ],
+   "listada": true,
+   "historico": false
+  },
+  {
+   "id": "camtaua",
+   "nome": "Teste · camtaua",
+   "nomeAdmin": "Teste · camtaua (administrador)",
+   "local": "Local de teste",
+   "grupo": "testes",
+   "ambiente": "producao",
+   "estado": "uso",
+   "estadoTxt": "estado de teste",
+   "deployment": "AKfycbTESTEcamtaua",
+   "deploymentUnico": "AKfycbyw9syhEIyuaMaYT-ej95koauzv4hXlLJEyAXY6OMwL4Ba6socaChpIapRx9ekWcVve",
+   "orgApp": "camtaua",
+   "apelidos": [],
+   "listada": true,
+   "historico": true
+  },
+  {
+   "id": "beta",
+   "nome": "Teste · Beta",
+   "nomeAdmin": "Teste · Beta (equipe)",
+   "local": "Local de teste",
+   "grupo": "beta",
+   "ambiente": "beta",
+   "estado": "uso",
+   "estadoTxt": "estado de teste",
+   "deployment": "AKfycbTESTEbeta",
+   "apelidos": [],
+   "listada": false,
+   "historico": false
+  }
+ ]
+}

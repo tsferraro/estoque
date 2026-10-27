@@ -32,7 +32,7 @@ function pagina(js) {
   vm.createContext(ctx);
   vm.runInContext(js, ctx, { filename: 'unica/index.html' });
   const run = e => { try { return vm.runInContext(e, ctx); } catch (er) { return 'ESTOUROU: ' + er.message; } };
-  ctx.__orgs = JSON.parse(fs.readFileSync(path.join(REPO, 'unica/organizacoes.json'), 'utf8'));
+  ctx.__orgs = JSON.parse(fs.readFileSync(path.join(REPO, 'scripts/fixtures/orgs-teste.json'), 'utf8'));
   run('montarLista(__orgs)');
   const org = run('orgAtual().id');
   run(`mudar(function(d){ d.cadastros['${org}'] = { etapas:[{id:'SEC', nome:'Secagem', tipo:'Transformação', cad:[]}], ord:{REC:1,SEC:2}, operadores:[['OP-1','Gilson']],

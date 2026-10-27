@@ -2,7 +2,8 @@
  *
  *   node scripts/teste-unico.js            (de dentro do repositório da lançadora; sai 0 se verde)
  *
- * Executa o texto de `unica/index.html` e de `unica/organizacoes.json`:
+ * Executa o texto de `unica/index.html` e de `scripts/fixtures/orgs-teste.json`:
+ * O «arquivo antigo» é a MESMA fixture sem `deploymentUnico`/`orgApp` (a forma de ANTES do projeto único, que um aparelho com cópia velha ainda guarda).
  *   · cada uma das 5 organizações aponta para o /exec do PROJETO ÚNICO em `/<orgApp>` (o id do registro do projeto único), e o endereço ANTIGO
  *     fica como reserva (`urlReserva`) — igual ao `deployment` que já estava no arquivo no `main`;
  *   · o arquivo ANTIGO (sem deploymentUnico/orgApp, como um aparelho que guardou a cópia velha) continua dando o endereço antigo, sem `?org=`;
@@ -35,8 +36,10 @@ function roda(indexTxt, jsonTxt, jsonAntigoTxt) {
     return { bom, ORGS: vm.runInContext('ORGS', ctx), ctx };
   }
   const N = monta(J), A = monta(ANT);
-  ok(N.bom && N.ORGS.length === 5, 'o arquivo novo monta as 5 organizações');
-  J.organizacoes.forEach(o => {
+  /* H10-510 · C3: a Beta (6ª cópia, projeto próprio com organização fixa) tem o portão dela em `teste-beta.js`; aqui ficam as 5 versões do projeto único */
+  const PROD = J.organizacoes.filter(o => o.ambiente !== 'beta');
+  ok(N.bom && N.ORGS.length === J.organizacoes.length && PROD.length === 5, 'o arquivo novo monta as 5 organizações de produção/demonstração (+ a Beta, se estiver no arquivo)');
+  PROD.forEach(o => {
     const L = N.ORGS.find(x => x.id === o.id), antigo = ANT.organizacoes.find(x => x.id === o.id);
     const app = ESPERADO[o.id];
     ok(!!L && REGISTRO.indexOf(app) >= 0, o.id + ' → orgApp `' + app + '` é um id do REGISTRO do projeto único');
@@ -47,10 +50,10 @@ function roda(indexTxt, jsonTxt, jsonAntigoTxt) {
     const La = A.ORGS.find(x => x.id === o.id);
     eq('   ' + o.id + ': o arquivo ANTIGO (cópia velha num aparelho) continua dando o endereço antigo, sem `?org=`', La && [La.url, La.unico], [exec(antigo.deployment), false]);
   });
-  eq('as 5 versões usam 5 organizações DIFERENTES do registro', [...new Set(J.organizacoes.map(o => o.orgApp))].length, 5);
+  eq('as 5 versões usam 5 organizações DIFERENTES do registro', [...new Set(PROD.map(o => o.orgApp))].length, 5);
 
   /* o envio offline: a mesma função do arquivo, com o mundo de mentira */
-  J.organizacoes.filter(o => o.id === 'camtaua-demo' || o.id === 'camtaua-oficial').forEach(o => {
+  PROD.filter(o => o.id === 'camtaua-demo' || o.id === 'camtaua-oficial').forEach(o => {
     const org = N.ORGS.find(x => x.id === o.id);
     const nav = { href: '' };
     const ctx = { orgAtual: () => org, ler: () => ({ fila: [], cadastros: {} }), navigator: { onLine: true }, location: { origin: 'https://x', pathname: '/gestao-operacional/', get href() { return nav.href; }, set href(v) { nav.href = v; } },
@@ -70,9 +73,8 @@ function roda(indexTxt, jsonTxt, jsonAntigoTxt) {
   return { falhas, log };
 }
 
-const indexTxt = fs.readFileSync(path.join(REPO, 'unica/index.html'), 'utf8'), jsonTxt = fs.readFileSync(path.join(REPO, 'unica/organizacoes.json'), 'utf8');
-let antigo = null;
-try { antigo = cp.execFileSync('git', ['-C', REPO, 'show', 'main:unica/organizacoes.json'], { encoding: 'utf8' }); } catch (e) { console.log('🔴 não li o organizacoes.json do main (git show): ' + e.message); process.exit(1); }
+const indexTxt = fs.readFileSync(path.join(REPO, 'unica/index.html'), 'utf8'), jsonTxt = fs.readFileSync(path.join(REPO, 'scripts/fixtures/orgs-teste.json'), 'utf8');
+const antigo = JSON.stringify((() => { const j = JSON.parse(jsonTxt); j.organizacoes.forEach(o => { delete o.deploymentUnico; delete o.orgApp; }); return j; })());
 const base = roda(indexTxt, jsonTxt, antigo);
 console.log(base.log.join('\n'));
 const M = [

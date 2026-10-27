@@ -2,7 +2,7 @@
  * Base: o sw.js da lançadora Oficial (15/10). O que mudou:
  *   · cache com prefixo PRÓPRIO `mandu-unica-` (o `activate` apaga só `mandu-unica-*` diferentes do atual; outro app na mesma origem
  *     da plataforma, ou a lançadora do GitHub, não é tocado);
- *   · a casca inclui `organizacoes.json` (a lista de organizações em arquivo: sem ela a lista não abre sem rede);
+ *   · a casca NÃO guarda lista de organizações (H10-759, 27/10): o repositório é público; a lista vem do Porteiro e fica no localStorage;
  *   · os ícones moram SOLTOS na raiz (o desenho evita subpasta para o ícone; `vendor/` segue subpasta, como na Oficial).
  * O que ele faz: guarda a própria página para abrir SEM REDE — e o leitor de QR (`leitor-qr.js` + `vendor/`, com o `.wasm` de ~1 MB),
  * a folha de QR e os ícones. O `addAll` é atômico de propósito: arquivo faltando no servidor derruba a INSTALAÇÃO (o Service Worker
@@ -10,11 +10,11 @@
  * mora no localStorage da página; o envio é uma navegação que o usuário dispara com rede).
  * Se a plataforma servir este arquivo errado (ex.: `text/html`, medido uma vez em 16/10) o registro falha e a lançadora segue
  * funcionando COM SINAL — a página diz isso (`?sonda=1` mostra a tabela). Troca de versão = mudar CACHE. */
-const CACHE = 'mandu-unica-v6';
-const CASCA = ['./', './index.html', './manifest.webmanifest', './organizacoes.json', './qr-teste.html', './leitor-qr.js',
+const CACHE = 'mandu-unica-v11';
+const CASCA = ['./', './index.html', './manifest.webmanifest', './qr-teste.html', './leitor-qr.js',
   './vendor/qrcode.js', './vendor/zxing-reader.iife.js', './vendor/zxing_reader.wasm',
   './u-mandu-32.png', './u-mandu-180.png', './u-mandu-glifo.png'];
-const ARQUIVOS_DA_CASCA = ['', 'index.html', 'qr-teste.html', 'manifest.webmanifest', 'organizacoes.json', 'leitor-qr.js',
+const ARQUIVOS_DA_CASCA = ['', 'index.html', 'qr-teste.html', 'manifest.webmanifest', 'leitor-qr.js',
   'u-mandu-32.png', 'u-mandu-180.png', 'u-mandu-glifo.png'];
 
 /* o caminho do pedido RELATIVO ao escopo deste Service Worker (`''` = a raiz); `null` se o pedido está fora do escopo */

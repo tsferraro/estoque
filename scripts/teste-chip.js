@@ -34,7 +34,7 @@ function pagina(js) {
   vm.createContext(ctx);
   vm.runInContext(js, ctx, { filename: 'unica/index.html' });
   const run = e => { try { return vm.runInContext(e, ctx); } catch (er) { return 'ESTOUROU: ' + er.message; } };
-  ctx.__orgs = JSON.parse(fs.readFileSync(path.join(REPO, 'unica/organizacoes.json'), 'utf8'));
+  ctx.__orgs = JSON.parse(fs.readFileSync(path.join(REPO, 'scripts/fixtures/orgs-teste.json'), 'utf8'));
   run('montarLista(__orgs)');
   const org = run('orgAtual().id');
   return { run, el, ctx, org, loja };
@@ -234,6 +234,7 @@ function roda(indexTxt) {
     'atualizarAbrir|(l.codigo || \'':   'rótulo da legenda do Balanço de Massa (texto da barra), não um cartão/linha de lote',
     'sobraGrandeDoAbrir_|(l.codigo || \'': 'rótulo que alimenta a frase da pergunta da sobra grande (texto corrido)',
     'rotuloOp|rotuloOp(':              'o código é o da OPERAÇÃO aberta (em processamento): subproduto só nasce no fechamento',
+    'telaB2_|rotuloOp(':               'C3 · B2: o detalhe de uma operação aberta lista o código da OPERAÇÃO (em processamento), o mesmo do Fechar: subproduto só nasce no fechamento',
     'telaFechar|rotuloOp(':            'o código é o da OPERAÇÃO aberta (em processamento): subproduto só nasce no fechamento',
     'telaFechar|(op.codigo || \'':      'o código é o da OPERAÇÃO aberta (em processamento): subproduto só nasce no fechamento',
     'lerRetorno|it.codigos':           'guarda no item da fila o que o servidor devolveu (dado, não tela); quem o desenha é `linhaFila` (com chip)',

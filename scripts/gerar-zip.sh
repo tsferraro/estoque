@@ -6,8 +6,9 @@
 #
 # FONTE ÚNICA: lancadora/unica/ (este repositório) + os ícones PNG e a imagem de prévia (og-sgo-mandu.png, 1200x630) de lancadora/icones/, que vão SOLTOS na raiz do ZIP (o desenho evita
 # subpasta para o ícone). Endereço no ar, SEMPRE com a barra: https://mandu-apps.lp.agentesamanda.com/gestao-operacional/
-# Falha alto se faltar index.html, sw.js, manifest.webmanifest ou organizacoes.json, se o JSON não abrir, se faltar meta tag/nome do app (H10-290),
-# ou se o sw.js, o index.html ou o manifesto citarem arquivo que não está na pasta (R1A-2). Organização com /exec «PREENCHER_…» é aviso, não erro.
+# Falha alto se faltar index.html, sw.js ou manifest.webmanifest, se faltar meta tag/nome do app (H10-290),
+# ou se o sw.js, o index.html ou o manifesto citarem arquivo que não está na pasta (R1A-2).
+# NÃO leva lista de organizações (H10-759, 27/10): o repositório é público e a lista vem do Porteiro; organização nova não exige ZIP novo.
 set -euo pipefail
 AQUI=${0:A:h}
 REPO=${AQUI:h}
@@ -15,7 +16,7 @@ FONTE="$REPO/unica"
 PRINCIPAL=${REPO:h}
 SAIDA_DIR="$PRINCIPAL/lancadora-zip"
 ICONES=(u-mandu-32.png u-mandu-180.png u-mandu-192.png u-mandu-512.png u-mandu-glifo.png og-sgo-mandu.png)
-OBRIGATORIOS=(index.html sw.js manifest.webmanifest organizacoes.json)
+OBRIGATORIOS=(index.html sw.js manifest.webmanifest)
 
 STAGE_ARG=""
 if [[ "${1:-}" == "--stage" ]]; then STAGE_ARG="${2:?uso: --stage <pasta>}"; fi
@@ -23,7 +24,6 @@ if [[ "${1:-}" == "--stage" ]]; then STAGE_ARG="${2:?uso: --stage <pasta>}"; fi
 for f in $OBRIGATORIOS; do
   [[ -s "$FONTE/$f" ]] || { echo "🔴 falta $FONTE/$f (obrigatório no ZIP)"; exit 1; }
 done
-node -e 'JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"))' "$FONTE/organizacoes.json" || { echo "🔴 organizacoes.json não é JSON válido"; exit 1; }
 
 FONTE_ICONES="$REPO/icones"
 [[ -d "$FONTE_ICONES" ]] || { echo "🔴 não achei $FONTE_ICONES (de onde vêm os ícones PNG e a imagem de prévia (og-sgo-mandu.png, 1200x630))"; exit 1; }
@@ -55,10 +55,7 @@ node -e '
   const semArq = locais.filter(u => !fs.existsSync(path.join(dir, u.replace(/^\.\//, ""))));
   if (semArq.length) { console.error("🔴 o index.html/manifesto citam arquivos que NÃO estão no ZIP: " + semArq.join(", ")); process.exit(1); }
   console.log("✓ " + locais.length + " arquivos citados no index.html/manifesto presentes: " + locais.join(", "));
-  const org = JSON.parse(fs.readFileSync(path.join(dir, "organizacoes.json"), "utf8"));
-  const pend = org.organizacoes.filter(o => /^PREENCHER/.test(o.deployment)).map(o => o.id);
-  console.log("✓ " + lista.length + " arquivos da instalação do Service Worker presentes · " + org.organizacoes.length + " organizações");
-  if (pend.length) console.log("🟡 /exec ainda por preencher em: " + pend.join(", ") + " (a lançadora mostra essas organizações como «aguardando o app»)");
+  console.log("✓ " + lista.length + " arquivos da instalação do Service Worker presentes");
 ' "$PASTA"
 
 # H10-290 · nome do app e meta tags presentes no index.html e no manifesto (o ZIP não sai sem eles)

@@ -52,6 +52,7 @@
   a.org .seta{margin-left:auto;color:var(--orange);font-weight:700;font-size:20px}
   .faixa{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
   .pill{font-size:12px;font-weight:700;border-radius:999px;padding:5px 10px;background:var(--bg);color:var(--text2)}
+  .pill.beta{background:var(--navy);color:#fff}
   .pill.on{background:var(--ok-bg);color:var(--ok)} .pill.off{background:var(--erro-bg);color:var(--erro)} .pill.laranja{background:var(--orange-bg);color:var(--orange-dark)}
   button{font:inherit;cursor:pointer}
   .grande{display:block;width:100%;border:0;border-radius:12px;padding:16px;font-weight:700;font-size:17px;background:var(--orange);color:#fff}
@@ -298,6 +299,44 @@
   }
   .lu-box a{color:var(--navy)}
   .lu-end{overflow-wrap:anywhere}
+  /* ═══ C3 · H10-510 (D75 = S «Aprovo B2 pro Tablet Paisagem!») · B2 mestre-detalhe no tablet ═══
+     Tablet deitado (≥ 1000 px): etapas à esquerda, detalhe da etapa à direita. Em pé (768–999 px): a mesma tela empilhada (etapas em 3 colunas). Celular (< 768 px) não muda.
+     Alvos de toque ≥ 44 px (id-visual §5; o desenho usa 48 nas peças de ação). */
+  @media (min-width:768px){
+    .ac4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .ac4 .ac{min-height:88px;padding:14px 12px;align-items:flex-start;text-align:left;justify-content:flex-start}
+    .ac4 .ac.qr{border-color:var(--navy);color:var(--navy)}
+    .ac4 .ac.qr svg{display:block;margin:0 0 2px}
+    .b2{display:grid;grid-template-columns:1fr;gap:14px;margin-top:12px;align-items:start}
+    .b2-mestre,.b2-detalhe{margin:0;min-width:0}
+    .b2-mestre .b2-lista{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .b2-et{min-height:64px;display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;text-align:left;font:inherit;color:inherit;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;width:100%}
+    .b2-et .et{font-weight:700;min-width:0} .b2-et .et small{display:block;font-weight:400;color:var(--text2);font-size:13px;line-height:1.3}
+    .b2-et .kg{font-weight:700;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+    .b2-et .bar{grid-column:1 / -1;height:8px;border-radius:4px;background:var(--bg);overflow:hidden}
+    .b2-et .bar i{display:block;height:100%;background:var(--orange);border-radius:4px} .b2-et .bar i.proc{background:repeating-linear-gradient(135deg,var(--orange) 0 4px,#FFB27A 4px 8px)} .b2-et .bar i.sub{background:#8E5FB0}
+    .b2-et.on{border-color:var(--orange);background:var(--orange-bg)}
+    .b2-fila{min-height:56px;display:flex;align-items:center;justify-content:space-between;gap:8px;grid-column:1 / -1;font-weight:700}
+    .b2-badge{font-size:13px;font-weight:700;color:var(--orange-dark);background:var(--orange-bg);border-radius:999px;padding:3px 10px}
+    .b2-selos{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end} .b2-badge.rec{color:var(--erro);background:var(--erro-bg)}
+    .b2-detalhe h3{margin:0;font-size:20px;color:var(--navy)} .b2-detalhe .b2-sub{margin:2px 0 10px;font-size:14px;color:var(--text2)}
+    .b2 .lt{padding:10px 12px;margin:0 0 8px;min-height:56px} .b2 .lt b{font-size:15px} .b2 .lt small{font-size:13px}
+    .b2 .lt.on{background:var(--orange-bg);border-color:var(--orange)}
+    .b2 .lt .mini{min-height:44px;padding:0 14px;display:inline-flex;align-items:center;font-size:14px;cursor:pointer}
+    .b2 .card{min-height:56px;margin:0 0 8px}
+    .b2-ficha{border-top:1.5px solid var(--line);margin-top:14px;padding-top:12px}
+    .b2-ficha .cod{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;font-size:16px;color:var(--navy);overflow-wrap:anywhere}
+    .b2-ficha dl{margin:8px 0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px} .b2-ficha dt{color:var(--text2)} .b2-ficha dd{margin:0;font-weight:700}
+    .b2-ficha .bt{min-height:44px;display:inline-block;padding:0 18px;line-height:44px}
+    .chip{min-height:44px;padding:0 16px;font-size:14px;display:inline-flex;align-items:center}
+    .bt,.tudo,.faixa-auto button{min-height:44px}
+    .link{min-height:44px;display:inline-flex;align-items:center}
+    .opc,.sug button{min-height:48px}
+  }
+  @media (min-width:1000px) and (orientation:landscape){
+    .b2{grid-template-columns:minmax(300px,2fr) 3fr}
+    .b2-mestre .b2-lista{grid-template-columns:1fr}
+  }
 </style>
 </head>
 <body>
@@ -332,29 +371,34 @@
  * google.script.run e devolve os resultados no fragmento desta (#r=…).
  * Reenviar é seguro: o servidor deduplica pelo token do gesto (R-411). */
 
-/* ═══ LU · A LISTA DE ORGANIZAÇÕES (19/10/2026) ═══════════════════════════════════════════════════════
- * ► ONDE EDITAR A LISTA: no arquivo `organizacoes.json`, ao lado desta página (um único bloco de dado: o array `"organizacoes"` no topo do arquivo).
- *   Hoje: Camtauá (grupo «organizacoes», a real), Demo Camtauá e Teste Felipe (grupo «testes»), mais a base antiga de produção (`listada:false`,
- *   histórico, nunca é zerada). Para acrescentar as 5 versões do H10-279: uma linha nova no array (id, nome, nomeAdmin, local, grupo, ambiente,
- *   estado, estadoTxt, deployment = código do /exec, apelidos, listada, historico) e gerar o ZIP de novo (`lancadora/scripts/gerar-zip.sh`).
- *   Quem aparece para quem: grupo «organizacoes» + `listada:true` aparece para QUALQUER aparelho na 1ª visita; grupo «testes» só no modo administrador
- *   (ou no aparelho que recebeu o link daquela organização).
- * Na Oficial a lista estava escrita aqui dentro (`ORGS`). Na lançadora ÚNICA ela mora no arquivo `organizacoes.json`, ao lado desta
- * página, dentro do ZIP (opção (a), decidida 18/10): organização nova = linha nova no arquivo + ZIP novo; nenhum link nem QR muda.
- * O arquivo é lido a cada abertura com sinal e a última cópia boa fica guardada no aparelho — a lista abre sem rede.
+/* ═══ LU · A LISTA DE ORGANIZAÇÕES (19/10/2026 · reescrita na onda S, 27/10/2026) ═══════════════════════════════════════════════════
+ * ► ESTA PÁGINA NÃO GUARDA LISTA DE ORGANIZAÇÕES. O repositório é público (GitHub Pages) e o arquivo que listava as organizações — com a linha da Beta —
+ *   saiu dele (H10-759). Organização nova NÃO exige ZIP novo: entra no Registro do SGO e o Porteiro a entrega a quem é dela.
+ * Aqui ficam só CONSTANTES de endereço que não identificam organização nenhuma (o `/exec` do projeto único, o modelo do endereço, o endereço da plataforma).
+ * `montarLista(j)` recebe uma lista no feitio {organizacoes:[{id,nome,grupo,ambiente,orgApp,deploymentUnico,deployment,apelidos,listada,historico…}]}
+ *   e monta `ORGS`; quem a entrega é o Porteiro (ver `LU · O PORTEIRO` mais abaixo) ou a cópia que o aparelho guardou.
  * `deployment` é o código do /exec; a forma longa do endereço (…/a/macros/mandusocial.org/s/<código>/exec) é montada aqui
  * (a curta abre a conta errada). Código `PREENCHER_…` = organização que ainda não tem app: aparece, mas diz «aguardando o app». */
 var ORGS = [];
-var CFG = { enderecoBase:'', execModelo:'https://script.google.com/a/macros/mandusocial.org/s/{deployment}/exec', administradores:[] };
-var LISTA_ORIGEM = '';                         /* 'arquivo' (veio agora) · 'aparelho' (última cópia guardada) · 'nenhuma' */
-var CHAVE_LISTA = 'lu_organizacoes_v1';
-var AMB_TXT = { producao:'Produção', demonstracao:'Demonstração', teste:'Teste' };
+var CFG = { enderecoBase:'https://mandu-apps.lp.agentesamanda.com/gestao-operacional/', execModelo:'https://script.google.com/a/macros/mandusocial.org/s/{deployment}/exec', administradores:[] };
+var LISTA_ORIGEM = '';                         /* 'aparelho' (a cópia que este aparelho guardou) · 'nenhuma' */
+var AMB_TXT = { producao:'Produção', demonstracao:'Demonstração', teste:'Teste', beta:'Beta' };
+/* C3 · H10-510 (D77): a Beta é a 6ª cópia do MESMO código, num projeto Apps Script próprio (organização fixa `beta`) — a equipe testa por aqui; o selo «Beta» fica sempre à vista e a Beta nunca se mistura com a produção */
+function seloBeta(o){ return (o && o.ambiente === 'beta') ? '<span class="pill beta" id="pill-beta" data-beta="1">Beta · teste da equipe, não é a produção</span>' : ''; }
+/* H10-612 (Tobia 22/10: «botão pra voltar ao Hub em todas as páginas») · «Hub Mandū» no Galpão/Campo. Espelha o SGO (`hubDestino_`): a EQUIPE (o mesmo critério do «Sou da equipe Mandū» e da Beta = `ehAdmin()`) abre a visão da equipe,
+   `<hub>?equipe=1&hub=1`; quem é da organização abre a dela, `<hub>?org=<orgApp>&hub=1` (sem o id do app, `?hub=1`: nunca a Camtauá de quem não é dela). `<hub>` é fixo, com a barra final. */
+var HUB_MANDU = 'https://mandu-apps.lp.agentesamanda.com/hub/';
+function linkHub(org){
+  if (ehAdmin()) return HUB_MANDU + '?equipe=1&hub=1';
+  var id = org && org.orgApp ? String(org.orgApp) : '';
+  return HUB_MANDU + (id ? '?org=' + encodeURIComponent(id) + '&hub=1' : '?hub=1');
+}
+function hubHtml(org){ return '<p class="lu-aviso lu-centro"><a class="lu-linkpeq" id="link-hub" href="' + esc(linkHub(org)) + '">Hub Mandū ›</a></p>'; }
 function execDe(dep){ dep = String(dep == null ? '' : dep).trim(); if (!dep || /^PREENCHER/i.test(dep)) return ''; return String(CFG.execModelo).replace('{deployment}', dep); }
 /* PROJETO ÚNICO (D35, c9): junta um parâmetro ao endereço com `?` ou `&`, conforme já houver `?` (`…/exec/x` + `modo=sincronizar` → `…/exec/x?modo=sincronizar`) */
 function juntaParam(u, kv){ u = String(u || ''); return u + (u.indexOf('?') < 0 ? '?' : '&') + kv; }
 function montarLista(j){
   if (!j || !Array.isArray(j.organizacoes) || !j.organizacoes.length) return false;
-  if (j.execModelo) CFG.execModelo = String(j.execModelo);
   var lista = [];
   j.organizacoes.forEach(function(r){
     if (!r || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(String(r.id || ''))) return;
@@ -365,23 +409,197 @@ function montarLista(j){
     var reserva = execDe(r.deployment);
     var exec = unico ? depU + '/' + encodeURIComponent(app) : reserva;      /* …/exec/<org>: a organização no CAMINHO (o servidor lê `pathInfo`; `?org=` continua aceito lá) */
     lista.push({ id:r.id, nomeCoop:r.nome || r.id, nomeAdm:r.nomeAdmin || r.nome || r.id, nome:r.nome || r.id, desc:r.local || '', local:r.local || '',
-      grupo: r.grupo === 'testes' ? 'testes' : 'organizacoes', ambiente:r.ambiente || 'teste', estado:r.estado || 'uso', estadoTxt:r.estadoTxt || '',
+      grupo: r.grupo === 'testes' ? 'testes' : r.grupo === 'beta' ? 'beta' : 'organizacoes', ambiente:r.ambiente || 'teste', estado:r.estado || 'uso', estadoTxt:r.estadoTxt || '',
       apelidos:(r.apelidos || []).map(function(a){ return String(a).toLowerCase(); }), listada: r.listada !== false, historico: !!r.historico,
       pendente: !exec, url:exec, offline:exec, orgApp: unico ? app : '', unico: unico, urlReserva: reserva });
   });
   if (!lista.length) return false;
-  CFG.enderecoBase = String(j.enderecoBase || '');
-  CFG.administradores = Array.isArray(j.administradores) ? j.administradores : [];
   ORGS = lista; return true;
 }
+/* ═══ LU · O PORTEIRO (onda S · lote C · H10-759 · 27/10/2026) ═══════════════════════════════════════════════════════════════════════════
+ * A lista de organizações vem do PORTEIRO — o `/exec` do projeto único (`?quem=1`), que já decide quem entra e devolve só as organizações DA PESSOA —,
+ * não de arquivo público. A aba inteira vai ao Porteiro (nunca `fetch`: o login do Google não tem CORS) e volta em
+ * `<esta página>?via=porteiro&quem=equipe|org|outro|recusa|vazio&state=<32 hex>#hub=<lista v1: {id,nome,grupo}>` (contrato do Porteiro, mesmo do Hub).
+ *   · `state`: sorteado aqui, guardado no aparelho por STATE_MIN minutos, uso único; volta sem o `state` certo não escreve nada.
+ *   · a lista chega com id do REGISTRO (= `orgApp`); a chave interna da fila, dos cadastros e do operador continua sendo o id ANTIGO da lançadora.
+ *     Os 3 ids de demonstração que diferem (`demo`→`camtaua-demo`, `felipe`→`teste-felipe`, `rodrigo`→`demo-rodrigo`) vão na tabela ALIAS_REGISTRO;
+ *     trocar o id em silêncio esconderia a fila não enviada dessas demos.
+ *   · validade no aparelho: LISTA_VALIDADE_H = 24 h (D26 da Plataforma). Vencida ou ausente → NADA é inventado: só continuam à vista as organizações que têm
+ *     lançamento esperando envio (a fila nunca fica sem caminho de envio) e a tela pede «Entrar com o Google».
+ *   · o `volta` que o Porteiro precisa aceitar é o endereço EXATO desta página (com a barra final) — mudança no `Porteiro.gs` (S3/M2), fora desta página.
+ * As constantes abaixo não identificam organização nenhuma: o /exec do projeto único é um só para todas, e a Beta (organização fixa, projeto próprio) só abre
+ * para a equipe ou para o aparelho que recebeu `?org=beta`. */
+var DEP_UNICO = 'AKfycbyw9syhEIyuaMaYT-ej95koauzv4hXlLJEyAXY6OMwL4Ba6socaChpIapRx9ekWcVve';
+var BETA_DEP = 'AKfycbxm5Y_bSYHRQoevzOSM9_vF3hTf_rijU6mxKc6Zjdw0XqT8mlYcdQAl7WKcdjZkwoc';
+var PORTEIRO_CURTO = 'https://script.google.com/macros/s/{dep}/exec';
+var LISTA_VALIDADE_H = 24, STATE_MIN = 10;
+var CH_LISTA = 'lu_lista_porteiro_v1', CH_STATE = 'lu_state_v1', CH_INTENCAO = 'lu_intencao_v1', CH_FILA_ORGS = 'lu_fila_orgs_v1', CHAVE_LEGADA = 'lu_organizacoes_v1';
+var ID_OK = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+var ALIAS_REGISTRO = {
+  demo:    { id:'camtaua-demo', apelidos:['demo', 'demo-tobia'] },
+  felipe:  { id:'teste-felipe', apelidos:['felipe', 'teste-limpo', 'demo-felipe'] },
+  rodrigo: { id:'demo-rodrigo', apelidos:['rodrigo'] }
+};
+var HISTORICO_IDS = ['camtaua'];                 /* a base antiga de produção: o QR do saco antigo não pode trocar a organização do aparelho (R1A-1) */
+var BETA_ROW = { id:'beta', nome:'SGO Mandū · Beta', nomeAdmin:'SGO Mandū · Beta (desenvolvimento da equipe)', local:'Ambiente de testes da equipe Mandū · nunca é a produção',
+  grupo:'beta', ambiente:'beta', deployment:BETA_DEP, apelidos:[], listada:false, historico:false };
+var AVISO_PORTEIRO = '';                         /* o que a tela diz depois de uma volta do Porteiro que não trouxe lista */
+function lsGet_(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } }
+function lsSet_(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } }
+function lsDel_(k){ try { localStorage.removeItem(k); } catch(e){} }
+function idadeMs_(em){ var t = Date.parse(em || 0); return isFinite(t) ? Date.now() - t : -1; }
+function listaValida_(g){ var i = g ? idadeMs_(g.em) : -1; return i >= 0 && i < LISTA_VALIDADE_H * 3600e3; }
+/* a lista do `#hub=` (v1): só {id,nome,grupo}; `grupo` é o ambiente do Registro (producao|demonstracao|teste). Nada fora do formato entra. */
+function listaDoHash_(hash){
+  var m = /[#&]hub=([^&]*)/.exec(hash || ''), j = null; if (!m) return null;
+  try { j = JSON.parse(decodeURIComponent(m[1])); } catch(e){ return null; }
+  if (!j || j.v !== 1 || !Array.isArray(j.orgs)) return null;
+  return j.orgs.filter(function(o){ return o && ID_OK.test(String(o.id || '')); }).slice(0, 200).map(function(o){
+    return { id:String(o.id), nome:String(o.nome || o.id).slice(0, 80), grupo:(o.grupo === 'producao' || o.grupo === 'demonstracao' || o.grupo === 'teste') ? o.grupo : 'teste' };
+  });
+}
+/* os lançamentos que ainda não terminaram: as organizações (id da lançadora) que precisam continuar à vista */
+function idsComFila_(){ var o = {}; (ler().fila || []).forEach(function(i){ if (i && i.org && i.estado !== 'enviado') o[i.org] = 1; }); return Object.keys(o); }
+/* a lista do Porteiro no feitio de `montarLista`; `soIds` (opcional) limita às organizações com lançamento esperando; a Beta é fixa */
+function montarDoPorteiro_(orgs, soIds){
+  var rows = [], vistos = {};
+  (orgs || []).forEach(function(p){
+    if (!p || !ID_OK.test(String(p.id || ''))) return;
+    var al = ALIAS_REGISTRO[p.id], id = al ? al.id : p.id;
+    if (id === 'beta' || vistos[id] || (soIds && soIds.indexOf(id) < 0)) return;
+    vistos[id] = 1;
+    var amb = (p.grupo === 'producao' || p.grupo === 'demonstracao' || p.grupo === 'teste') ? p.grupo : 'teste', nome = String(p.nome || p.id).slice(0, 80), hist = HISTORICO_IDS.indexOf(p.id) >= 0;
+    rows.push({ id:id, orgApp:p.id, nome:nome, nomeAdmin:nome, grupo:(amb === 'producao' && !hist) ? 'organizacoes' : 'testes', ambiente:amb, deploymentUnico:DEP_UNICO,
+      apelidos: al ? al.apelidos : [], listada:true, historico:hist });
+  });
+  if (!soIds || soIds.indexOf('beta') >= 0) rows.push(BETA_ROW);
+  ORGS = [];
+  return montarLista({ organizacoes: rows });
+}
+/* a cópia que os aparelhos de antes guardavam (o arquivo público saiu): serve só de provisória da FILA, no feitio do Porteiro */
+function orgsDoLegado_(){
+  var t = null; try { t = localStorage.getItem(CHAVE_LEGADA); } catch(e){}
+  if (!t) return [];
+  try { return (JSON.parse(t).organizacoes || []).filter(function(r){ return r && r.orgApp && r.ambiente !== 'beta'; }).map(function(r){ return { id:String(r.orgApp), nome:r.nome, grupo:r.ambiente }; }); } catch(e){ return []; }
+}
 function carregarOrgs(){
-  return fetch('organizacoes.json', { cache:'no-store' })
-    .then(function(r){ if (!r.ok) throw new Error('http ' + r.status); return r.text(); })
-    .then(function(t){ if (!montarLista(JSON.parse(t))) throw new Error('lista vazia'); try { localStorage.setItem(CHAVE_LISTA, t); } catch(e){} LISTA_ORIGEM = 'arquivo'; })
-    .catch(function(){
-      var t = null; try { t = localStorage.getItem(CHAVE_LISTA); } catch(e){}
-      try { LISTA_ORIGEM = (t && montarLista(JSON.parse(t))) ? 'aparelho' : 'nenhuma'; } catch(e){ LISTA_ORIGEM = 'nenhuma'; }
-    });
+  return Promise.resolve().then(function(){
+    var g = lsGet_(CH_LISTA), fila = lsGet_(CH_FILA_ORGS), legado = orgsDoLegado_();
+    if (g && Array.isArray(g.orgs) && listaValida_(g)) { montarDoPorteiro_(g.orgs); LISTA_ORIGEM = ORGS.length ? 'aparelho' : 'nenhuma'; return; }
+    /* vencida, ausente ou só a cópia antiga: NÃO se inventa lista — ficam à vista só as organizações com lançamento esperando envio */
+    var base = [].concat((g && g.orgs) || [], Array.isArray(fila) ? fila : [], legado);
+    montarDoPorteiro_(base, idsComFila_());
+    LISTA_ORIGEM = (g || (Array.isArray(fila) && fila.length) || legado.length) ? 'vencida' : 'nenhuma';
+  });
+}
+function semLista_(){ return !ORGS.some(function(o){ return o.grupo !== 'beta'; }); }
+/* a ida: a aba inteira ao Porteiro. Sem rede não vai (ficaria numa página de erro do Google). A intenção do QR (`org`,`lote`) fica guardada para depois da volta. */
+function urlDoPorteiro_(st){
+  var base = ehAdmin() ? execDe(DEP_UNICO) : PORTEIRO_CURTO.replace('{dep}', DEP_UNICO);   /* a equipe pela forma longa: a curta cai em «Page introuvable» com 2 contas Google */
+  return base + '?quem=1&volta=' + encodeURIComponent(location.origin + location.pathname) + '&state=' + st;
+}
+function sortearState_(){
+  var a = new Uint8Array(16), t = '';
+  try { crypto.getRandomValues(a); } catch(e){ for (var i = 0; i < 16; i++) a[i] = Math.floor(Math.random() * 256); }
+  for (var j = 0; j < a.length; j++) t += ('0' + a[j].toString(16)).slice(-2);
+  return t;
+}
+function irAoPorteiro(){
+  if (!navigator.onLine) { toast('Sem sinal agora. Para entrar com o Google, abra esta página com sinal.'); return; }
+  AVISO_SAIU = ''; var st = sortearState_(), org = paramDaUrl(location.search, 'org'), lote = paramDaUrl(location.search, 'lote');
+  lsSet_(CH_STATE, { s:st, em:new Date().toISOString() });
+  if (org || lote) lsSet_(CH_INTENCAO, { org:org, lote:lote }); else lsDel_(CH_INTENCAO);
+  toast('Conferindo a sua conta Google…');
+  location.assign(urlDoPorteiro_(st));
+}
+/* a volta (antes de `lerRetorno`): confere o `state`, guarda a lista, limpa o endereço e devolve a intenção do QR */
+function lerVoltaDoPorteiro(){
+  if (paramDaUrl(location.search, 'via') !== 'porteiro') return;
+  var st = lsGet_(CH_STATE), idade = st ? idadeMs_(st.em) : -1;
+  var certo = !!(st && st.s && idade >= 0 && idade < STATE_MIN * 60e3 && paramDaUrl(location.search, 'state') === st.s);
+  var q = paramDaUrl(location.search, 'quem'), hash = location.hash, intencao = lsGet_(CH_INTENCAO);
+  lsDel_(CH_STATE); lsDel_(CH_INTENCAO);                                   /* uso único: certo, errado ou vencido */
+  AVISO_PORTEIRO = '';
+  if (!certo) AVISO_PORTEIRO = 'Não consegui confirmar a sua conta nesta janela. Nada mudou neste aparelho.';
+  else if (q === 'equipe' || q === 'org' || q === 'outro') {
+    var orgs = listaDoHash_(hash);
+    if (orgs && orgs.length) { lsSet_(CH_LISTA, { orgs:orgs, em:new Date().toISOString(), quem:q }); lsDel_(CHAVE_LEGADA); lsDel_(CH_FILA_ORGS); }
+    else AVISO_PORTEIRO = 'A sua conta não trouxe nenhuma organização. Entre com a conta que a sua cooperativa cadastrou.';
+  }
+  else if (q === 'recusa') AVISO_PORTEIRO = 'Esta conta não tem acesso ao Estoque. Entre com a conta que a sua cooperativa cadastrou.';
+  else if (q === 'vazio') AVISO_PORTEIRO = 'Não consegui ler a sua conta Google.';
+  else AVISO_PORTEIRO = 'Não consegui ler a sua conta Google.';
+  var volta = location.pathname;
+  if (intencao && (intencao.org || intencao.lote)) volta += '?' + [intencao.org ? 'org=' + encodeURIComponent(intencao.org) : '', intencao.lote ? 'lote=' + encodeURIComponent(intencao.lote) : ''].filter(Boolean).join('&');
+  try { history.replaceState(null, '', volta); } catch(e){}                  /* o `#hub=` e os parâmetros saem do endereço */
+}
+function entrarHtml_(){
+  return navigator.onLine ? '<button class="grande lu-gap" id="btn-entrar-porteiro" data-porteiro="1">Entrar com o Google</button>' :
+    '<p class="lu-aviso" id="entrar-sem-sinal">Sem sinal agora. Para ver as suas organizações, abra esta página com sinal e toque em «Entrar com o Google».</p>';
+}
+/* ═══ LU · SAIR DESTE APARELHO, SEM PERDER A FILA (onda S · lote C · 27/10/2026) ═══════════════════════════════════════════════════════════
+ * «Sair» apaga a identidade e a lista (conta, lista do Porteiro, cadastros com nomes de família, operador, «recebidas», última organização, modo administrador).
+ * Lançamento que ainda NÃO foi para a planilha nunca se perde em silêncio. A regra escolhida (levantamento de 27/10, seção f.3):
+ *   · sem lançamento esperando → uma confirmação e apaga tudo;
+ *   · COM lançamento esperando e COM sinal → primeiro oferece ENVIAR AGORA (a fila vai ao /exec; depois de voltar, toca-se em «Sair» de novo);
+ *   · COM lançamento esperando e sem sinal (ou quem recusa enviar) → AVISA A CONTAGEM e pede confirmação: «Sair e manter N lançamentos esperando envio».
+ *     Mantém a fila (os não enviados e os já enviados que algum pendente ainda aponta por `ref`) e o mínimo para enviar — `{id, nome, grupo}` das organizações
+ *     que têm lançamento esperando (`lu_fila_orgs_v1`) e a marca de «recebida» delas. Cadastros e operador saem. O servidor segura o que vier de outra conta
+ *     (`res.identidade`), e a tela diz isso. */
+var AVISO_SAIU = '';
+function resumoFila_(){ var por = {}, n = 0; (ler().fila || []).forEach(function(i){ if (i && i.estado === 'guardado') { n++; por[i.org] = (por[i.org] || 0) + 1; } }); return { n:n, por:por }; }
+/* a caixa «N lançamentos esperando envio» da lista: aparece mesmo sem cadastros e sem lista (a fila nunca fica invisível) */
+function filaHtml_(){
+  var r = resumoFila_(); if (!r.n) return '';
+  var h = '<div class="lu-caixa" id="fila-esperando"><b class="t">' + r.n + (r.n === 1 ? ' lançamento esperando envio' : ' lançamentos esperando envio') + '</b>Estão guardados neste aparelho e vão para a planilha quando você enviar (com sinal).';
+  Object.keys(r.por).forEach(function(id){
+    var o = achaOrg(id);
+    h += o ? '<button class="grande sec lu-gap" data-enviar-fila="' + esc(o.id) + '">Enviar ' + r.por[id] + ' de ' + esc(o.nome) + '</button>' :
+             '<p class="lu-mini">' + r.por[id] + ' de uma organização que este aparelho não reconhece agora — entre com o Google para enviar.</p>';
+  });
+  return h + '</div>';
+}
+function enviarFila_(id){ var o = achaOrg(id); if (!o) { toast('Não achei essa organização neste aparelho. Entre com o Google.'); return; } mudar(function(d){ d.orgOffline = o.id; }); enviar(false); }
+function algoNoAparelho_(){
+  var db = ler(); return !!(lsGet_(CH_LISTA) || lsGet_(CH_FILA_ORGS) || (db.fila || []).length || (db.recebidas || []).length || (db.cadastros && Object.keys(db.cadastros).length) || ultima || orgsDoLegado_().length);
+}
+function sairHtml_(){ return algoNoAparelho_() ? '<p class="lu-aviso lu-centro"><button class="lu-linkpeq" id="link-sair-aparelho" data-sair="1">Sair deste aparelho</button></p>' : ''; }
+/* o que fica da fila: tudo que não foi enviado + o já enviado que um pendente ainda aponta (`ref`) */
+function filaParaManter_(db){
+  var fila = db.fila || [], refs = {};
+  fila.forEach(function(i){ if (i.estado !== 'enviado') refsDe(i).forEach(function(r){ refs[r] = 1; }); });
+  return fila.filter(function(i){ return i.estado !== 'enviado' || refs[i.token]; });
+}
+function limparAparelho_(db, manter){
+  var keep = manter ? filaParaManter_(db) : [], orgs = {}, minimas = [];
+  keep.forEach(function(i){ if (i.estado !== 'enviado' && i.org) orgs[i.org] = 1; });
+  Object.keys(orgs).forEach(function(id){ var o = achaOrg(id); if (o && o.orgApp) minimas.push({ id:o.orgApp, nome:o.nome, grupo:o.ambiente }); });
+  if (keep.length) gravar({ fila:keep, cadastros:{}, operador:{}, recebidas:Object.keys(orgs) }); else lsDel_(CHAVE);
+  if (minimas.length) lsSet_(CH_FILA_ORGS, minimas); else lsDel_(CH_FILA_ORGS);
+  [CH_LISTA, CHAVE_LEGADA, CH_STATE, CH_INTENCAO, 'estoque_org', 'lu_admin_aparelho', 'estoque_auto_off'].forEach(lsDel_);
+  sess('estoque_auto', null); sess('lu_admin', null);
+  ultima = null; ADMIN_MEM = false; AVISO_PORTEIRO = '';
+}
+function sairDoAparelho(){
+  var db = ler(), pend = (db.fila || []).filter(function(i){ return i && i.estado === 'guardado'; }), n = pend.length;
+  if (!n) {
+    if (!confirm('Sair deste aparelho?\n\nA lançadora esquece a conta, as organizações e o que guardou aqui.')) return false;
+  } else {
+    if (navigator.onLine) {
+      var por = {}; pend.forEach(function(i){ por[i.org] = (por[i.org] || 0) + 1; });
+      var id = Object.keys(por).sort(function(a, b){ return por[b] - por[a]; })[0];
+      if (achaOrg(id) && confirm('Há ' + n + ' lançamento(s) neste aparelho que ainda NÃO foram para a planilha.\n\nEnviar agora, antes de sair?\n\n«OK» envia agora (quando voltar, toque em «Sair» de novo). «Cancelar» deixa escolher sair sem enviar.')) { enviarFila_(id); return false; }
+    }
+    if (!confirm('Sair e manter ' + n + ' lançamento(s) esperando envio?\n\nA conta e a lista saem deste aparelho, mas os ' + n + ' lançamento(s) NÃO se perdem: ficam aqui até serem enviados (com a conta de quem lançou).\n\n«Cancelar» mantém tudo como está.')) return false;
+  }
+  limparAparelho_(db, n > 0);
+  AVISO_SAIU = (n ? 'Os ' + n + ' lançamento(s) ainda não enviados continuam aqui, esperando envio. ' : '') + 'Antes de passar o aparelho, saia também da conta Google (no Gmail ou em accounts.google.com).';
+  return carregarOrgs().then(function(){
+    aplicarNomes(); TELA = { nome:'inicio', form:null };
+    try { history.replaceState(null, '', location.pathname); } catch(e){}
+    render(); try { window.scrollTo(0, 0); } catch(e){}
+    return true;
+  });
 }
 /* o id, ou um nome antigo que continua valendo para sempre (`demo`, `felipe`, `teste-limpo`): QR impresso não quebra */
 function achaOrg(id){
@@ -480,12 +698,12 @@ function lerRetorno(){
   history.replaceState(null, '', location.pathname + location.search);
   sess('estoque_auto', 'tentou');                                  /* OFF5 · B6 · voltou do envio: o automático não tenta de novo nesta volta da rede */
   var r; try { r = JSON.parse(deB64url(h.slice(3))); } catch(e){ toast('O retorno do envio veio ilegível — nada foi marcado; envie de novo.'); return; }
-  var ok = 0, rec = 0, espera = 0;
+  var ok = 0, rec = 0, espera = 0, esperaConta = 0;
   var gravou = mudar(function(db){
     (r.resultados || []).forEach(function(res){
       var it = db.fila.find(function(i){ return i.token === res.token; }); if (!it) return;
       it.mensagem = res.mensagem || '';
-      if (res.pendente) { it.estado = 'guardado'; it.aviso = res.mensagem || ''; espera++; }                 /* fica na fila: NÃO é recusa */
+      if (res.pendente) { it.estado = 'guardado'; it.aviso = res.mensagem || ''; if (res.identidade) esperaConta++; else espera++; }                 /* fica na fila: NÃO é recusa · C4-P3 H10-215: a pendência de IDENTIDADE espera a CONTA certa, não a origem */
       else if (res.ok) { it.estado = 'enviado'; it.codigos = res.codigos || []; it.codigo = res.codigo || (res.codigos||[])[0] || ''; it.filhos = res.filhos || [];
                          it.repetido = !!res.repetido; it.alerta = !!res.jaFechada; it.enviadoEm = r.quando; it.erro = ''; it.aviso = ''; ok++; }
       else { it.estado = 'recusado'; it.erro = res.erro || 'recusado'; it.aviso = ''; rec++; }
@@ -499,7 +717,7 @@ function lerRetorno(){
     db.fila = db.fila.filter(function(i){ return i.estado !== 'enviado' || Date.now() - Date.parse(i.enviadoEm || i.quando) < 30 * 864e5; });
   });
   toast(!gravou ? 'O aparelho recusou guardar o retorno — confira o espaço livre.' :
-        (r.resultados||[]).length ? (ok + ' na planilha' + (rec ? ' · ' + rec + ' recusado(s)' : '') + (espera ? ' · ' + espera + ' esperando a origem' : '') + (r.cadastros ? ' · cadastros atualizados' : ' · cadastros NÃO atualizados — toque em «Atualizar cadastros»')) :
+        (r.resultados||[]).length ? (ok + ' na planilha' + (rec ? ' · ' + rec + ' recusado(s)' : '') + (espera ? ' · ' + espera + ' esperando a origem' : '') + (esperaConta ? ' · ' + esperaConta + ' esperando a conta de quem lançou' : '') + (r.cadastros ? ' · cadastros atualizados' : ' · cadastros NÃO atualizados — toque em «Atualizar cadastros»')) :
         'Galpão/Campo preparado · cadastros guardados no aparelho');
 }
 
@@ -541,6 +759,7 @@ function dependentesDe(fila, token){
 /* ── ENVIO: navegação para o /exec da organização ─────────────────────────── */
 function enviar(soCadastros){
   var org = orgAtual(), db = ler();
+  if (!org) { toast('Entre com o Google para ver as organizações antes de enviar.'); return; }     /* sem lista nem organização com envio esperando: nada a enviar daqui */
   var pend = soCadastros ? [] : (db.fila || []).filter(function(i){ return i.org === org.id && i.estado === 'guardado'; });
   if (!navigator.onLine) { toast('Sem rede agora. Está tudo guardado no aparelho — envie quando o sinal voltar.'); return; }
   var pacote = { volta: location.origin + location.pathname + voltaDaFicha(), org: org.id, orgApp: org.orgApp || '', fuso: (db.cadastros && db.cadastros[org.id] && db.cadastros[org.id].fuso) || FUSO_PADRAO,
@@ -604,6 +823,7 @@ function render(){
   }
   h += telaInicioBasica(db, org, cad, pend, fila, lista);
   h += chkOff.replace('class="chave"', 'class="chave" style="margin-top:16px"');
+  h += sairHtml_();
   app.innerHTML = textoVisivel_(h); ligarInicio();
   agendarAuto();
 }
@@ -691,10 +911,13 @@ function telaInicioBasica(db, org, cad, pend, fila, lista){
   h += '<button class="sync' + (pend.length ? ' pend' : '') + '" id="btn-enviar">Sincronizar · ' + (pend.length ? pend.length + (pend.length === 1 ? ' guardado' : ' guardados') + ' · ' : '') + 'retrato de ' + esc(hora) + '</button>';
   h += '<div id="slot-auto"></div>';
   if (lista.length > 1) h += '<select class="txt" id="sel-org" style="margin:0 0 10px">' + lista.map(function(o){ return '<option value="' + esc(o.id) + '"' + (o.id === org.id ? ' selected' : '') + '>' + esc(o.nome) + '</option>'; }).join('') + '</select>';
-  h += '<div class="faixa"><span class="pill ' + (navigator.onLine ? 'on' : 'off') + '" id="pill-rede">' + (navigator.onLine ? 'com rede' : 'sem rede') + '</span>' +
+  h += '<div class="faixa">' + seloBeta(org) + '<span class="pill ' + (navigator.onLine ? 'on' : 'off') + '" id="pill-rede">' + (navigator.onLine ? 'com rede' : 'sem rede') + '</span>' +
        '<span class="pill" id="pill-retrato">retrato de ' + esc(ret) + '</span>' +
        ((db.cadVelho || {})[org.id] ? '<span class="pill off" id="pill-velho">cadastros desatualizados · toque em «Sincronizar»</span>' : '') + '</div>';
   h += chipsHtml(cad, proj);
+  B2_ULTIMO = b2Ativo();
+  if (B2_ULTIMO) h += telaB2_(db, org, cad, proj, fila, fuso);        /* C3 · tablet: o B2 mestre-detalhe no lugar da régua + ações + lista */
+  else {
   h += '<div class="sec"><p class="lbl">No galpão agora</p>' + reguaHtml(resumoDoGalpao(cad, proj, FILTRO)) + '</div>';
   var nAbrir = contagemAbrir(cad, proj), ops = opsDoFechar(proj), nFechar = ops.length, maisVelha = null;
   ops.forEach(function(o){ if (o.codigo && (!maisVelha || codData(o.codigo) < codData(maisVelha.codigo))) maisVelha = o; });
@@ -707,8 +930,73 @@ function telaInicioBasica(db, org, cad, pend, fila, lista){
   h += '<p class="lbl">Lançamentos deste aparelho</p>';
   h += fila.length ? '<ul class="fila">' + fila.slice().reverse().map(function(i){ return linhaFila(i, fila, fuso); }).join('') + '</ul>'
                    : '<p class="aviso" style="margin:0 0 12px">Nada lançado neste aparelho ainda.</p>';
+  }
   h += '<p class="aviso">Quem assina o envio é a conta Google aberta no celular na hora de enviar. Enviar de novo é seguro: o que já entrou não entra duas vezes. O botão «Sincronizar» no topo envia o que está guardado e atualiza os cadastros numa ida só.</p>';
+  h += hubHtml(org);
   return h;
+}
+
+/* ══ C3 · H10-510 · B2 MESTRE-DETALHE (D75 = S, tablet) ═══════════════════════════════════════════
+   Mesmo dado e mesmas funções do Início de hoje (`resumoDoGalpao`, `gruposDoEstoque`, `linhaFila`); muda a DISPOSIÇÃO: etapas à esquerda (cada barra é tocável), detalhe à direita
+   (lotes com «Abrir <próxima etapa> ›», operações com «Fechar ›», os lançamentos do aparelho) e a ficha curta do lote tocado. Nenhuma função nova para quem lança. */
+var B2 = { sel:'', lote:'' }, B2_ULTIMO = null;
+function b2Ativo(){ try { return !!(window.matchMedia && window.matchMedia('(min-width:768px)').matches); } catch(e){ return false; } }
+function b2Resize_(){ if (TELA.nome === 'inicio' && B2_ULTIMO !== null && b2Ativo() !== B2_ULTIMO) render(); }
+window.addEventListener('resize', function(){ clearTimeout(b2Resize_._t); b2Resize_._t = setTimeout(b2Resize_, 150); });
+function b2Escolher(chave){ B2.sel = chave; B2.lote = ''; render(); }
+function b2EscolherLote(chave){ B2.lote = chave; render(); }
+function b2LoteHtml(l, cad){
+  var venda = acabaVendaDe(cad, l), on = B2.lote === l.chave;
+  return '<div role="button" tabindex="0" class="lt b2-lote' + (l.sub ? ' sub' : '') + (l.local ? ' local' : '') + (on ? ' on' : '') + '"' + bordaSub(l.sub) + ' data-b2lote="' + esc(l.chave) + '" data-lote="' + esc(l.chave) + '">' +
+    '<b class="b2-prod">' + esc(l.produto) + chipSub(l.sub) + '</b><span class="b2-kg kg">' + kgTxt(l.saldo) + ' kg</span>' +
+    '<small' + (l.local ? ' class="local"' : '') + '>' + esc(l.codigo ? l.codigo + ' · ' + (l.sub ? 'subproduto' : diasTxt(l.dias)) : LOCAL_TXT) + (venda ? ' · acaba na venda ' + esc(venda) : '') + '</small>' +
+    (l.proximo && !venda ? '<button class="mini" data-abrir="' + esc(l.chave) + '" data-etapa-abrir="' + esc(l.proximo.id) + '">' + esc(acaoDaEtapa(l.proximo)) + ' ›</button>' : '<span></span>') + '</div>';
+}
+function b2FichaHtml(db, org, cad, proj){
+  var l = B2.lote ? proj.lotes[B2.lote] : null; if (!l || !l.codigo) return '';
+  var fi = cad.fichas ? cad.fichas[l.codigo] : null, sub = ehSubFicha(l.codigo, fi, l), com = fi && fi[6] ? fi[6].slice(0, 3) : [];
+  return '<div class="b2-ficha" id="b2-ficha"' + bordaSub(sub) + '><p class="lbl" style="margin:0 0 4px">Ficha do lote · o que o QR abre</p>' +
+    '<div><b class="cod">' + esc(codigoExibicao(l.codigo)) + '</b>' + chipSub(sub) + '</div>' +
+    '<dl><dt>Produto</dt><dd>' + esc(l.produto) + '</dd><dt>Disponível</dt><dd>' + kgTxt(l.saldo) + ' kg</dd>' +
+    (fi && fi[3] ? '<dt>Entrou em</dt><dd>' + esc(dataBR(fi[3])) + '</dd>' : '') +
+    (com.length ? '<dt>Origem</dt><dd>' + com.map(function(x){ return esc(x[0]) + ' · ' + kgTxt(x[1]) + ' kg'; }).join('; ') + '</dd>' : '') + '</dl>' +
+    '<button class="bt" id="b2-ficha-abrir" data-ficha="' + esc(l.codigo) + '">Ficha completa ›</button></div>';
+}
+function telaB2_(db, org, cad, proj, fila, fuso){
+  var rows = resumoDoGalpao(cad, proj, FILTRO), pend = fila.filter(function(i){ return i.estado === 'guardado'; }), rec = fila.filter(function(i){ return i.estado === 'recusado'; }), h = '';
+  var nAbrir = contagemAbrir(cad, proj), ops = opsDoFechar(proj), nFechar = ops.length, maisVelha = null;
+  ops.forEach(function(o){ if (o.codigo && (!maisVelha || codData(o.codigo) < codData(maisVelha.codigo))) maisVelha = o; });
+  h += '<div class="sec b2-acoes"><p class="lbl">O que fazer agora</p><div class="ac4" id="acoes-b2">' +
+       '<button class="ac" id="btn-receber"><span class="n">&nbsp;</span><span class="v">Receber</span><span class="s">entrega nova</span></button>' +
+       '<button class="ac' + (nAbrir ? ' prim' : '') + '" id="btn-abrir"><span class="n" id="n-abrir">' + nAbrir + '</span><span class="v">Abrir</span><span class="s">' + (nAbrir === 1 ? 'lote esperando' : 'lotes esperando') + '</span></button>' +
+       '<button class="ac' + (nFechar ? ' prim' : '') + '" id="btn-fechar"><span class="n" id="n-fechar">' + nFechar + '</span><span class="v">Fechar</span><span class="s">' +
+         (nFechar ? (maisVelha ? esc(nomeDaEtapa(cad, maisVelha.etapa)) + ' · desde ' + esc(ddmm(maisVelha.codigo)) : (nFechar === 1 ? 'operação aberta' : 'operações abertas')) : 'nenhuma aberta') + '</span></button>' +
+       '<button class="ac qr" id="btn-lerqr"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM19 14h2v2h-2zM14 19h2v2h-2zM18 18h3v3h-3z" fill="none" stroke="currentColor" stroke-width="2"/></svg><span class="v">Ler QR</span><span class="s">abre a ficha do lote</span></button></div></div>';
+  var chaves = rows.map(function(r){ return r.chave; }).concat(['fila']);
+  /* H10-658 · havendo lançamento recusado, a tela abre (e volta do /exec) na etapa «Lançamentos»: o motivo e o «descartar» ficam à vista, sem depender do toast que some. Só na abertura: o que o operador escolher depois fica. */
+  if (chaves.indexOf(B2.sel) < 0) { B2.sel = rec.length ? 'fila' : chaves[0]; B2.lote = ''; }
+  var max = Math.max.apply(null, rows.map(function(r){ return r.kg; }).concat([1]));
+  h += '<div class="b2" id="b2"><div class="sec b2-mestre"><p class="lbl">No galpão agora</p><div class="b2-lista">' + rows.map(function(r){
+    var on = B2.sel === r.chave;
+    return '<button class="b2-et' + (on ? ' on' : '') + '" data-b2="' + esc(r.chave) + '" data-linha="' + esc(r.chave) + '" data-kg="' + r.kg + '" data-n="' + r.n + '" aria-pressed="' + (on ? 'true' : 'false') + '"><span class="et">' + esc(r.nome) + '<small>' + esc(r.sub) + '</small></span><span class="kg">' + kgTxt(Math.round(r.kg)) + ' kg</span>' +
+           '<span class="bar"><i class="' + (r.tipo === 'op' ? 'proc' : r.tipo === 'sub' ? 'sub' : '') + '" style="width:' + Math.max(2, r.kg / max * 100).toFixed(1) + '%"></i></span></button>'; }).join('') +
+    '<button class="b2-et b2-fila' + (B2.sel === 'fila' ? ' on' : '') + '" data-b2="fila" data-linha="fila" aria-pressed="' + (B2.sel === 'fila' ? 'true' : 'false') + '"><span>Lançamentos deste aparelho</span><span class="b2-selos">' + (pend.length ? '<span class="b2-badge">' + pend.length + (pend.length === 1 ? ' guardado' : ' guardados') + '</span>' : '') + (rec.length ? '<span class="b2-badge rec">' + rec.length + (rec.length === 1 ? ' recusado' : ' recusados') + '</span>' : '') + '</span></button></div>' +
+    (rows.length ? '' : '<p class="aviso" id="regua-vazia" style="margin:0">Nada no galpão' + (FILTRO ? ' desta cadeia' : '') + ' segundo o retrato deste aparelho.</p>') + '</div>';
+  var r = rows.filter(function(x){ return x.chave === B2.sel; })[0], gs = gruposDoEstoque(cad, proj, FILTRO), lotes = [];
+  gs.forEach(function(g){ g.lotes.forEach(function(l){ lotes.push(l); }); });
+  h += '<div class="sec b2-detalhe" id="b2-detalhe">';
+  if (B2.sel === 'fila') {
+    h += '<h3>Lançamentos deste aparelho</h3><p class="b2-sub">' + (fila.length ? fila.length + ' · ' + pend.length + (pend.length === 1 ? ' guardado' : ' guardados') + (rec.length ? ' · ' + rec.length + (rec.length === 1 ? ' recusado' : ' recusados') : '') : 'nenhum ainda') + '</p>' +
+         (fila.length ? '<ul class="fila">' + fila.slice().reverse().map(function(i){ return linhaFila(i, fila, fuso); }).join('') + '</ul>' : '<p class="aviso" style="margin:0 0 12px">Nada lançado neste aparelho ainda.</p>');
+  } else if (r && r.tipo === 'op') {
+    var id = r.chave.slice(3);
+    h += '<h3>' + esc(r.nome) + '</h3><p class="b2-sub">' + esc(r.sub) + ' · ' + kgTxt(Math.round(r.kg)) + ' kg</p>' + ops.filter(function(o){ return o.etapa === id && (!FILTRO || o.cadeia === FILTRO); }).map(function(o){
+      return '<button class="card" data-b2op="' + esc(o.chave) + '"><span class="m"><b>' + esc(nomeDaEtapa(cad, o.etapa)) + ' · ' + esc(o.produto) + '</b><small' + (o.local ? ' class="local"' : '') + '>' + esc(rotuloOp(o)) + '</small></span><span class="kg">' + kgTxt(o.kg) + ' kg</span><span class="mais">Fechar ›</span></button>'; }).join('');
+  } else if (r) {
+    var da = r.tipo === 'sub' ? lotes.filter(function(l){ return l.sub; }) : lotes.filter(function(l){ return !l.sub && l.etapa === r.chave.slice(5); });
+    h += '<h3>' + esc(r.nome) + '</h3><p class="b2-sub">' + kgTxt(Math.round(r.kg)) + ' kg · ' + esc(r.sub) + '</p>' + da.map(function(l){ return b2LoteHtml(l, cad); }).join('') + b2FichaHtml(db, org, cad, proj);
+  } else h += '<p class="aviso" style="margin:0">Escolha uma etapa à esquerda.</p>';
+  return h + '</div></div>';
 }
 
 function ligarInicio(){
@@ -727,6 +1015,14 @@ function ligarInicio(){
   var bs = document.getElementById('btn-estoque'); if (bs) bs.onclick = function(){ TELA = { nome:'estoque' }; render(); };
   document.querySelectorAll('[data-cadeia]').forEach(function(b){ b.onclick = function(){ FILTRO = b.dataset.cadeia; render(); }; });
   var bq = document.getElementById('btn-lerqr'); if (bq) bq.onclick = function(){ abrirLeitor(); };
+  /* C3 · B2: tocar numa etapa escolhe o detalhe; num lote, a ficha curta; no «Abrir …» o Abrir já com o lote; no «Fechar ›» o Fechar daquela operação */
+  document.querySelectorAll('[data-b2]').forEach(function(b){ b.onclick = function(){ b2Escolher(b.dataset.b2); }; });
+  document.querySelectorAll('[data-b2lote]').forEach(function(c){ c.onclick = function(){ b2EscolherLote(c.dataset.b2lote); }; });
+  document.querySelectorAll('[data-b2op]').forEach(function(b){ b.onclick = function(){ TELA = { nome:'fechar', form:{ op:b.dataset.b2op, pesoSaida:'', principal:'', subs:['','',''], obs:'' } }; render(); }; });
+  document.querySelectorAll('[data-abrir]').forEach(function(b){ b.onclick = function(ev){
+    ev.stopPropagation(); var o = orgAtual(), c = ler().cadastros[o.id], pj = projecao(ler(), o), f = { etapa: b.dataset.etapaAbrir, lotes:{}, obs:'', pre: b.dataset.abrir };
+    puxarLotePre(f, c, pj); TELA = { nome:'abrir', form: f }; render(); }; });
+  var bfc = document.getElementById('b2-ficha-abrir'); if (bfc) bfc.onclick = function(){ abrirFicha(orgAtual().id, bfc.dataset.ficha, 'inicio'); };
   document.querySelectorAll('[data-descartar]').forEach(function(b){ b.onclick = function(){
     var dep = dependentesDe(ler().fila || [], b.dataset.descartar);
     if (!confirm('Descartar este lançamento? Ele sai do aparelho e não vai para a planilha.' +
@@ -1020,6 +1316,9 @@ function linhaFila(i, fila, fuso){
       /* C12-CON · menor 4 · «na planilha · <códigos>»: o código da casca que o Fechar acabou de gravar leva o chip «Subproduto» (o par do «Gravado: …» do app); o `Fechar` grava o filho com o próprio código `QUE-…` */
       st = (i.repetido ? 'já estava na planilha · ' : 'na planilha · ') + (i.codigos || []).join(', ');
       stH = esc(i.repetido ? 'já estava na planilha · ' : 'na planilha · ') + (i.codigos || []).map(function(c){ return esc(c) + chipSub(infoLoteDaFila_(cad, c, '').sub); }).join(', ');
+      /* C4-P3 · H10-214 · O2A-3 «nunca em silêncio»: o servidor gravou com a data de HOJE (a do aparelho não valia) e disse isso na mensagem — a linha da lista repete a frase */
+      var dh = /( · com a data de hoje[^·]*)$/.exec(i.mensagem || '');
+      if (dh) { st += dh[1]; stH += esc(dh[1]); }
     }
   }
   else if (i.estado === 'recusado') {
@@ -1378,7 +1677,7 @@ function telaFicha(db){
   var f = TELA, cod = f.lote, org = orgDaFicha(f), rede = navigator.onLine;
   var h = '<div class="topo"><button class="link" id="btn-voltar">‹ voltar</button></div><h2>Ficha do lote</h2><p class="ficha-cod cod" id="ficha-codigo" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;margin:0 0 10px;overflow-wrap:anywhere">' + esc(codigoExibicao(cod)) + '</p>';
   var ler_outro = '<div class="col-acoes"><button class="grande sec" id="btn-lerqr">Ler outro QR</button></div>';
-  if (!org) return h + '<p class="aviso" id="ficha-msg">Este QR é de uma organização que a lançadora não conhece («' + esc(f.org) + '»). Confira o QR.</p>' + ler_outro;
+  if (!org) return h + '<p class="aviso" id="ficha-msg">Este QR é de uma organização que a lançadora não conhece («' + esc(f.org) + '»). Confira o QR.</p>' + (LISTA_ORIGEM !== 'aparelho' ? entrarHtml_() : '') + ler_outro;
   if (org.historico) return h + '<p class="aviso" id="ficha-base-antiga"><b>Esta etiqueta é da base antiga</b> (planilha de produção de até 18/10). Ela não abre a ficha aqui e não muda a organização deste aparelho. ' +
     'Peça uma etiqueta nova ao administrador.</p>' + ler_outro;
   if (!org.offline) return h + '<p class="aviso" id="ficha-msg">O Galpão/Campo ainda não está liberado para ' + esc(org.nome) + '.</p>' + ler_outro;
@@ -1681,7 +1980,7 @@ function aplicarNomes(){ var adm = ehAdmin(); ORGS.forEach(function(o){ o.nome =
    e as demonstrações na seção «Demonstrações e testes» do mesmo seletor (H10-316, Tobia 19/10: «tudo deve ser fundido»; supera o R1A-3). */
 function disponiveis(){
   var db = ler(), rec = db.recebidas || [], adm = ehAdmin();
-  return ORGS.filter(function(o){ return rec.indexOf(o.id) >= 0 || o.listada; });   /* H10-316 (19/10): uma lista só para todos — demonstrações na seção «Demonstrações e testes» */
+  return ORGS.filter(function(o){ return rec.indexOf(o.id) >= 0 || o.listada || (adm && o.grupo === 'beta'); });   /* H10-316 (19/10): uma lista só para todos — demonstrações na seção «Demonstrações e testes» */
 }
 function marcarRecebida(o, comoUltima){
   mudar(function(db){
@@ -1740,10 +2039,14 @@ function telaGeral(db, chkOff){
   var disp = disponiveis(), adm = ehAdmin(), h = '';
   h += '<div class="faixa"><span class="pill ' + (navigator.onLine ? 'on' : 'off') + '" id="pill-rede">' + (navigator.onLine ? 'com rede' : 'sem rede') + '</span>' +
        (adm ? '<span class="pill laranja" id="pill-admin">administrador</span>' : '') +
-       (LISTA_ORIGEM === 'aparelho' ? '<span class="pill" id="pill-lista-guardada">lista guardada no aparelho</span>' : '') + '</div>';
-  if (!ORGS.length) {
-    return h + '<div class="lu-caixa erro" id="lista-falhou"><b class="t">A lista de organizações não abriu</b>Falta o arquivo da lista e este aparelho ainda não guardou uma cópia. Com sinal, toque em «Tentar de novo»; se continuar, avise a Mandū.</div>' +
-      '<button class="grande sec lu-gap" id="btn-tentar">Tentar de novo</button>';
+       (LISTA_ORIGEM === 'vencida' ? '<span class="pill" id="pill-lista-vencida">lista vencida</span>' : '') + '</div>';
+  if (AVISO_SAIU) h += '<div class="lu-caixa" id="aviso-saiu"><b class="t">Você saiu deste aparelho</b>' + esc(AVISO_SAIU) + '</div>';
+  if (AVISO_PORTEIRO) h += '<div class="lu-caixa erro" id="aviso-porteiro"><b class="t">Não foi desta vez</b>' + esc(AVISO_PORTEIRO) + '</div>';
+  h += filaHtml_();
+  if (semLista_()) {            /* sem lista (ou vencida e sem lançamento esperando): NADA é inventado — a tela pede a conta Google */
+    return h + '<div class="lu-caixa' + (LISTA_ORIGEM === 'vencida' ? '' : ' erro') + '" id="sem-lista"><b class="t">' + (LISTA_ORIGEM === 'vencida' ? 'A lista das suas organizações venceu' : 'Entre com a sua conta Google') + '</b>' +
+      (LISTA_ORIGEM === 'vencida' ? 'Ela vale ' + LISTA_VALIDADE_H + ' h neste aparelho. Com sinal, entre de novo com a conta Google para renovar.' : 'A lista das suas organizações vem da sua conta Google (Gmail serve), a mesma que a cooperativa cadastrou. Este aparelho ainda não tem lista.') + '</div>' +
+      entrarHtml_() + sairHtml_();
   }
   if (!disp.length) {
     return h + '<div class="lu-vazio" id="geral-vazio"><p class="g">Use o link que a Mandū enviou</p><p>Este aparelho ainda não abriu nenhuma organização. O link (ou o QR) da sua organização abre o Estoque e ela passa a aparecer aqui.</p></div>' + avisoSemSW() +
@@ -1751,21 +2054,23 @@ function telaGeral(db, chkOff){
   }
   var ult = achaOrg(ultima), sel = (ult && disp.indexOf(ult) >= 0) ? ult : disp[0];
   var opt = function(o){ return '<option value="' + esc(o.id) + '"' + (o === sel ? ' selected' : '') + '>' + esc(o.nome) + (o.pendente ? ' · aguardando o app' : '') + '</option>'; };
-  var og = disp.filter(function(o){ return o.grupo === 'organizacoes'; }), tg = disp.filter(function(o){ return o.grupo === 'testes'; });
+  var og = disp.filter(function(o){ return o.grupo === 'organizacoes'; }), tg = disp.filter(function(o){ return o.grupo === 'testes'; }), bg = disp.filter(function(o){ return o.grupo === 'beta'; });
   h += '<label class="lbl" for="sel-geral" style="margin-top:6px">Organização</label>' +
        '<select class="lu-sel" id="sel-geral" aria-label="Organização">' +
        (og.length ? '<optgroup label="Organizações">' + og.map(opt).join('') + '</optgroup>' : '') +
-       (tg.length ? '<optgroup label="Demonstrações e testes">' + tg.map(opt).join('') + '</optgroup>' : '') + '</select>';
+       (tg.length ? '<optgroup label="Demonstrações e testes">' + tg.map(opt).join('') + '</optgroup>' : '') +
+       (bg.length ? '<optgroup label="Beta · só para a equipe testar">' + bg.map(opt).join('') + '</optgroup>' : '') + '</select>';
   if (ult && disp.indexOf(ult) >= 0 && db.ultimaEm) h += '<p class="lu-aviso" id="ultima-usada">Última usada: <b>' + esc(ult.nome) + '</b> · ' + esc(quandoTxt(db.ultimaEm, FUSO_PADRAO)) + '</p>';
   h += '<button class="grande lu-gap" id="btn-abrir-geral">Abrir</button>';
   h += '<div class="lu-gap"></div>' + chkOff;
   h += avisoSemSW();
+  if (LISTA_ORIGEM === 'vencida') h += '<div class="lu-caixa" id="lista-vencida"><b class="t">A lista venceu</b>Aparecem só as organizações com lançamento esperando envio. Com sinal, entre com o Google para renovar a lista.</div>' + entrarHtml_();
+  h += sairHtml_();
   if (adm) h += '<p class="lu-aviso lu-centro"><button class="lu-linkpeq" id="link-painel">Painel do administrador ›</button> &nbsp;·&nbsp; <button class="lu-linkpeq" id="link-sair-admin">Sair do modo administrador</button></p>';
   else h += '<p class="lu-aviso lu-centro"><button class="lu-linkpeq" id="link-equipe">Sou da equipe Mandū ›</button></p>';
   return h;
 }
 function ligarGeral(){
-  var bt = luEl('btn-tentar'); if (bt) bt.onclick = function(){ carregarOrgs().then(function(){ aplicarNomes(); render(); }); };
   var ba = luEl('btn-abrir-geral'); if (ba) ba.onclick = function(){ entrar(achaOrg(luEl('sel-geral').value)); };
   var lp = luEl('link-painel'); if (lp) lp.onclick = function(){ irPara('?painel=administrador', { nome:'painel' }); };
   var le = luEl('link-equipe'); if (le) le.onclick = function(){ irPara('?painel=administrador', { nome:'painel' }); };   /* H10-277 · a saída do aparelho sem organização para quem é da equipe */
@@ -1793,9 +2098,10 @@ function manifestoDaOrg(o){
 function telaSub(db){
   var o = achaOrg(TELA.org), h = luCab();
   if (!o) return h + '<div class="lu-caixa erro" id="sub-desconhecida"><b class="t">Organização não encontrada</b>Este link é de uma organização que a lançadora não conhece («' + esc(TELA.org) + '»). Confira o link com quem enviou, ou veja a lista deste aparelho.</div>' +
-    '<button class="grande sec lu-gap" id="sub-lista">Ver a lista deste aparelho</button>';
+    (LISTA_ORIGEM !== 'aparelho' ? entrarHtml_() : '') + '<button class="grande sec lu-gap" id="sub-lista">Ver a lista deste aparelho</button>';
   var recebida = (db.recebidas || []).indexOf(o.id) >= 0, direto = recebida || modoIcone();
   var rede = navigator.onLine, offlinePronto = db.modoOffline && o.offline && db.cadastros && db.cadastros[o.id];
+  h += seloBeta(o) ? '<div class="faixa">' + seloBeta(o) + '</div>' : '';
   if (o.pendente) return h + '<p class="lbl" style="margin-top:0">Sua organização</p><p class="lu-nomegrande" id="sub-nome">' + esc(o.nome) + '</p><p class="lu-sub">' + esc(o.local) + '</p>' +
     '<div class="lu-caixa" id="sub-aguardando"><b class="t">Aguardando o app</b>O Estoque desta organização ainda não foi publicado. Quando estiver pronto, este mesmo link passa a abrir. Nada a fazer por enquanto.</div>' +
     '<button class="grande sec lu-gap" id="sub-lista">Ver a lista deste aparelho</button>';
@@ -1805,7 +2111,7 @@ function telaSub(db){
       '<p class="lu-aviso">Quando o sinal voltar, toque em «Tentar de novo». Nada foi perdido.</p><button class="grande sec lu-gap" id="sub-tentar">Tentar de novo</button>' + avisoSemSW();
   }
   if (direto) {
-    return '<div class="lu-abrindo" id="sub-direto"><img alt="Mandū" src="' + GLIFO_URI + '"><p class="q">Abrindo</p><p class="nome" id="sub-nome">' + esc(o.nome) + '</p><p class="cid">' + esc(o.local) + '</p>' +
+    return '<div class="lu-abrindo" id="sub-direto"><img alt="Mandū" src="' + GLIFO_URI + '">' + seloBeta(o) + '<p class="q">Abrindo</p><p class="nome" id="sub-nome">' + esc(o.nome) + '</p><p class="cid">' + esc(o.local) + '</p>' +
       '<div class="lu-barra"><i></i></div>' +
       '<button class="lu-linkpeq" id="sub-outra">Trocar de organização</button>' +
       (modoIcone() ? '' : '<div><button class="lu-linkpeq" id="sub-inst">Instalar na tela de início</button></div>') + '</div>' +
@@ -1869,7 +2175,7 @@ function cartaoOrg(o){
     '<p class="lu-est"><i class="' + est + '"></i>' + esc(o.pendente ? 'aguardando o app · ainda sem o endereço do Estoque' : o.estadoTxt) + '</p>' +
     '<span class="lu-end">' + esc(linkDe(o)) + '</span>' +
     '<div class="lu-bts3"><button class="lu-bt pri" data-a="copiar">Copiar link</button><button class="lu-bt" data-a="qr">QR de instalação</button><button class="lu-bt" data-a="gestor"' + (o.pendente ? ' disabled title="O app desta organização ainda não foi publicado"' : '') + '>Gestor</button></div>' +
-    '<p class="lu-mini">' + (o.historico ? 'Base antiga do galpão (até 18/10): <b>nunca é zerada</b>. O nome curto <b>camtaua</b> fica reservado e continua abrindo-a pelo link; a etiqueta antiga de lote só mostra um aviso.' : (o.apelidos.length ? 'Nomes antigos que continuam valendo: ' + o.apelidos.map(esc).join(', ') + '.' : '')) + '</p>';
+    '<p class="lu-mini">' + (o.ambiente === 'beta' ? 'Ambiente de desenvolvimento da equipe (projeto e planilha próprios): <b>nunca grava na produção</b>; cada onda sobe aqui primeiro.' : '') + (o.historico ? 'Base antiga do galpão (até 18/10): <b>nunca é zerada</b>. O nome curto <b>camtaua</b> fica reservado e continua abrindo-a pelo link; a etiqueta antiga de lote só mostra um aviso.' : (o.apelidos.length ? 'Nomes antigos que continuam valendo: ' + o.apelidos.map(esc).join(', ') + '.' : '')) + '</p>';
   if (GESTOR_ABERTO === o.id) {
     h += '<div class="lu-form-gestor"><label class="lu-mini" for="g-' + esc(o.id) + '">E-mail de quem vai ser Gestor de ' + esc(o.nomeAdm) + '</label>' +
       '<div class="lu-linha-in"><input id="g-' + esc(o.id) + '" type="email" inputmode="email" autocomplete="off" placeholder="nome@exemplo.org"><button class="lu-bt pri" data-a="delegar">Abrir no app</button></div>' +
@@ -1878,8 +2184,8 @@ function cartaoOrg(o){
   return h + '</article>';
 }
 function administradoresHtml(){
-  var l = CFG.administradores || [];
-  return '<ul class="lu-adms" id="adms">' + (l.length ? l.map(function(a){ return '<li><b>' + esc(a.nome || '—') + '</b><small>' + (a.email ? esc(a.email) : 'e-mail a preencher (peça à sessão)') + '</small></li>'; }).join('') : '<li>Nenhum administrador na lista.</li>') + '</ul>';
+  var l = CFG.administradores || [];       /* a página não guarda nomes de administradores: quem é administrador mora no índice do SGO (aba Administradores) */
+  return '<ul class="lu-adms" id="adms">' + (l.length ? l.map(function(a){ return '<li><b>' + esc(a.nome || '—') + '</b><small>' + (a.email ? esc(a.email) : 'e-mail a preencher (peça à sessão)') + '</small></li>'; }).join('') : '<li>A lista de administradores fica no índice do SGO (aba Administradores), não nesta página.</li>') + '</ul>';
 }
 function slugDe(t){ return String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40); }
 function idOcupado(id){ return ORGS.some(function(o){ return o.id === id || o.apelidos.indexOf(id) >= 0; }); }
@@ -1888,8 +2194,8 @@ function pedidoDe(w){
     'Nome: ' + w.nome + '\nCidade: ' + (w.local || '—') + '\nTipo: ' + (AMB_TXT[w.amb] || w.amb) + '\nNome curto (vai no link e no QR): ' + w.id + '\n' +
     'Cópia da planilha-modelo: ' + w.copia + '\n\n' +
     'A fazer (sessão): 1) conferir a cópia zerada e os administradores; 2) publicar o app próprio dela e anotar o /exec; ' +
-    '3) incluir a linha no organizacoes.json (id ' + w.id + ', deployment = código do /exec); 4) reempacotar o ZIP (lancadora/scripts/gerar-zip.sh); 5) subir o ZIP na plataforma. ' +
-    'O link ' + baseDaLancadora() + '?org=' + w.id + ' passa a abrir quando o ZIP subir.';
+    '3) incluir a organização no Registro do SGO (id ' + w.id + ', projeto único) e conferir que o Porteiro a entrega a quem é dela. ' +
+    'Não precisa de ZIP novo: esta página não guarda lista de organizações. O link ' + baseDaLancadora() + '?org=' + w.id + ' passa a abrir quando ela estiver no Registro.';
 }
 function criarHtml(){
   if (!WIZ) return '<h3>Criar organização nova</h3><p class="lu-mini">Nome → cópia da planilha-modelo → nome curto (vai no link) → pedido pronto para a sessão. <b>Não cria planilha nem app</b>: só prepara o texto e mostra o link e o QR que vão existir.</p><button class="grande lu-gap" id="criar-btn">+ Criar organização nova</button>';
@@ -2011,8 +2317,8 @@ function ligarSonda(){
   var h = location.href.split('#')[0];
   linha('Endereço aberto', h, location.protocol === 'https:' ? (!location.port && /\/$/.test(location.pathname)) : /^(localhost|127\.0\.0\.1)$/.test(location.hostname));
   tipo('sw.js').then(function(a){ linha('sw.js (código do modo sem rede)', a.s + ' · ' + a.t, a.s === 200 && /javascript/.test(a.t)); return tipo('manifest.webmanifest'); })
-  .then(function(b){ linha('manifest.webmanifest (ícone na tela de início)', b.s + ' · ' + b.t, b.s === 200 && /(manifest|json)/.test(b.t)); return tipo('organizacoes.json'); })
-  .then(function(c){ linha('organizacoes.json (a lista de organizações)', c.s + ' · ' + c.t + ' · lida de: ' + (LISTA_ORIGEM || '—'), c.s === 200 && /json/.test(c.t) && LISTA_ORIGEM === 'arquivo'); return tipo('vendor/qrcode.js'); })
+  .then(function(b){ linha('manifest.webmanifest (ícone na tela de início)', b.s + ' · ' + b.t, b.s === 200 && /(manifest|json)/.test(b.t));
+    linha('lista de organizações (vem da conta Google, não de arquivo)', 'guardada neste aparelho: ' + (LISTA_ORIGEM || '—'), LISTA_ORIGEM === 'aparelho'); return tipo('vendor/qrcode.js'); })
   .then(function(d){ linha('subpasta vendor/qrcode.js (leitor e desenho de QR)', d.s + ' · ' + d.t, d.s === 200 && /javascript/.test(d.t)); return tipo('u-mandu-180.png'); })
   .then(function(e){ linha('ícone u-mandu-180.png (solto na raiz)', e.s + ' · ' + e.t, e.s === 200 && /image\/png/.test(e.t)); return tipo('vendor/zxing_reader.wasm'); })
   .then(function(f){ linha('vendor/zxing_reader.wasm (leitor de QR do iPhone)', f.s + ' · ' + f.t, f.s === 200); 
@@ -2053,13 +2359,13 @@ function classeDaTela(nome){
   if (nome === 'painel') return 'cartao lu-largo';
   if (nome === 'sonda') return 'cartao lu-medio';
   if (nome === 'sub' || nome === 'abrindo') return 'cartao lu-estreito';
-  if (nome === 'inicio') { var db = ler(); return (db.modoOffline && orgAtual()) ? 'cartao' : 'cartao lu-estreito'; }
+  if (nome === 'inicio') { var db = ler(); return (db.modoOffline && orgAtual()) ? ((db.cadastros && db.cadastros[orgAtual().id] && b2Ativo()) ? 'cartao lu-largo' : 'cartao') : 'cartao lu-estreito'; }
   return 'cartao';
 }
 
 function telaAbrindo(){
   var o = achaOrg(TELA.org); if (!o) return '';
-  return '<div class="lu-abrindo" id="abrindo"><img alt="Mandū" src="' + GLIFO_URI + '"><p class="q">Abrindo</p><p class="nome">' + esc(o.nome) + '</p><p class="cid">' + esc(o.local) + '</p><div class="lu-barra"><i></i></div>' +
+  return '<div class="lu-abrindo" id="abrindo"><img alt="Mandū" src="' + GLIFO_URI + '">' + seloBeta(o) + '<p class="q">Abrindo</p><p class="nome">' + esc(o.nome) + '</p><p class="cid">' + esc(o.local) + '</p><div class="lu-barra"><i></i></div>' +
          '<button class="lu-linkpeq" id="abrindo-cancelar">‹ voltar à lista</button></div>';
 }
 function ligarAbrindo(){ var c = luEl('abrindo-cancelar'); if (c) c.onclick = function(){ clearTimeout(entrar._t); paraALista(); }; }
@@ -2076,7 +2382,14 @@ window.addEventListener('pageshow', function(ev){ if (ev.persisted && TELA.nome 
 function iniciarTela(){ rotaInicial(); abrirDoEndereco(); }
 /* LU · a lista de organizações vem do arquivo: primeiro ela, depois a rota e a tela */
 try { if (ler().admin !== undefined) mudar(function(db){ delete db.admin; }); } catch(e){}   /* R1A-3 · aparelho que já guardava «administrador» para sempre: apaga a marca antiga */
+lerVoltaDoPorteiro();                                                                  /* a volta do Porteiro (`?via=porteiro#hub=`) antes do retorno do envio (`#r=`) */
 lerRetorno();
+document.addEventListener('click', function(ev){                                      /* os botões do Porteiro, do «Sair» e do envio da fila (delegado: o re-render não os perde) */
+  var t = ev.target, b = (t && t.closest) ? t.closest('[data-porteiro],[data-sair],[data-enviar-fila]') : null; if (!b) return;
+  if (b.hasAttribute('data-porteiro')) irAoPorteiro();
+  else if (b.hasAttribute('data-sair')) sairDoAparelho();
+  else enviarFila_(b.getAttribute('data-enviar-fila'));
+});
 carregarOrgs().then(function(){ aplicarNomes(); registrarSW(); iniciarTela(); render(); });
 </script>
 </body>
